@@ -1,0 +1,6 @@
+area MAL [1]
+
+/// Only MAL may define new fundamental types.
+fundamental NewFundamentalType
+
+fundamental AnotherFundamentalType extends NewFundamentalType

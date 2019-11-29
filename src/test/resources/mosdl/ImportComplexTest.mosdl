@@ -1,0 +1,26 @@
+area test [4711]
+
+import MC::Parameter.ValidityState
+
+service ServiceName {
+	composite SomeServiceComposite {
+		importedValidity: ValidityState
+		secondImportedValidity: MC::Parameter.ValidityState
+		serviceValidity: ServiceName.ValidityState
+		secondServiceValidity: test::ServiceName.ValidityState
+	}
+
+	composite ValidityState {
+		importedValidity: ValidityState
+		secondImportedValidity: MC::Parameter.ValidityState
+		serviceValidity: ServiceName.ValidityState
+		secondServiceValidity: test::ServiceName.ValidityState
+	}
+}
+
+composite SomeAreaComposite {
+	importedValidity: ValidityState
+	secondImportedValidity: MC::Parameter.ValidityState
+	serviceValidity: ServiceName.ValidityState
+	secondServiceValidity: test::ServiceName.ValidityState
+}

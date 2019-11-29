@@ -1,0 +1,5 @@
+"""
+This is the documentation of a test area.
+Its name is 'areaName', its number is 4711 and its version is 2.
+"""
+area areaName [4711.2]

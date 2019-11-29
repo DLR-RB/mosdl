@@ -1,0 +1,9 @@
+area test [4711]
+
+service ServiceName {
+	request myOperation [42] (firstParam: String, secondParam: MyType)
+		-> (someResponseNumber: UInteger)
+		throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR, error MY_INLINE_ERROR [666] : String
+	
+	request *getFileNames(directory: String) -> (fileNames: List<String>)
+}

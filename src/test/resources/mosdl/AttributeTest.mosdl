@@ -1,0 +1,4 @@
+area MAL [1]
+
+/// Only MAL may define new attribute types.
+attribute NewAttributeType

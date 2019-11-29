@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="MAL" number="1" version="1">
+        <mal:dataTypes>
+            <mal:fundamental name="NewFundamentalType" comment="Only MAL may define new fundamental types."/>
+            <mal:fundamental name="AnotherFundamentalType">
+                <mal:extends>
+                    <mal:type area="MAL" name="NewFundamentalType"/>
+                </mal:extends>
+            </mal:fundamental>
+        </mal:dataTypes>
+    </mal:area>
+</mal:specification>

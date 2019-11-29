@@ -1,0 +1,8 @@
+area test [4711]
+
+service ServiceName {
+	progress operationName(firstParam: String, secondParam: MyType) // PROGRESS message
+		-> (someAckNumber: UInteger)                                // ACK message
+		-> (messageNumber: Integer, update: Blob)*                  // UPDATE messages
+		-> (text: String?, value: Attribute)                        // RESPONSE message
+}

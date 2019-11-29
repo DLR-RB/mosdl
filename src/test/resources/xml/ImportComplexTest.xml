@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="test" number="4711" version="1">
+        <mal:service name="ServiceName" number="1">
+            <mal:dataTypes>
+                <mal:composite name="SomeServiceComposite" shortFormPart="1">
+                    <mal:field name="importedValidity" canBeNull="false">
+                        <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="secondImportedValidity" canBeNull="false">
+                        <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="serviceValidity" canBeNull="false">
+                        <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="secondServiceValidity" canBeNull="false">
+                        <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                    </mal:field>
+                </mal:composite>
+                <mal:composite name="ValidityState" shortFormPart="2">
+                    <mal:field name="importedValidity" canBeNull="false">
+                        <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="secondImportedValidity" canBeNull="false">
+                        <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="serviceValidity" canBeNull="false">
+                        <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                    </mal:field>
+                    <mal:field name="secondServiceValidity" canBeNull="false">
+                        <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                    </mal:field>
+                </mal:composite>
+            </mal:dataTypes>
+        </mal:service>
+        <mal:dataTypes>
+            <mal:composite name="SomeAreaComposite" shortFormPart="1">
+                <mal:field name="importedValidity" canBeNull="false">
+                    <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                </mal:field>
+                <mal:field name="secondImportedValidity" canBeNull="false">
+                    <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                </mal:field>
+                <mal:field name="serviceValidity" canBeNull="false">
+                    <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                </mal:field>
+                <mal:field name="secondServiceValidity" canBeNull="false">
+                    <mal:type area="test" service="ServiceName" name="ValidityState"/>
+                </mal:field>
+            </mal:composite>
+        </mal:dataTypes>
+    </mal:area>
+</mal:specification>

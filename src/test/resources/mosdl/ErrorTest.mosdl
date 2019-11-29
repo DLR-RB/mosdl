@@ -1,0 +1,5 @@
+area test [4711]
+
+/// Simple error that does not contain extra information.
+error SOME_ERROR
+error DESCRIPTIVE_ERROR [0xD00F] : """Human readable error cause.""" String

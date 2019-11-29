@@ -1,0 +1,19 @@
+area hcc [4711.2]
+
+"""
+This a very simple service with
+just one operation and one data type.
+"""
+service VerySimpleService {
+	request myOnlyOperation (text: String?, numbers: List<UInteger?>)
+		-> (answer: String, myInstance: MyOwnType)
+		throws MY_ONLY_ERROR
+
+	/// The only data type of this service.
+	composite MyOwnType {
+		numberList: List<UInteger?>
+		isFullMoon: Boolean?
+	}
+}
+
+error MY_ONLY_ERROR [12345]

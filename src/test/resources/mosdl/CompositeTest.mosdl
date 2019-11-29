@@ -1,0 +1,11 @@
+area test [4711]
+
+/// Composite representing a color.
+composite Color {
+	/// The red value between 0 and 1.
+	r: Double
+	/// The green value between 0 and 1.
+	g: Double
+	/// The blue value between 0 and 1.
+	b: Double
+}

@@ -1,0 +1,6 @@
+area test [4711]
+
+/// Documentation for service 'ServiceName'. This service will get number 1 auto-assigned.
+service ServiceName {
+	// all service contents (data types, operations, errors) come here
+}

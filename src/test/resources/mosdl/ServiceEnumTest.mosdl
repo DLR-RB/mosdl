@@ -1,0 +1,12 @@
+area test [4711]
+
+service ServiceName {
+	/// This enumeration denotes the possible fuel types for a car.
+	enum FuelType {
+		/// Gasoline, petrol, Benzin.
+		GASOLINE
+		DIESEL
+		ELECTRIC [4]
+		HYDROGEN
+	}
+}

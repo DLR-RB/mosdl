@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="test" number="4711" version="1">
+        <mal:service name="ServiceName" number="1">
+            <mal:capabilitySet number="1">
+                <mal:pubsubIP name="monitor" number="1" supportInReplay="false">
+                    <mal:messages>
+                        <mal:publishNotify>
+                            <mal:field name="eventText" canBeNull="false">
+<mal:type area="MAL" name="String"/>
+                            </mal:field>
+                        </mal:publishNotify>
+                    </mal:messages>
+                </mal:pubsubIP>
+            </mal:capabilitySet>
+        </mal:service>
+    </mal:area>
+</mal:specification>

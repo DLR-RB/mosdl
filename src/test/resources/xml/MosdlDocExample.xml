@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="hcc" number="4711" version="2">
+        <mal:service name="VerySimpleService" number="1" comment="This a very simple service with&#xD;&#xA;just one operation and one data type.">
+            <mal:capabilitySet number="1">
+                <mal:requestIP name="myOnlyOperation" number="1" supportInReplay="false">
+                    <mal:messages>
+                        <mal:request>
+                            <mal:field name="text">
+<mal:type area="MAL" name="String"/>
+                            </mal:field>
+                            <mal:field name="numbers" canBeNull="false">
+<mal:type list="true" area="MAL" name="UInteger"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response>
+                            <mal:field name="answer" canBeNull="false">
+<mal:type area="MAL" name="String"/>
+                            </mal:field>
+                            <mal:field name="myInstance" canBeNull="false">
+<mal:type area="hcc" service="VerySimpleService" name="MyOwnType"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef>
+                            <mal:type area="hcc" name="MY_ONLY_ERROR"/>
+                        </mal:errorRef>
+                    </mal:errors>
+                </mal:requestIP>
+            </mal:capabilitySet>
+            <mal:dataTypes>
+                <mal:composite name="MyOwnType" shortFormPart="1" comment="The only data type of this service.">
+                    <mal:field name="numberList" canBeNull="false">
+                        <mal:type list="true" area="MAL" name="UInteger"/>
+                    </mal:field>
+                    <mal:field name="isFullMoon">
+                        <mal:type area="MAL" name="Boolean"/>
+                    </mal:field>
+                </mal:composite>
+            </mal:dataTypes>
+        </mal:service>
+        <mal:service name="TestService" number="3">
+            <mal:capabilitySet number="1">
+                <mal:requestIP name="getValue" number="1" supportInReplay="true">
+                    <mal:messages>
+                        <mal:request>
+                            <mal:field name="id" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response>
+                            <mal:field name="value">
+<mal:type area="MAL" name="Attribute"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef>
+                            <mal:type area="hcc" name="NOT_FOUND"/>
+                        </mal:errorRef>
+                    </mal:errors>
+                </mal:requestIP>
+            </mal:capabilitySet>
+            <mal:capabilitySet number="2">
+                <mal:submitIP name="setValue" number="5" supportInReplay="false">
+                    <mal:messages>
+                        <mal:submit>
+                            <mal:field name="id" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                            <mal:field name="newValue">
+<mal:type area="MAL" name="Attribute"/>
+                            </mal:field>
+                        </mal:submit>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef>
+                            <mal:type area="hcc" name="NOT_FOUND"/>
+                        </mal:errorRef>
+                        <mal:error name="INVALID" number="12346">
+                            <mal:extraInformation>
+<mal:type area="hcc" service="TestService" name="InvalidType"/>
+                            </mal:extraInformation>
+                        </mal:error>
+                    </mal:errors>
+                </mal:submitIP>
+                <mal:requestIP name="lockValue" number="6" supportInReplay="false">
+                    <mal:messages>
+                        <mal:request>
+                            <mal:field name="id" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response>
+                            <mal:field name="lockedValue">
+<mal:type area="MAL" name="Attribute"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef>
+                            <mal:type area="hcc" name="NOT_FOUND"/>
+                        </mal:errorRef>
+                    </mal:errors>
+                </mal:requestIP>
+            </mal:capabilitySet>
+            <mal:capabilitySet number="3">
+                <mal:progressIP name="listIds" number="7" supportInReplay="true" comment="">
+                    <mal:messages>
+                        <mal:progress>
+                            <mal:field name="includeValueHistory" canBeNull="false">
+<mal:type area="MAL" name="Boolean"/>
+                            </mal:field>
+                        </mal:progress>
+                        <mal:acknowledgement>
+                            <mal:field name="expectedNumberOfIds" canBeNull="false">
+<mal:type area="MAL" name="UInteger"/>
+                            </mal:field>
+                        </mal:acknowledgement>
+                        <mal:update>
+                            <mal:field name="id" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                            <mal:field name="valueHistory" comment="Only set if includeValueHistory is true.">
+<mal:type list="true" area="MAL" name="Attribute"/>
+                            </mal:field>
+                        </mal:update>
+                        <mal:response>
+                            <mal:field name="processingTime" canBeNull="false">
+<mal:type area="MAL" name="Duration"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef>
+                            <mal:type area="MAL" name="TOO_MANY"/>
+                        </mal:errorRef>
+                    </mal:errors>
+                </mal:progressIP>
+            </mal:capabilitySet>
+            <mal:capabilitySet number="4">
+                <mal:pubsubIP name="monitorValueChanges" number="8" supportInReplay="false">
+                    <mal:messages>
+                        <mal:publishNotify>
+                            <mal:field name="oldValue">
+<mal:type area="MAL" name="Attribute"/>
+                            </mal:field>
+                            <mal:field name="newValue">
+<mal:type area="MAL" name="Attribute"/>
+                            </mal:field>
+                        </mal:publishNotify>
+                    </mal:messages>
+                </mal:pubsubIP>
+            </mal:capabilitySet>
+            <mal:dataTypes>
+                <mal:enumeration name="InvalidType" shortFormPart="1">
+                    <mal:item value="TOO_LARGE" nvalue="1"/>
+                    <mal:item value="TOO_SMALL" nvalue="2"/>
+                </mal:enumeration>
+            </mal:dataTypes>
+        </mal:service>
+        <mal:service name="OrbitService" number="4">
+            <mal:capabilitySet number="1">
+                <mal:invokeIP name="calculate" number="1" supportInReplay="false">
+                    <mal:messages>
+                        <mal:invoke>
+                            <mal:field name="timestamp" canBeNull="false">
+<mal:type area="MAL" name="Time"/>
+                            </mal:field>
+                        </mal:invoke>
+                        <mal:acknowledgement>
+                            <mal:field name="expectedTimeUntilAnswer" canBeNull="false">
+<mal:type area="MAL" name="Duration"/>
+                            </mal:field>
+                        </mal:acknowledgement>
+                        <mal:response>
+                            <mal:field name="answer" canBeNull="false">
+<mal:type area="hcc" name="OrbitStuff"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                </mal:invokeIP>
+            </mal:capabilitySet>
+        </mal:service>
+        <mal:dataTypes>
+            <mal:composite name="OrbitStuff">
+                <mal:field name="inclination" canBeNull="false">
+                    <mal:type area="MAL" name="Double"/>
+                </mal:field>
+            </mal:composite>
+            <mal:composite name="MoonOrbitStuff" shortFormPart="1">
+                <mal:extends>
+                    <mal:type area="hcc" name="OrbitStuff"/>
+                </mal:extends>
+                <mal:field name="fullMoonInfo" canBeNull="false">
+                    <mal:type area="hcc" service="VerySimpleService" name="MyOwnType"/>
+                </mal:field>
+                <mal:field name="isMoonFromCheese" canBeNull="false">
+                    <mal:type area="MAL" name="Boolean"/>
+                </mal:field>
+            </mal:composite>
+        </mal:dataTypes>
+        <mal:errors>
+            <mal:error name="MY_ONLY_ERROR" number="12345"/>
+            <mal:error name="NOT_FOUND" number="65534"/>
+        </mal:errors>
+    </mal:area>
+</mal:specification>

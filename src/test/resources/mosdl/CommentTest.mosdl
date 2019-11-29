@@ -1,0 +1,52 @@
+area hcc [4711.2]
+
+//import hcc::VerySimpleService.MyOwnType
+
+service Test/*Service [3]*/ {
+//	request *getValue(id: Identifier) -> (/*value: Attribute?*/) throws NOT_FOUND
+
+/*
+	capability {
+		submit setValue [5](id: Identifier, newValue: Attribute?) throws NOT_FOUND, error INVALID: InvalidType
+		request lockValue(id: Identifier) -> (lockedValue: Attribute?) throws NOT_FOUND
+	}
+
+	/// @progressparam valueHistory: Determines whether to include value history.
+	progress *listIds(includeValueHistory: Boolean)
+		-> (expectedNumberOfIds: UInteger)
+		-> (id: Identifier, """Only set if includeValueHistory is true. """ valueHistory: List?<Attribute?>)*
+		-> (processingTime: Duration)
+		throws MAL::TOO_MANY
+*/
+	// pubsub monitorValueChanges <- (oldValue: Attribute?, newValue: Attribute?)
+
+	/*
+	composite CommentedOut {
+		... - this composite is completely ignored; it is not even a valid composite
+	}
+	*/
+
+	//enum InvalidType { // TODO: Maybe add some more values?
+	//	TOO_LARGE
+	//	TOO_SMALL
+	//}
+}
+
+//service OrbitService {
+//	invoke calculate(timestamp: Time)
+//		-> (expectedTimeUntilAnswer: Duration)
+//		-> (answer: OrbitStuff)
+//}
+
+/*
+abstract composite OrbitStuff {
+	inclination: Double
+}
+
+//composite MoonOrbitStuff extends OrbitStuff {
+//	fullMoonInfo: MyOwnType
+//	isMoonFromCheese: Boolean
+//}
+
+error NOT_FOUND // [0xFFFE]
+*/

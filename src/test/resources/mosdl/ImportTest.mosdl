@@ -1,0 +1,13 @@
+area test [4711]
+
+import MC::Parameter.ValidityState
+
+service ServiceName {
+	composite ServiceCompositeWithImportedType {
+		svcValidity: ValidityState
+	}
+}
+
+composite CompositeWithImportedType {
+	validity: ValidityState
+}

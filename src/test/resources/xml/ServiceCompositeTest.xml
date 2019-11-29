@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="test" number="4711" version="1">
+        <mal:service name="ServiceName" number="1">
+            <mal:dataTypes>
+                <mal:composite name="Color" shortFormPart="1" comment="Composite representing a color.">
+                    <mal:field name="r" canBeNull="false" comment="The red value between 0 and 1.">
+                        <mal:type area="MAL" name="Double"/>
+                    </mal:field>
+                    <mal:field name="g" canBeNull="false" comment="The green value between 0 and 1.">
+                        <mal:type area="MAL" name="Double"/>
+                    </mal:field>
+                    <mal:field name="b" canBeNull="false" comment="The blue value between 0 and 1.">
+                        <mal:type area="MAL" name="Double"/>
+                    </mal:field>
+                </mal:composite>
+            </mal:dataTypes>
+        </mal:service>
+    </mal:area>
+</mal:specification>

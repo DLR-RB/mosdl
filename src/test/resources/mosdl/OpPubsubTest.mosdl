@@ -1,0 +1,5 @@
+area test [4711]
+
+service ServiceName {
+	pubsub monitor <- (eventText: String)
+}

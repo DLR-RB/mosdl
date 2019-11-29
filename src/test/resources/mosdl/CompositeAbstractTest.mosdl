@@ -1,0 +1,26 @@
+area test [4711]
+
+/// Composite representing a color.
+composite Color {
+	/// The red value between 0 and 1.
+	r: Double
+	/// The green value between 0 and 1.
+	g: Double
+	/// The blue value between 0 and 1.
+	b: Double
+}
+
+abstract composite Vehicle { // no number is allowed for abstract composites
+	maxSpeed: UInteger
+	color: Color?
+}
+
+composite Car extends Vehicle {
+	fuel: FuelType
+	licensePlate: Identifier
+}
+
+composite Airplane [42] extends Vehicle {
+	numberOfEngines: UInteger
+	wingSpan: UInteger
+}

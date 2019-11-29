@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="TestArea" number="4711" version="1">
+        <mal:service name="TestSvc" number="1">
+            <mal:capabilitySet number="1">
+                <mal:requestIP name="testRequest" number="1" supportInReplay="false">
+                    <mal:messages>
+                        <mal:request>
+                            <mal:field name="in" canBeNull="false">
+<mal:type list="true" area="MAL" name="String"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response>
+                            <mal:field name="out">
+<mal:type area="MAL" name="Integer"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                </mal:requestIP>
+            </mal:capabilitySet>
+        </mal:service>
+    </mal:area>
+</mal:specification>

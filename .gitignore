@@ -1,0 +1,10 @@
+target/
+
+# Netbeans ignores
+nbactions*.xml
+nb-configuration.xml
+
+# Eclipse ignores
+.project
+.classpath
+.settings/

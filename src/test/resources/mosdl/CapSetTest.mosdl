@@ -1,0 +1,14 @@
+area test [4711]
+
+service ServiceName {
+	/// Basic operations for just getting definitions.
+	capability [7] {
+		request listDefinitions() -> (definitionIds: List<Identifier>)
+		request getDefinition(definitionId: Identifier) -> (definition: Element)
+	}
+
+	/// Advanced operation to store new definitions.
+	capability {
+		submit addDefinition(definitionId: Identifier, newDefinition: Element)
+	}
+}

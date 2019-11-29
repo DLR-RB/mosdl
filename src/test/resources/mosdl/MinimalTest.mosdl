@@ -1,0 +1,5 @@
+area TestArea [4711]
+
+service TestSvc {
+	request testRequest(in: List<String>) -> (out: Integer?)
+}

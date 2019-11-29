@@ -1,0 +1,25 @@
+area test [4711]
+
+service ServiceName {
+	"""
+	This is the operation documentation.
+
+	@request: This is the documentation for the REQUEST message.
+	@requestparam firstParam : Doc for the first param.
+	@requestparam secondParam: Doc for the second param.
+
+	@response: This is the documentation for the RESPONSE message.
+	@responseparam someResponseNumber: Doc for the only response param.
+
+	@error     MAL::INTERNAL  : Documentation for the INTERAL error.
+	@error     MY_OWN_ERROR   : Documentation for MY_OWN_ERROR.
+	@errorinfo MY_OWN_ERROR   : Some number helpful for understanding this error.
+	@error     MY_INLINE_ERROR: Multi-line documentation
+	for the in-line defined MY_INLINE_ERROR.
+	@errorinfo MY_INLINE_ERROR: Human readable error cause.
+	"""
+	request myOperation [42] (firstParam: String, secondParam: MyType)
+		-> (someResponseNumber: UInteger)
+		throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR, error MY_INLINE_ERROR [666] : String
+}
+

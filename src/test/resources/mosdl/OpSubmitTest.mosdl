@@ -1,0 +1,5 @@
+area test [4711]
+
+service ServiceName {
+	submit operationName(firstParam: String, secondParam: MyType)
+}

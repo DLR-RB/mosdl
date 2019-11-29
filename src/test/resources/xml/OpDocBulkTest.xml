@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="test" number="4711" version="1">
+        <mal:service name="ServiceName" number="1">
+            <mal:capabilitySet number="1">
+                <mal:requestIP name="myOperation" number="42" supportInReplay="false" comment="This is the operation documentation.">
+                    <mal:messages>
+                        <mal:request comment="This is the documentation for the REQUEST message.">
+                            <mal:field name="firstParam" canBeNull="false" comment="Doc for the first param.">
+<mal:type area="MAL" name="String"/>
+                            </mal:field>
+                            <mal:field name="secondParam" canBeNull="false" comment="Doc for the second param.">
+<mal:type area="test" name="MyType"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response comment="This is the documentation for the RESPONSE message.">
+                            <mal:field name="someResponseNumber" canBeNull="false" comment="Doc for the only response param.">
+<mal:type area="MAL" name="UInteger"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                    <mal:errors>
+                        <mal:errorRef comment="Documentation for the INTERAL error.">
+                            <mal:type area="MAL" name="INTERNAL"/>
+                        </mal:errorRef>
+                        <mal:errorRef comment="Documentation for MY_OWN_ERROR.">
+                            <mal:type area="test" name="MY_OWN_ERROR"/>
+                            <mal:extraInformation comment="Some number helpful for understanding this error.">
+<mal:type area="MAL" name="Integer"/>
+                            </mal:extraInformation>
+                        </mal:errorRef>
+                        <mal:errorRef>
+                            <mal:type area="test" name="ANOTHER_ERROR"/>
+                        </mal:errorRef>
+                        <mal:error name="MY_INLINE_ERROR" number="666" comment="Multi-line documentation&#xD;&#xA;&#x9;for the in-line defined MY_INLINE_ERROR.">
+                            <mal:extraInformation comment="Human readable error cause.">
+<mal:type area="MAL" name="String"/>
+                            </mal:extraInformation>
+                        </mal:error>
+                    </mal:errors>
+                </mal:requestIP>
+            </mal:capabilitySet>
+        </mal:service>
+    </mal:area>
+</mal:specification>

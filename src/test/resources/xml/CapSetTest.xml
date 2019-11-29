@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
+    <mal:area name="test" number="4711" version="1">
+        <mal:service name="ServiceName" number="1">
+            <mal:capabilitySet number="7" comment="Basic operations for just getting definitions.">
+                <mal:requestIP name="listDefinitions" number="1" supportInReplay="false">
+                    <mal:messages>
+                        <mal:request/>
+                        <mal:response>
+                            <mal:field name="definitionIds" canBeNull="false">
+<mal:type list="true" area="MAL" name="Identifier"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                </mal:requestIP>
+                <mal:requestIP name="getDefinition" number="2" supportInReplay="false">
+                    <mal:messages>
+                        <mal:request>
+                            <mal:field name="definitionId" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                        </mal:request>
+                        <mal:response>
+                            <mal:field name="definition" canBeNull="false">
+<mal:type area="MAL" name="Element"/>
+                            </mal:field>
+                        </mal:response>
+                    </mal:messages>
+                </mal:requestIP>
+            </mal:capabilitySet>
+            <mal:capabilitySet number="8" comment="Advanced operation to store new definitions.">
+                <mal:submitIP name="addDefinition" number="3" supportInReplay="false">
+                    <mal:messages>
+                        <mal:submit>
+                            <mal:field name="definitionId" canBeNull="false">
+<mal:type area="MAL" name="Identifier"/>
+                            </mal:field>
+                            <mal:field name="newDefinition" canBeNull="false">
+<mal:type area="MAL" name="Element"/>
+                            </mal:field>
+                        </mal:submit>
+                    </mal:messages>
+                </mal:submitIP>
+            </mal:capabilitySet>
+        </mal:service>
+    </mal:area>
+</mal:specification>
