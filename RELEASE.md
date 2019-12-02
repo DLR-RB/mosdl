@@ -42,7 +42,7 @@ All of the following steps happen on the `master` branch. Currently, there is no
 	```
 	Release v<release version>
 	```
-7. Create release tag in git. Tag name:
+7. Create annotated release tag in git. Tag name:
 	```
 	v<release version>
 	```
@@ -53,6 +53,7 @@ All of the following steps happen on the `master` branch. Currently, there is no
 9. Add new section to top of [`CHANGELOG.md`](CHANGELOG.md):
 	```
 	### <snapshot version> (unreleased)
+	- Not released yet.
 	```
 10. Stage and commit all changes in git. Commit message:
 	```

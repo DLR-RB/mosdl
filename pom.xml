@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dlr.gsoc.mcds</groupId>
 	<artifactId>mosdl</artifactId>
-	<version>0.1.0</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>MOSDL</name>
