@@ -7,7 +7,7 @@ The standardized service description format of CCSDS MO services is an XML forma
 
 MOSDL has been developed at the German Space Operations Center GSOC, which is part of [DLR, the German Aerospace Center](https://www.dlr.de/).
 
-Current version: __${project.version}__ (also see [change log](CHANGELOG.md))
+Current version: __0.1.0__ (also see [change log](CHANGELOG.md))
 
 
 Table of contents
@@ -83,7 +83,7 @@ java -jar mosdl.jar --help
 This will print detailed usage instruction which are repeated here for convenience:
 
 ```
-Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version ${project.version})
+Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version 0.1.0)
 
 Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-sv|--skip-validation] [-t|--doc-type <mosdl-doc-type>] [-h|--help]
 
@@ -114,9 +114,9 @@ The Maven plugin is not yet available on *Maven Central*! Currently, you need to
 
 ```xml
 <plugin>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>${project.artifactId}</artifactId>
-    <version>${project.version}</version>
+    <groupId>de.dlr.gsoc.mcds</groupId>
+    <artifactId>mosdl</artifactId>
+    <version>0.1.0</version>
     <configuration>
         <serviceSpecs>
             <serviceSpec>src/main/mosdl</serviceSpec>
@@ -150,9 +150,9 @@ The Java library is not yet available on *Maven Central*! Currently, you need to
 
 ```xml
 <dependency>
-    <groupId>${project.groupId}</groupId>
-    <artifactId>${project.artifactId}</artifactId>
-    <version>${project.version}</version>
+    <groupId>de.dlr.gsoc.mcds</groupId>
+    <artifactId>mosdl</artifactId>
+    <version>0.1.0</version>
 </dependency>
 ```
 

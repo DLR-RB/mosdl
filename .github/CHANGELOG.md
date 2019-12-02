@@ -1,7 +1,7 @@
 MOSDL change log
 ================
 
-Current version: __${project.version}__
+Current version: __0.1.0__
 
 
 MOSDL version history

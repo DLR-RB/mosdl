@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dlr.gsoc.mcds</groupId>
 	<artifactId>mosdl</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>MOSDL</name>
@@ -317,12 +317,6 @@
 		<!-- Javadoc attachment, source attachment and artifact signing are only necessary when releasing. -->
 		<profile>
 			<id>release</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
 			<build>
 				<plugins>
 					<!-- Attach artifact containing project sources. -->

@@ -29,7 +29,7 @@ All of the following steps happen on the `master` branch. Currently, there is no
 
 1. Update version number to release version:
 	```
-	mvn version:set -DnewVersion=<release version>
+	mvn org.codehaus.mojo:versions-maven-plugin:set -DgenerateBackupPoms=false -DnewVersion=<release version>
 	```
 2. Make sure [`CHANGELOG.md`](CHANGELOG.md) contains all relevant changes for the new release up to <release version>.
 3. Stage all changes in git.
@@ -48,7 +48,7 @@ All of the following steps happen on the `master` branch. Currently, there is no
 	```
 8. Update version number to next snapshot version:
 	```
-	mvn version:set -DnewVersion=<snapshot version>
+	mvn org.codehaus.mojo:versions-maven-plugin:set -DgenerateBackupPoms=false -DnewVersion=<snapshot version>
 	```
 9. Add new section to top of [`CHANGELOG.md`](CHANGELOG.md):
 	```
