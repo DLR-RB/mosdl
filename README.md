@@ -1,5 +1,5 @@
-MOSDL Compiler - Mission Operations Service Description Language
-================================================================
+MOSDL - Mission Operations Service Description Language
+=======================================================
 
 MOSDL is a language that can be used to specify [CCSDS MO services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/).
 
@@ -39,11 +39,11 @@ Example
 A very simple MOSDL document looks like this:
 
 ```
-area TestArea [123];
+area TestArea [123]
 
 service HelloWorldService {
     request myOperation(hello: String)
-        -> (world: String);
+        -> (world: String)
 }
 ```
 
@@ -55,7 +55,7 @@ The MOSDL compiler can be used to generate an CCSDS MO XML document, which can t
 MOSDL language
 --------------
 
-The MOSDL language is documented in [MOSDL.md](MOSDL.md). Syntax highlighting is provided for [Notepad++](https://notepad-plus-plus.org/) users: Just load [`npp_mosdl.xml`](npp_mosdl.xml) in Notepad++ using its user-defined language functionality.
+The MOSDL language is documented in [the MOSDL language reference](MOSDL.md). Syntax highlighting is provided for [Notepad++](https://notepad-plus-plus.org/) users: Just load [`npp_mosdl.xml`](npp_mosdl.xml) in Notepad++ using its user-defined language functionality.
 
 
 Usage
@@ -110,7 +110,7 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-sv|--skip-valida
 
 ### Usage as plugin in a Maven-based build process
 
-The Maven plugin is not yet available on *Maven Central*! Currently, you need to [compile the plugin yourself](#compilation). Alternatively, you can [download the latest plugin version as JAR file from GitHub](https://github.com/DLR-RB/mosdl/releases/latest). Then use the resulting JAR file or add a build plugin dependency to your Maven `pom.xml` file:
+The Maven plugin is available on the [Maven Central Repository](https://search.maven.org/artifact/${project.groupId}/${project.artifactId}). Add a build plugin dependency to your Maven `pom.xml` file:
 
 ```xml
 <plugin>
@@ -133,6 +133,8 @@ The Maven plugin is not yet available on *Maven Central*! Currently, you need to
 </plugin>
 ```
 
+Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=${project.groupId}&a=${project.artifactId}&v=${project.version}) directly or [compile the plugin yourself](#compilation) and put the classes on your classpath.
+
 Reference all your service description XML/MOSDL files or directories in the `<serviceSpecs>` tag (multiple `<serviceSpec>` tags are allowed here). It is advisable to put your service specifications in the `src/main/mosdl` directory. The generated files will be put in the `generated-sources/mosdl` subfolder of your target folder.
 
 The following configuration options are available:
@@ -146,7 +148,7 @@ The following configuration options are available:
 
 ### Usage as a Java library
 
-The Java library is not yet available on *Maven Central*! Currently, you need to [compile the library yourself](#compilation). Alternatively, you can [download the latest library version as JAR file from GitHub](https://github.com/DLR-RB/mosdl/releases/latest). Then use the resulting JAR file or add a dependency to your Maven `pom.xml` file:
+The Java library is available on the [Maven Central Repository](https://search.maven.org/artifact/${project.groupId}/${project.artifactId}). Add a dependency to your Maven `pom.xml` file:
 
 ```xml
 <dependency>
@@ -155,6 +157,8 @@ The Java library is not yet available on *Maven Central*! Currently, you need to
     <version>${project.version}</version>
 </dependency>
 ```
+
+Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=${project.groupId}&a=${project.artifactId}&v=${project.version}) directly or [compile the library yourself](#compilation) and put the classes on your classpath.
 
 Use cases for this library are loading specifications, writing specifications and glueing loading and writing together. This document shall just give a hint where to start. Please refer to the code documentation for detailed instructions on how to use the classes provided in this project.
 
@@ -196,7 +200,7 @@ Source code and compilation
 
 ### Source code
 
-The source code of this project is available at GitHub: https://github.com/DLR-RB/mosdl
+The source code of this project is available on GitHub: https://github.com/DLR-RB/mosdl
 
 Use [git](https://git-scm.com/) to clone the source repository:
 
@@ -209,19 +213,19 @@ git clone https://github.com/DLR-RB/mosdl.git
 
 The only requirements for compiling the project yourself are a Java 8 JDK (e.g. [AdoptOpenJDK](https://adoptopenjdk.net/)) and [Maven 3](https://maven.apache.org/). Currently, Java versions other than Java 8 are not supported.
 
-This project uses a standard Maven-based build process. You can compile the source yourself by simply issuing 
+This project uses a standard [Maven](https://maven.apache.org/)-based build process. You can compile the source yourself by simply issuing 
 
 ```
 mvn install
 ```
 
-in the project base directory. Required dependencies need to be resolved by Maven, e.g. by getting them from [Maven Central](https://search.maven.org/). You will find the compiled packages in the `target` directory as well as your local Maven repository.
+in the project base directory. Required dependencies need to be resolved by Maven, e.g. by getting them from the [Maven Central Repository](https://search.maven.org/). You will find the compiled packages in the `target` directory as well as your local Maven repository.
 
 
 Contributing
 ------------
 
-Contributions to this project are welcome. You may open issues, fix or expand documentation, provide new functionality or create more and better tests. If you have a minor contribution you can open a pull request. For any major contribution please open an issue first or discuss with the repository owner. Please also note that you need to fill out and sign a [contributor license agreement](https://github.com/DLR-RB/mosdl/blob/master/DLR%20Individual%20Contributor%20License%20Agreement.pdf).
+Contributions to this project are welcome. You may open issues, fix or expand documentation, provide new functionality or create more and better tests. If you have a minor contribution you can open a pull request right away. For any major contribution please open an issue first or discuss with the repository maintainer. Please also note that you need to fill out and sign a [contributor license agreement](https://github.com/DLR-RB/mosdl/blob/master/DLR%20Individual%20Contributor%20License%20Agreement.pdf).
 
 
 Maintainer
