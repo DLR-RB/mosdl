@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class MosdlMojo extends AbstractMojo {
 
 	private static final Logger logger = LoggerFactory.getLogger(MosdlMojo.class);
-	private static final String GENERATED_SOURCES_SUBDIR = "generated-sources/mosdl";
+	private static final String GENERATED_SOURCES_SUBDIR = "generated-sources/mosdl/";
 
 	@Parameter(property = "generate.serviceSpecs", required = true)
 	private List<File> serviceSpecs;
@@ -50,6 +50,7 @@ public class MosdlMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		File targetDirectory = new File(projectBuildDir, GENERATED_SOURCES_SUBDIR);
+		targetDirectory.mkdirs();
 		project.addCompileSourceRoot(targetDirectory.toString());
 		logger.debug("MOSDL compilation target directory set to '{}'.", targetDirectory);
 
