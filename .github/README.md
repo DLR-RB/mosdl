@@ -7,7 +7,7 @@ The standardized service description format of CCSDS MO services is an XML forma
 
 MOSDL has been developed at the German Space Operations Center GSOC, which is part of [DLR, the German Aerospace Center](https://www.dlr.de/).
 
-Current version: __0.1.0__ (also see [change log](CHANGELOG.md))
+Current version: __0.1.1__ (also see [change log](CHANGELOG.md))
 
 
 Table of contents
@@ -83,7 +83,7 @@ java -jar mosdl.jar --help
 This will print detailed usage instruction which are repeated here for convenience:
 
 ```
-Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version 0.1.0)
+Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version 0.1.1)
 
 Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-sv|--skip-validation] [-t|--doc-type <mosdl-doc-type>] [-h|--help]
 
@@ -116,7 +116,7 @@ The Maven plugin is available on the [Maven Central Repository](https://search.m
 <plugin>
     <groupId>de.dlr.gsoc.mcds</groupId>
     <artifactId>mosdl</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <configuration>
         <serviceSpecs>
             <serviceSpec>src/main/mosdl</serviceSpec>
@@ -133,7 +133,7 @@ The Maven plugin is available on the [Maven Central Repository](https://search.m
 </plugin>
 ```
 
-Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=de.dlr.gsoc.mcds&a=mosdl&v=0.1.0) directly or [compile the plugin yourself](#compilation) and put the classes on your classpath.
+Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=de.dlr.gsoc.mcds&a=mosdl&v=0.1.1) directly or [compile the plugin yourself](#compilation) and put the classes on your classpath.
 
 Reference all your service description XML/MOSDL files or directories in the `<serviceSpecs>` tag (multiple `<serviceSpec>` tags are allowed here). It is advisable to put your service specifications in the `src/main/mosdl` directory. The generated files will be put in the `generated-sources/mosdl` subfolder of your target folder.
 
@@ -154,11 +154,11 @@ The Java library is available on the [Maven Central Repository](https://search.m
 <dependency>
     <groupId>de.dlr.gsoc.mcds</groupId>
     <artifactId>mosdl</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 </dependency>
 ```
 
-Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=de.dlr.gsoc.mcds&a=mosdl&v=0.1.0) directly or [compile the library yourself](#compilation) and put the classes on your classpath.
+Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=de.dlr.gsoc.mcds&a=mosdl&v=0.1.1) directly or [compile the library yourself](#compilation) and put the classes on your classpath.
 
 Use cases for this library are loading specifications, writing specifications and glueing loading and writing together. This document shall just give a hint where to start. Please refer to the code documentation for detailed instructions on how to use the classes provided in this project.
 
