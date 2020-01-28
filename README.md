@@ -3,7 +3,9 @@ MOSDL - Mission Operations Service Description Language
 
 MOSDL is a language that can be used to specify [CCSDS MO services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/).
 
-The standardized service description format of CCSDS MO services is an XML format described by an [XML Schema](https://sanaregistry.org/r/moschemas). However, these XML documents can be difficult to edit, iterate and reason about. MOSDL provides an alternative to the CCSDS MO XML format. MOSDL documents can be compiled to standards-compliant XML documents using the compiler contained in this project. It is also possible to transform CCSDS MO XML documents to MOSDL documents.
+The standardized service description format of CCSDS MO services is an XML format described by an [XML Schema](https://sanaregistry.org/r/moschemas). However, these XML documents can be difficult to edit, iterate and reason about. MOSDL provides an alternative to the CCSDS MO XML format. MOSDL documents can be compiled to standards-compliant XML documents using the compiler contained in this project. It is also possible to transform CCSDS MO XML documents back to MOSDL documents.
+
+Besides transforming MO specifications from one representation to another this project can also be used for generating other artifacts from these specifications: This project ships with a generator which creates XML Schema documents for data structures contained in MO specifications.
 
 MOSDL has been developed at the German Space Operations Center GSOC, which is part of [DLR, the German Aerospace Center](https://www.dlr.de/).
 
@@ -21,6 +23,7 @@ Table of contents
     - [Usage as a Java library](#usage-as-a-java-library)
         - [Load a specification](#load-a-specification)
         - [Write a specification](#write-a-specification)
+        - [Write other artifacts](#write-other-artifacts)
         - [Glueing together loading and writing of a specification](#glueing-together-loading-and-writing-of-a-specification)
 - [Source code and compilation](#source-code-and-compilation)
     - [Source code](#source-code)
@@ -30,7 +33,7 @@ Table of contents
 - [Copyright, license and third party software](#copyright-license-and-third-party-software)
     - [Copyright](#copyright)
     - [License](#license)
-	- [Third party software in binary distributions](#third-party-software-in-binary-distributions)
+    - [Third party software in binary distributions](#third-party-software-in-binary-distributions)
 
 
 Example
@@ -85,7 +88,7 @@ This will print detailed usage instruction which are repeated here for convenien
 ```
 Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version ${project.version})
 
-Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-sv|--skip-validation] [-t|--doc-type <mosdl-doc-type>] [-h|--help]
+Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-sv|--skip-validation] [-t|--doc-type <mosdl-doc-type>] [-h|--help] 
 
 <service-descr>
         MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language.
@@ -97,6 +100,8 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-sv|--skip-valida
         If given MO XML service description file will be generated.
 -m, --mosdl
         If given MOSDL service description file will be generated.
+-s, --xsd
+        If given an MO data structure XML Schema file will be generated.
 -sv, --skip-validation
         If given try to recover from MOSDL files with errors and do not validate XML input and output files against the service schema. Useful for slightly malformed files.
 -t, --doc-type <mosdl-doc-type>
@@ -142,6 +147,7 @@ The following configuration options are available:
 * `<serviceSpecs>`: Required. List the service specification files you wish to generate code for here. You can specify a service description XML file here, a single MOSDL file or a directory containing multiple MOSDL files that together form a single service specification.
 * `<xml>`: Optional. Set to `true` if you want to generate the service description XML files.
 * `<mosdl>`: Optional. Set to `true` if you want to generate the service description MOSDL files.
+* `<xsd>`: Optional. Set to `true` if you want to generate XSD files for data structures contained in the service descriptions.
 * `<skipValidation>`: Optional. Set to `true` if you want to skip validation of XML input and output files against the service schema.
 * `<mosdlDocType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Has no effect if no MOSDL files are created.
 
@@ -160,7 +166,7 @@ The Java library is available on the [Maven Central Repository](https://search.m
 
 Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=${project.groupId}&a=${project.artifactId}&v=${project.version}) directly or [compile the library yourself](#compilation) and put the classes on your classpath.
 
-Use cases for this library are loading specifications, writing specifications and glueing loading and writing together. This document shall just give a hint where to start. Please refer to the code documentation for detailed instructions on how to use the classes provided in this project.
+Use cases for this library are loading specifications, writing specifications and other artifacts, as well as glueing loading and writing together. This document shall just give a hint where to start. Please refer to the code documentation for detailed instructions on how to use the classes provided in this project.
 
 
 #### Load a specification
@@ -186,6 +192,18 @@ Example:
 
 ```java
 Generator generator = new MosdlGenerator(false);
+generator.generate(spec, targetDirectory);
+```
+
+
+#### Write other artifacts
+
+A third `Generator` implementation is shipped that allows you to write XML Schema documents for data structures contained in MO specifications (`XsdGenerator`).
+
+Example:
+
+```java
+Generator generator = new XsdGenerator();
 generator.generate(spec, targetDirectory);
 ```
 

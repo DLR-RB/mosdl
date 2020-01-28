@@ -9,6 +9,7 @@ MOSDL version history
 
 ### 0.2-SNAPSHOT (unreleased)
 - Not released yet.
+- New XSD generator for generating XML Schema files for data structures defined in an MO specification.
 
 ### Version 0.1.1 (2019-12-05)
 - #1: Maven plugin now properly creates target directory.
