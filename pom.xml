@@ -70,6 +70,12 @@
 			<artifactId>antlr4-runtime</artifactId>
 			<version>4.7.2</version>
 		</dependency>
+		<!-- Apache XmlSchema for generating MO XSD files for MO structure descriptions. -->
+		<dependency>
+			<groupId>org.apache.ws.xmlschema</groupId>
+			<artifactId>xmlschema-core</artifactId>
+			<version>2.2.2</version>
+		</dependency>
 		<!-- Use SLF4J for logging - Maven provides an implementation when run as Maven plugin. -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

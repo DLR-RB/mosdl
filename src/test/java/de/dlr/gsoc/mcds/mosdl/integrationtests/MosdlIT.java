@@ -45,7 +45,7 @@ public class MosdlIT {
 		File outputFile = new File(targetDirectory, outputFileName);
 		File expectedFile = TestUtils.getResource(expectedFilePath);
 
-		Runner runner = new MosdlRunner(false, true, false, null);
+		Runner runner = new MosdlRunner(false, true, false, false, null);
 		runner.execute(outputFile, inputFile);
 
 		assertXmlEquals(expectedFile, outputFile);
@@ -63,7 +63,7 @@ public class MosdlIT {
 		File outputFile = new File(targetDirectory, outputFileName);
 		File expectedFile = TestUtils.getResource(expectedFilePath);
 
-		Runner runner = new MosdlRunner(false, true, false, null);
+		Runner runner = new MosdlRunner(false, true, false, false, null);
 		runner.execute(outputFile, inputFile1, inputFile2);
 
 		assertXmlEquals(expectedFile, outputFile);
@@ -90,10 +90,10 @@ public class MosdlIT {
 		File inputFile = TestUtils.getResource(inputFilePath);
 		File outputFile = new File(xmlTargetDirectory, xmlFileName);
 
-		Runner xmlToMosdlRunner = new MosdlRunner(false, false, true, docType);
+		Runner xmlToMosdlRunner = new MosdlRunner(false, false, true, false, docType);
 		xmlToMosdlRunner.execute(mosdlTargetDirectory, inputFile);
 
-		Runner mosdlToXmlRunner = new MosdlRunner(false, true, false, null);
+		Runner mosdlToXmlRunner = new MosdlRunner(false, true, false, false, null);
 		mosdlToXmlRunner.execute(outputFile, mosdlTargetDirectory);
 
 		assertXmlEquals(inputFile, outputFile);
