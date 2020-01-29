@@ -112,6 +112,12 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-sv|--
         Print detailed usage instructions for this program.
 ```
 
+In case you need more detailed logging you can change the log settings by supplying certain system properties to the JVM. Please refer to the [documentation of the `slf4j-simple` logger](http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html) (which is used by the command-line interface) for all possible settings. If you simply wish to activate the debug log level invoke MOSDL like:
+
+```
+java -Dorg.slf4j.simpleLogger.defaultLogLevel=debug -jar mosdl.jar --help
+```
+
 
 ### Usage as plugin in a Maven-based build process
 
@@ -151,6 +157,8 @@ The following configuration options are available:
 * `<skipValidation>`: Optional. Set to `true` if you want to skip validation of XML input and output files against the service schema.
 * `<mosdlDocType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Has no effect if no MOSDL files are created.
 
+The Maven plugin uses the logging functionality provided by Maven. Therefore, debug log messages can be printed by supplying the `-X` switch to Maven.
+
 
 ### Usage as a Java library
 
@@ -167,6 +175,8 @@ The Java library is available on the [Maven Central Repository](https://search.m
 Alternatively, you can [download the JAR file](https://search.maven.org/remote_content?g=${project.groupId}&a=${project.artifactId}&v=${project.version}) directly or [compile the library yourself](#compilation) and put the classes on your classpath.
 
 Use cases for this library are loading specifications, writing specifications and other artifacts, as well as glueing loading and writing together. This document shall just give a hint where to start. Please refer to the code documentation for detailed instructions on how to use the classes provided in this project.
+
+This library uses the [SLF4J logging facade](http://www.slf4j.org/) for logging. You should provide an SLF4J implementation on the classpath, otherwise an error message complaining about a missing implementation is printed and you will not see any log output.
 
 
 #### Load a specification

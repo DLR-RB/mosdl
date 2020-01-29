@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
@@ -55,6 +54,7 @@ public class XsdGenerator extends Generator {
 
 	private static final Logger logger = LoggerFactory.getLogger(XsdGenerator.class);
 
+	private static final String META_KEY_FILENAME = "filename";
 	private static final String XSD_FILE_ENDING = ".xsd";
 	private static final String MAL_AREA_NAME = "MAL";
 	// Mismatch between 5.2.1 and 3.7.3.2.1! urn:ccsds:schema:mo:malxml vs. http://www.ccsds.org/schema/malxml/MAL (latter seems to be more common and is used by NASA implementation)
@@ -98,14 +98,13 @@ public class XsdGenerator extends Generator {
 	public void generate(SpecificationType spec, File targetDirectory) throws GeneratorException {
 		logger.debug("Generating XSD file(s) into directory '{}'.", targetDirectory);
 
+		int nFiles = 0;
 		try {
 			XmlSchemaCollection schemaCollection = new XmlSchemaCollection();
-			Map<String, XmlSchema> allSchemas = new LinkedHashMap<>();
-
 			for (AreaType area : spec.getArea()) {
 				if (null != area.getDataTypes()) {
-					XmlSchema schema = addSchema(schemaCollection, area, null);
-					allSchemas.put(area.getName(), schema);
+					logger.debug("Generating schema for area '{}'.", area.getName());
+					XmlSchema schema = getOrAddSchema(schemaCollection, area, null);
 					if (MAL_AREA_NAME.equals(area.getName())) {
 						// XSD type and element for message body as defined in CCSDS 524.3-B-1, 3.7.3.2 need to be added explicitly.
 						XmlSchemaType xsdType = addExtraMalBodyType(schema);
@@ -117,8 +116,8 @@ public class XsdGenerator extends Generator {
 				}
 				for (ServiceType service : area.getService()) {
 					if (null != service.getDataTypes()) {
-						XmlSchema schema = addSchema(schemaCollection, area, service);
-						allSchemas.put(area.getName() + service.getName(), schema);
+						logger.debug("Generating schema for service '{}' of area '{}'.", service.getName(), area.getName());
+						XmlSchema schema = getOrAddSchema(schemaCollection, area, service);
 						for (Object dataType : service.getDataTypes().getCompositeOrEnumeration()) {
 							addDataType(schema, dataType);
 						}
@@ -126,32 +125,52 @@ public class XsdGenerator extends Generator {
 				}
 			}
 
-			for (Map.Entry<String, XmlSchema> schemaEntry : allSchemas.entrySet()) {
-				File targetFile = new File(targetDirectory, schemaEntry.getKey() + XSD_FILE_ENDING);
-				try (OutputStream os = new BufferedOutputStream(new FileOutputStream(targetFile))) {
-					schemaEntry.getValue().write(os, WRITE_OPTIONS);
+			for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+				Map<Object, Object> metaInfo = schema.getMetaInfoMap();
+				if (null == metaInfo) {
+					continue;
 				}
+				String filename = (String) metaInfo.get(META_KEY_FILENAME);
+				if (null == filename) {
+					continue;
+				}
+				File targetFile = new File(targetDirectory, filename + XSD_FILE_ENDING);
+				logger.debug("Writing schema file '{}'.", targetFile);
+				try (OutputStream os = new BufferedOutputStream(new FileOutputStream(targetFile))) {
+					schema.write(os, WRITE_OPTIONS);
+				}
+				nFiles++;
 			}
 		} catch (IOException ex) {
 			throw new GeneratorException(ex);
 		}
+		logger.debug("Generated {} XSD files for the supplied specification(s) into directory '{}'.", nFiles, targetDirectory);
 	}
 
 	/**
-	 * Add a new XML Schema to a schema collection.
+	 * Get an XML schema from a schema collection or add a new one if it is not present yet for the
+	 * given area and/or service.
 	 *
-	 * @param schemaCollection the schema collection to add the schema to
+	 * @param schemaCollection the schema collection to get the schema from/add the schema to
 	 * @param area the MAL area containing the data structures to add, must not be {@code null}
 	 * @param service the MAL service containing the data structures to add, may be {@code null}
-	 * @return
+	 * @return an XML schema suitable for adding the transformed data structures of given area
+	 * and/or service
 	 */
-	private static XmlSchema addSchema(XmlSchemaCollection schemaCollection, AreaType area, ServiceType service) {
-		String namespace = toNamespace(area.getName(), null == service ? null : service.getName());
-		XmlSchema schema = new XmlSchema(namespace, schemaCollection);
-		schema.setElementFormDefault(XmlSchemaForm.QUALIFIED);
-		schema.setAttributeFormDefault(XmlSchemaForm.QUALIFIED);
-		schema.setInputEncoding(StandardCharsets.UTF_8.name());
-		schema.setNamespaceContext(NAMESPACE_MAP);
+	private static XmlSchema getOrAddSchema(XmlSchemaCollection schemaCollection, AreaType area, ServiceType service) {
+		String serviceName = null == service ? null : service.getName();
+		String namespace = toNamespace(area.getName(), serviceName);
+		XmlSchema schema = schemaCollection.schemaForNamespace(namespace);
+		if (null == schema) {
+			serviceName = null == serviceName ? "" : serviceName;
+			String filename = area.getName() + serviceName;
+			schema = new XmlSchema(namespace, schemaCollection);
+			schema.setElementFormDefault(XmlSchemaForm.QUALIFIED);
+			schema.setAttributeFormDefault(XmlSchemaForm.QUALIFIED);
+			schema.setInputEncoding(StandardCharsets.UTF_8.name());
+			schema.setNamespaceContext(NAMESPACE_MAP);
+			schema.addMetaInfo(META_KEY_FILENAME, filename);
+		}
 		return schema;
 	}
 
