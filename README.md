@@ -104,8 +104,8 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-sv|--
         If given an MO data structure XML Schema file will be generated.
 -sv, --skip-validation
         If given try to recover from MOSDL files with errors and do not validate XML input and output files against the service schema. Useful for slightly malformed files.
--t, --doc-type <mosdl-doc-type>
-        Type of documentation to create for MOSDL files (BULK: operation documentation will be generated in bulk; INLINE: operation documentation will be put in-line; SUPPRESS: all documentation is stripped).
+-t, --doc-type <doc-type>
+        Type of documentation to create for MOSDL or XSD files (BULK: operation documentation will be generated in bulk; INLINE: operation documentation will be put in-line; SUPPRESS: all documentation is stripped). BULK and INLINE produce the same results for XSD files.
         Possible values: BULK, INLINE, SUPPRESS
         Default: BULK
 -h, --help
@@ -155,7 +155,7 @@ The following configuration options are available:
 * `<mosdl>`: Optional. Set to `true` if you want to generate the service description MOSDL files.
 * `<xsd>`: Optional. Set to `true` if you want to generate XSD files for data structures contained in the service descriptions.
 * `<skipValidation>`: Optional. Set to `true` if you want to skip validation of XML input and output files against the service schema.
-* `<mosdlDocType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Has no effect if no MOSDL files are created.
+* `<docType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Also controls documentation generation for XSD files, but there is no difference between `BULK` and `INLINE`. Has no effect if no MOSDL or XSD files are created.
 
 The Maven plugin uses the logging functionality provided by Maven. Therefore, debug log messages can be printed by supplying the `-X` switch to Maven.
 
@@ -201,7 +201,7 @@ Two `Generator` implementations are shipped that allow you to write a specificat
 Example:
 
 ```java
-Generator generator = new MosdlGenerator(false);
+Generator generator = new MosdlGenerator(MosdlGenerator.DocType.BULK);
 generator.generate(spec, targetDirectory);
 ```
 
@@ -213,7 +213,7 @@ A third `Generator` implementation is shipped that allows you to write XML Schem
 Example:
 
 ```java
-Generator generator = new XsdGenerator();
+Generator generator = new XsdGenerator(true);
 generator.generate(spec, targetDirectory);
 ```
 

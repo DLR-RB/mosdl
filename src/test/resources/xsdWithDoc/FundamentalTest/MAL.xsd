@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/MAL">
+    <xs:complexType name="Body">
+        <xs:sequence>
+            <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="Body" type="malxml:Body"/>
+    <xs:complexType abstract="true" name="NewFundamentalType">
+        <xs:annotation>
+            <xs:documentation>Only MAL may define new fundamental types.</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+    <xs:complexType abstract="true" name="AnotherFundamentalType">
+        <xs:complexContent>
+            <xs:extension base="malxml:NewFundamentalType"/>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

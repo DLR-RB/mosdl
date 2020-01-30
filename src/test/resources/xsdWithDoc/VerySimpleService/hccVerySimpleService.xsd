@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService">
+    <xs:complexType name="MyOwnType">
+        <xs:annotation>
+            <xs:documentation>The only data type of this service.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="numberList" type="malxml:UIntegerList"/>
+                    <xs:element name="isFullMoon" nillable="true" type="malxml:Boolean"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="MyOwnTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="MyOwnType" nillable="true" type="MyOwnType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="MyOwnType" type="MyOwnType"/>
+    <xs:element name="MyOwnTypeList" type="MyOwnTypeList"/>
+</xs:schema>

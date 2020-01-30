@@ -109,17 +109,28 @@ public class MosdlIT {
 
 	@ParameterizedTest()
 	@MethodSource("allTestCaseProvider")
-	void mosdlToXsdTest(String input, @TempDir File targetDirectory) throws Exception {
-		logger.info("MOSDL to XSD Test: '{}'", input);
+	void mosdlToXsdWithDocTest(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test (with doc): '{}'", input);
+		mosdlToXsdTest(input, "/xsdWithDoc/", targetDirectory, MosdlGenerator.DocType.BULK);
+	}
+
+	@ParameterizedTest()
+	@MethodSource("allTestCaseProvider")
+	void mosdlToXsdWithoutDocTest(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test (without doc): '{}'", input);
+		mosdlToXsdTest(input, "/xsdWithoutDoc/", targetDirectory, MosdlGenerator.DocType.SUPPRESS);
+	}
+
+	private void mosdlToXsdTest(String input, String expectedBaseDir, File targetDirectory, MosdlGenerator.DocType docType) throws Exception {
 		String inputFilePath = "/mosdl/" + input + ".mosdl";
-		String expectedDirectoryPath = "/xsd/" + input;
+		String expectedDirectoryPath = expectedBaseDir + input;
 
 		File inputFile = TestUtils.getResource(inputFilePath);
 		File outputDirectory = new File(targetDirectory, input);
 		outputDirectory.mkdirs();
 		File expectedDirectory = TestUtils.getResource(expectedDirectoryPath);
 
-		Runner runner = new MosdlRunner(false, false, false, true, null);
+		Runner runner = new MosdlRunner(false, false, false, true, docType);
 		runner.execute(outputDirectory, inputFile);
 
 		File[] expectedFiles = null == expectedDirectory ? new File[]{} : expectedDirectory.listFiles();

@@ -26,7 +26,7 @@ public class CliMain {
 				.toggle("mosdl", "m", "If given MOSDL service description file will be generated.")
 				.toggle("xsd", "s", "If given an MO data structure XML Schema file will be generated.")
 				.toggle("skip-validation", "sv", "If given try to recover from MOSDL files with errors and do not validate XML input and output files against the service schema. Useful for slightly malformed files.")
-				.optional("doc-type", "t", "mosdl-doc-type", MosdlGenerator.DocType.class, MosdlGenerator.DocType.BULK, "Type of documentation to create for MOSDL files (BULK: operation documentation will be generated in bulk; INLINE: operation documentation will be put in-line; SUPPRESS: all documentation is stripped).")
+				.optional("doc-type", "t", "doc-type", MosdlGenerator.DocType.class, MosdlGenerator.DocType.BULK, "Type of documentation to create for MOSDL or XSD files (BULK: operation documentation will be generated in bulk; INLINE: operation documentation will be put in-line; SUPPRESS: all documentation is stripped). BULK and INLINE produce the same results for XSD files.")
 				.build()
 				.parse(args);
 
