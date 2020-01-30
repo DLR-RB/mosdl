@@ -38,7 +38,6 @@ import org.ccsds.schema.serviceschema.EnumerationType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.ServiceType;
-
 import org.ccsds.schema.serviceschema.SpecificationType;
 import org.ccsds.schema.serviceschema.TypeReference;
 import org.slf4j.Logger;

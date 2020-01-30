@@ -8,7 +8,9 @@ import de.dlr.gsoc.mcds.mosdl.TestUtils;
 import static de.dlr.gsoc.mcds.mosdl.TestUtils.assertXmlEquals;
 import de.dlr.gsoc.mcds.mosdl.generators.MosdlGenerator;
 import java.io.File;
+import java.util.Arrays;
 import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,10 +29,16 @@ public class MosdlIT {
 		"ServiceCompositeTest", "ServiceCompositeAbstractTest", "ServiceEnumTest", "ServiceErrorTest",
 		"CommentTest", "ImportTest", "ImportComplexTest",
 		"FundamentalTest", "AttributeTest"};
+	private static final String[] COMPLEX_TEST_CASES = {"VerySimpleService", "ComplexService"};
 
 	// do not change method signature without changing MethodSource annotations on test methods
 	static Stream<String> simpleTestCaseProvider() {
 		return Stream.of(SIMPLE_TEST_CASES);
+	}
+
+	// do not change method signature without changing MethodSource annotations on test methods
+	static Stream<String> allTestCaseProvider() {
+		return Stream.concat(Stream.of(SIMPLE_TEST_CASES), Stream.of("VerySimpleService", "ComplexService"));
 	}
 
 	@ParameterizedTest()
@@ -97,6 +105,32 @@ public class MosdlIT {
 		mosdlToXmlRunner.execute(outputFile, mosdlTargetDirectory);
 
 		assertXmlEquals(inputFile, outputFile);
+	}
+
+	@ParameterizedTest()
+	@MethodSource("allTestCaseProvider")
+	void mosdlToXsdTest(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test: '{}'", input);
+		String inputFilePath = "/mosdl/" + input + ".mosdl";
+		String expectedDirectoryPath = "/xsd/" + input;
+
+		File inputFile = TestUtils.getResource(inputFilePath);
+		File outputDirectory = new File(targetDirectory, input);
+		outputDirectory.mkdirs();
+		File expectedDirectory = TestUtils.getResource(expectedDirectoryPath);
+
+		Runner runner = new MosdlRunner(false, false, false, true, null);
+		runner.execute(outputDirectory, inputFile);
+
+		File[] expectedFiles = null == expectedDirectory ? new File[]{} : expectedDirectory.listFiles();
+		File[] outputFiles = outputDirectory.listFiles();
+		assertEquals(expectedFiles.length, outputFiles.length);
+
+		Arrays.sort(expectedFiles);
+		Arrays.sort(outputFiles);
+		for (int i = 0; i < expectedFiles.length; i++) {
+			assertXmlEquals(expectedFiles[i], outputFiles[i]);
+		}
 	}
 
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test/ServiceName" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/MC/Parameter" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test/ServiceName">
+    <xs:complexType name="SomeServiceComposite">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="importedValidity" type="ns0:ValidityState"/>
+                    <xs:element name="secondImportedValidity" type="ns0:ValidityState"/>
+                    <xs:element name="serviceValidity" type="ValidityState"/>
+                    <xs:element name="secondServiceValidity" type="ValidityState"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="SomeServiceCompositeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="SomeServiceComposite" nillable="true" type="SomeServiceComposite"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="SomeServiceComposite" type="SomeServiceComposite"/>
+    <xs:element name="SomeServiceCompositeList" type="SomeServiceCompositeList"/>
+    <xs:complexType name="ValidityState">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="importedValidity" type="ns0:ValidityState"/>
+                    <xs:element name="secondImportedValidity" type="ns0:ValidityState"/>
+                    <xs:element name="serviceValidity" type="ValidityState"/>
+                    <xs:element name="secondServiceValidity" type="ValidityState"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ValidityStateList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="ValidityState" nillable="true" type="ValidityState"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="ValidityState" type="ValidityState"/>
+    <xs:element name="ValidityStateList" type="ValidityStateList"/>
+</xs:schema>
