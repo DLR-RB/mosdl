@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
@@ -45,14 +47,9 @@ import org.ccsds.schema.serviceschema.SpecificationType;
 import org.ccsds.schema.serviceschema.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import static org.w3c.dom.Node.TEXT_NODE;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Text;
-import org.w3c.dom.UserDataHandler;
 
 /**
  * Class for generating MO XSD files describing data structures of an MO specification.
@@ -77,6 +74,7 @@ public class XsdGenerator extends Generator {
 	private static final NamespaceMap NAMESPACE_MAP = new NamespaceMap();
 	private static final Map<String, String> WRITE_OPTIONS = new HashMap<>();
 	private final boolean isIncludeDoc;
+	private final Document documentationDocument;
 
 	static {
 		ATTRIBUTE_XSD_MAPPING.put("Blob", Constants.XSD_HEXBIN);
@@ -107,6 +105,15 @@ public class XsdGenerator extends Generator {
 
 	public XsdGenerator(boolean isIncludeDoc) {
 		this.isIncludeDoc = isIncludeDoc;
+		if (isIncludeDoc) {
+			try {
+				documentationDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			} catch (ParserConfigurationException ex) {
+				throw new RuntimeException(ex);
+			}
+		} else {
+			documentationDocument = null;
+		}
 	}
 
 	@Override
@@ -482,282 +489,12 @@ public class XsdGenerator extends Generator {
 		annotatableElement.setAnnotation(xsdAnnotation);
 		XmlSchemaDocumentation xsdDoc = new XmlSchemaDocumentation();
 		xsdAnnotation.getItems().add(xsdDoc);
-		xsdDoc.setMarkup(createTextNodeList(docText));
 
-	}
+		Text textNode = documentationDocument.createTextNode(docText);
+		DocumentFragment docFragment = documentationDocument.createDocumentFragment();
+		docFragment.appendChild(textNode);
+		xsdDoc.setMarkup(docFragment.getChildNodes());
 
-	/**
-	 * Create a W3C DOM node list with a single text node containing the given text.
-	 * <p>
-	 * The W3C DOM API has only been implemented minimally in order to provide the minimal set of
-	 * methods for writing documentation annotations to the schema files. Do not attempt to use the
-	 * return value of this method for anything else.
-	 *
-	 * @param text the text to be wrapped in a Node, which is wrapped in a NodeList
-	 * @return the created NodeList with a minimal implementation of the W3C DOM API
-	 */
-	private static NodeList createTextNodeList(String text) {
-		return new NodeList() {
-			@Override
-			public int getLength() {
-				return 1;
-			}
-
-			@Override
-			public Node item(int index) {
-				if (index > 0) {
-					return null;
-				}
-				return new Text() {
-					@Override
-					public String getNodeValue() throws DOMException {
-						return text;
-					}
-
-					@Override
-					public short getNodeType() {
-						return TEXT_NODE;
-					}
-
-					// <editor-fold defaultstate="collapsed" desc="any other DOM method throws an UnsupportedOperationException">
-					@Override
-					public Text splitText(int offset) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean isElementContentWhitespace() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getWholeText() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Text replaceWholeText(String content) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getData() throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void setData(String data) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public int getLength() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String substringData(int offset, int count) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void appendData(String arg) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void insertData(int offset, String arg) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void deleteData(int offset, int count) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void replaceData(int offset, int count, String arg) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getNodeName() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void setNodeValue(String nodeValue) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node getParentNode() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public NodeList getChildNodes() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node getFirstChild() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node getLastChild() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node getPreviousSibling() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node getNextSibling() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public NamedNodeMap getAttributes() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Document getOwnerDocument() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node insertBefore(Node newChild, Node refChild) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node replaceChild(Node newChild, Node oldChild) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node removeChild(Node oldChild) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node appendChild(Node newChild) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean hasChildNodes() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Node cloneNode(boolean deep) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void normalize() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean isSupported(String feature, String version) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getNamespaceURI() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getPrefix() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void setPrefix(String prefix) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getLocalName() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean hasAttributes() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getBaseURI() {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public short compareDocumentPosition(Node other) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String getTextContent() throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public void setTextContent(String textContent) throws DOMException {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean isSameNode(Node other) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String lookupPrefix(String namespaceURI) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean isDefaultNamespace(String namespaceURI) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public String lookupNamespaceURI(String prefix) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public boolean isEqualNode(Node arg) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Object getFeature(String feature, String version) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Object setUserData(String key, Object data, UserDataHandler handler) {
-						throw new UnsupportedOperationException();
-					}
-
-					@Override
-					public Object getUserData(String key) {
-						throw new UnsupportedOperationException();
-					}
-					// </editor-fold>
-				};
-			}
-		};
 	}
 
 }
