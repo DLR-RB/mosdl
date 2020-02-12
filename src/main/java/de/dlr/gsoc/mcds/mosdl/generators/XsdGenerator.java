@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +32,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
 import org.apache.ws.commons.schema.XmlSchemaForm;
+import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
@@ -62,6 +66,7 @@ public class XsdGenerator extends Generator {
 	private static final Logger logger = LoggerFactory.getLogger(XsdGenerator.class);
 
 	private static final String META_KEY_FILENAME = "filename";
+	private static final String META_KEY_IMPORTS = "imports";
 	private static final String XSD_FILE_ENDING = ".xsd";
 	private static final String MAL_AREA_NAME = "MAL";
 	// Mismatch between 5.2.1 and 3.7.3.2.1! urn:ccsds:schema:mo:malxml vs. http://www.ccsds.org/schema/malxml/MAL (latter seems to be more common and is used by NASA implementation)
@@ -99,6 +104,7 @@ public class XsdGenerator extends Generator {
 		NAMESPACE_MAP.add("xs", Constants.URI_2001_SCHEMA_XSD);
 		NAMESPACE_MAP.add("malxml", MALXML_NAMESPACE);
 
+		System.setProperty("org.apache.ws.commons.schema.protectReadOnlyCollections", "true");
 		WRITE_OPTIONS.put("omit-xml-declaration", "no");
 		WRITE_OPTIONS.put("indent", "yes");
 	}
@@ -126,7 +132,7 @@ public class XsdGenerator extends Generator {
 			for (AreaType area : spec.getArea()) {
 				if (null != area.getDataTypes()) {
 					logger.debug("Generating schema for area '{}'.", area.getName());
-					XmlSchema schema = getOrAddSchema(schemaCollection, area, null);
+					XmlSchema schema = getOrCreateSchema(schemaCollection, area, null);
 					if (MAL_AREA_NAME.equals(area.getName())) {
 						// XSD type and element for message body as defined in CCSDS 524.3-B-1, 3.7.3.2 need to be added explicitly.
 						XmlSchemaType xsdType = addExtraMalBodyType(schema);
@@ -139,7 +145,7 @@ public class XsdGenerator extends Generator {
 				for (ServiceType service : area.getService()) {
 					if (null != service.getDataTypes()) {
 						logger.debug("Generating schema for service '{}' of area '{}'.", service.getName(), area.getName());
-						XmlSchema schema = getOrAddSchema(schemaCollection, area, service);
+						XmlSchema schema = getOrCreateSchema(schemaCollection, area, service);
 						for (Object dataType : service.getDataTypes().getCompositeOrEnumeration()) {
 							addDataType(schema, dataType);
 						}
@@ -157,6 +163,17 @@ public class XsdGenerator extends Generator {
 					continue;
 				}
 				File targetFile = new File(targetDirectory, filename + XSD_FILE_ENDING);
+
+				Set<String> schemaImports = (Set<String>) metaInfo.get(META_KEY_IMPORTS);
+				if (null != schemaImports) {
+					for (String namespace : schemaImports) {
+						if (Objects.equals(namespace, schema.getTargetNamespace())) {
+							continue;
+						}
+						XmlSchemaImport xsdImport = new XmlSchemaImport(schema);
+						xsdImport.setNamespace(namespace);
+					}
+				}
 				logger.debug("Writing schema file '{}'.", targetFile);
 				try (OutputStream os = new BufferedOutputStream(new FileOutputStream(targetFile))) {
 					schema.write(os, WRITE_OPTIONS);
@@ -170,8 +187,8 @@ public class XsdGenerator extends Generator {
 	}
 
 	/**
-	 * Get an XML schema from a schema collection or add a new one if it is not present yet for the
-	 * given area and/or service.
+	 * Get an XML schema from a schema collection or create a new one if it is not present yet for
+	 * the given area and/or service.
 	 *
 	 * @param schemaCollection the schema collection to get the schema from/add the schema to
 	 * @param area the MAL area containing the data structures to add, must not be {@code null}
@@ -179,7 +196,7 @@ public class XsdGenerator extends Generator {
 	 * @return an XML schema suitable for adding the transformed data structures of given area
 	 * and/or service
 	 */
-	private static XmlSchema getOrAddSchema(XmlSchemaCollection schemaCollection, AreaType area, ServiceType service) {
+	private static XmlSchema getOrCreateSchema(XmlSchemaCollection schemaCollection, AreaType area, ServiceType service) {
 		String serviceName = null == service ? null : service.getName();
 		String namespace = toNamespace(area.getName(), serviceName);
 		XmlSchema schema = schemaCollection.schemaForNamespace(namespace);
@@ -192,6 +209,7 @@ public class XsdGenerator extends Generator {
 			schema.setInputEncoding(StandardCharsets.UTF_8.name());
 			schema.setNamespaceContext(NAMESPACE_MAP);
 			schema.addMetaInfo(META_KEY_FILENAME, filename);
+			schema.addMetaInfo(META_KEY_IMPORTS, new LinkedHashSet<String>());
 		}
 		return schema;
 	}
@@ -260,7 +278,7 @@ public class XsdGenerator extends Generator {
 		xsdContent.setContent(xsdExtension);
 		QName xsdBaseTypeName = XSD_MAL_COMPOSITE;
 		if (null != composite.getExtends()) {
-			xsdBaseTypeName = toQName(composite.getExtends().getType());
+			xsdBaseTypeName = toQName(schema, composite.getExtends().getType());
 		}
 		xsdExtension.setBaseTypeName(xsdBaseTypeName);
 
@@ -272,7 +290,7 @@ public class XsdGenerator extends Generator {
 			xsdSequenceItems.add(xsdSeqElem);
 			xsdSeqElem.setName(field.getName());
 			xsdSeqElem.setNillable(field.isCanBeNull());
-			xsdSeqElem.setSchemaTypeName(toQName(field.getType()));
+			xsdSeqElem.setSchemaTypeName(toQName(schema, field.getType()));
 			addDoc(xsdSeqElem, field.getComment());
 		}
 		return xsdType;
@@ -365,7 +383,7 @@ public class XsdGenerator extends Generator {
 		xsdType.setContentModel(xsdContent);
 		XmlSchemaComplexContentExtension xsdExtension = new XmlSchemaComplexContentExtension();
 		xsdContent.setContent(xsdExtension);
-		xsdExtension.setBaseTypeName(toQName(fundamental.getExtends().getType()));
+		xsdExtension.setBaseTypeName(toQName(schema, fundamental.getExtends().getType()));
 
 		// PENDING: Not sure whether the attribute should go in the base type or in each Composite (5.6.8).
 		if ("Composite".equals(fundamental.getName())) {
@@ -373,6 +391,7 @@ public class XsdGenerator extends Generator {
 			xsdExtension.getAttributes().add(xsdShortFormAttr);
 			xsdShortFormAttr.setName("type");
 			xsdShortFormAttr.setSchemaTypeName(Constants.XSD_LONG);
+			// xsdShortFormAttr.setUse(XmlSchemaUse.REQUIRED);
 		}
 		return xsdType;
 	}
@@ -460,17 +479,28 @@ public class XsdGenerator extends Generator {
 	}
 
 	/**
-	 * Create an XML qualified name from a MAL type reference.
+	 * Create an XML qualified name from a MAL type reference and adds namespace to the set of
+	 * namespaces to be imported.
 	 *
+	 * @param schema the schema that holds the set of namespaces to be imported
 	 * @param typeRef the MAL type reference
 	 * @return the XML qualified name corresponding to the MAL type reference
 	 */
-	private static QName toQName(TypeReference typeRef) {
+	private static QName toQName(XmlSchema schema, TypeReference typeRef) {
 		String namespace = toNamespace(typeRef.getArea(), typeRef.getService());
 		String typeName = typeRef.getName();
 		if (typeRef.isList()) {
 			typeName += "List";
 		}
+
+		Map<Object, Object> metaInfo = schema.getMetaInfoMap();
+		if (null != metaInfo) {
+			Set<String> schemaImports = (Set<String>) metaInfo.get(META_KEY_IMPORTS);
+			if (null != schemaImports) {
+				schemaImports.add(namespace);
+			}
+		}
+
 		return new QName(namespace, typeName);
 	}
 
