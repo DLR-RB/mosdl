@@ -166,7 +166,9 @@ public class XsdGenerator extends Generator {
 
 				Set<String> schemaImports = (Set<String>) metaInfo.get(META_KEY_IMPORTS);
 				if (null != schemaImports) {
+					schemaImports.add(MALXML_NAMESPACE); // always add import for MAL types
 					for (String namespace : schemaImports) {
+						// remove import if it would import the target namespace of the current schema
 						if (Objects.equals(namespace, schema.getTargetNamespace())) {
 							continue;
 						}
