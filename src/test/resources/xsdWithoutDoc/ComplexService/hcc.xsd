@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService"/>
     <xs:complexType abstract="true" name="OrbitStuff">
         <xs:complexContent>
             <xs:extension base="malxml:Composite">

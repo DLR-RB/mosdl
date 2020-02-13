@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
     <xs:complexType name="FuelType">
         <xs:annotation>
             <xs:documentation>This enumeration denotes the possible fuel types for a car.</xs:documentation>
