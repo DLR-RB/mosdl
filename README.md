@@ -1,11 +1,11 @@
 MOSDL - Mission Operations Service Description Language
 =======================================================
 
-MOSDL is a language that can be used to specify [CCSDS MO services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/).
+MOSDL is a language that can be used to specify [CCSDS Mission Operations (MO) services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/). For a detailed description of the service description primitives refer to [CCSDS 521.0-B-2 MO Message Abstraction Layer](https://public.ccsds.org/Pubs/521x0b2e1.pdf).
 
 The standardized service description format of CCSDS MO services is an XML format described by an [XML Schema](https://sanaregistry.org/r/moschemas). However, these XML documents can be difficult to edit, iterate and reason about. MOSDL provides an alternative to the CCSDS MO XML format. MOSDL documents can be compiled to standards-compliant XML documents using the compiler contained in this project. It is also possible to transform CCSDS MO XML documents back to MOSDL documents.
 
-Besides transforming MO specifications from one representation to another this project can also be used for generating other artifacts from these specifications: This project ships with a generator which creates XML Schema documents for data structures contained in MO specifications.
+Besides transforming MO specifications from one representation to another this project can also be used for generating other artifacts from these specifications: This project ships with a generator which creates XML Schema documents for data structures contained in MO specifications. Generated XML Schema documents conform to standard [CCSDS 524.3-B-1 MO-MAL Binding to HTTP Transport and XML Encoding](https://public.ccsds.org/Pubs/524x3b1.pdf).
 
 MOSDL has been developed at the German Space Operations Center GSOC, which is part of [DLR, the German Aerospace Center](https://www.dlr.de/).
 
@@ -88,7 +88,7 @@ This will print detailed usage instruction which are repeated here for convenien
 ```
 Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version ${project.version})
 
-Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-sv|--skip-validation] [-t|--doc-type <mosdl-doc-type>] [-h|--help] 
+Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-b|--create-body-types] [-sv|--skip-validation] [-t|--doc-type <doc-type>] [-h|--help] 
 
 <service-descr>
         MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language.
@@ -102,6 +102,8 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-sv|--
         If given MOSDL service description file will be generated.
 -s, --xsd
         If given an MO data structure XML Schema file will be generated.
+-b, --create-body-types
+        If given specialized non-standard message body XSD types will be generated for operations (only applicable when generating XML Schema files).
 -sv, --skip-validation
         If given try to recover from MOSDL files with errors and do not validate XML input and output files against the service schema. Useful for slightly malformed files.
 -t, --doc-type <doc-type>
@@ -154,6 +156,7 @@ The following configuration options are available:
 * `<xml>`: Optional. Set to `true` if you want to generate the service description XML files.
 * `<mosdl>`: Optional. Set to `true` if you want to generate the service description MOSDL files.
 * `<xsd>`: Optional. Set to `true` if you want to generate XSD files for data structures contained in the service descriptions.
+* `<xsdBodyTypes>`: Optional. Set to `true` if you want to generate specialized non-standard message body XSD types for operations (only applicable when generating XSD files).
 * `<skipValidation>`: Optional. Set to `true` if you want to skip validation of XML input and output files against the service schema.
 * `<docType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Also controls documentation generation for XSD files, but there is no difference between `BULK` and `INLINE`. Has no effect if no MOSDL or XSD files are created.
 

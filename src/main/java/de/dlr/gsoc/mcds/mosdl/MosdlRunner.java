@@ -31,6 +31,7 @@ public class MosdlRunner extends Runner {
 	private final boolean createXml;
 	private final boolean createMosdl;
 	private final boolean createXsd;
+	private final boolean isCreateXsdBodyTypes;
 	private final MosdlGenerator.DocType docType;
 
 	/**
@@ -42,15 +43,20 @@ public class MosdlRunner extends Runner {
 	 * @param createMosdl {@code true} if MOSDL files shall be generated, {@code false} otherwise
 	 * @param createXsd {@code true} if MO data structure XSD files shall be generated,
 	 * {@code false} otherwise
+	 * @param isCreateXsdBodyTypes {@code true} if generated XSD files shall also contain specific
+	 * types for all message bodies of the defined service operations, {@code false} otherwise. Body
+	 * type specializations are not part of the standard and only applicable if {@code createXsd} is
+	 * {@code true}.
 	 * @param docType only applicable if {@code createMosdl} or {@code createXsd} is {@code true}.
 	 * Determines the type of documentation to generate for MOSDL files.
 	 */
-	public MosdlRunner(boolean isSkipValidation, boolean createXml, boolean createMosdl, boolean createXsd, MosdlGenerator.DocType docType) {
+	public MosdlRunner(boolean isSkipValidation, boolean createXml, boolean createMosdl, boolean createXsd, boolean isCreateXsdBodyTypes, MosdlGenerator.DocType docType) {
 		this.isSkipValidation = isSkipValidation;
 		this.createXml = createXml;
 		this.createMosdl = createMosdl;
 		this.createXsd = createXsd;
 		this.docType = docType;
+		this.isCreateXsdBodyTypes = isCreateXsdBodyTypes;
 	}
 
 	@Override
@@ -72,7 +78,7 @@ public class MosdlRunner extends Runner {
 			generators.add(new MosdlGenerator(docType));
 		}
 		if (createXsd) {
-			generators.add(new XsdGenerator(docType != MosdlGenerator.DocType.SUPPRESS));
+			generators.add(new XsdGenerator(docType != MosdlGenerator.DocType.SUPPRESS, isCreateXsdBodyTypes));
 		}
 		return generators;
 	}

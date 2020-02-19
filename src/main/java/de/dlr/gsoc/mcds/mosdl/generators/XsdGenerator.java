@@ -25,6 +25,7 @@ import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexContent;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
+import org.apache.ws.commons.schema.XmlSchemaComplexContentRestriction;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContentProcessing;
 import org.apache.ws.commons.schema.XmlSchemaDocumentation;
@@ -42,10 +43,12 @@ import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.AttributeType;
+import org.ccsds.schema.serviceschema.CapabilitySetType;
 import org.ccsds.schema.serviceschema.CompositeType;
 import org.ccsds.schema.serviceschema.EnumerationType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
+import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ServiceType;
 import org.ccsds.schema.serviceschema.SpecificationType;
 import org.ccsds.schema.serviceschema.TypeReference;
@@ -75,10 +78,12 @@ public class XsdGenerator extends Generator {
 	private static final QName XSD_MAL_ELEMENT = new QName(MALXML_NAMESPACE, "Element");
 	private static final QName XSD_MAL_ATTRIBUTE = new QName(MALXML_NAMESPACE, "Attribute");
 	private static final QName XSD_MAL_COMPOSITE = new QName(MALXML_NAMESPACE, "Composite");
+	private static final QName XSD_MAL_BODY = new QName(MALXML_NAMESPACE, "Body");
 	private static final Map<String, QName> ATTRIBUTE_XSD_MAPPING = new HashMap<>();
 	private static final NamespaceMap NAMESPACE_MAP = new NamespaceMap();
 	private static final Map<String, String> WRITE_OPTIONS = new HashMap<>();
 	private final boolean isIncludeDoc;
+	private final boolean isCreateBodyTypes;
 	private final Document documentationDocument;
 
 	static {
@@ -109,8 +114,17 @@ public class XsdGenerator extends Generator {
 		WRITE_OPTIONS.put("indent", "yes");
 	}
 
-	public XsdGenerator(boolean isIncludeDoc) {
+	/**
+	 * Creates a new XML Schema generator.
+	 *
+	 * @param isIncludeDoc {@code true} to create annotations for documenting the schema,
+	 * {@code false} otherwise
+	 * @param isCreateBodyTypes {@code true} to create non-standard specialized message body types
+	 * for operations, {@code false} otherwise
+	 */
+	public XsdGenerator(boolean isIncludeDoc, boolean isCreateBodyTypes) {
 		this.isIncludeDoc = isIncludeDoc;
+		this.isCreateBodyTypes = isCreateBodyTypes;
 		if (isIncludeDoc) {
 			try {
 				documentationDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -143,11 +157,24 @@ public class XsdGenerator extends Generator {
 					}
 				}
 				for (ServiceType service : area.getService()) {
+					XmlSchema schema = null;
 					if (null != service.getDataTypes()) {
 						logger.debug("Generating schema for service '{}' of area '{}'.", service.getName(), area.getName());
-						XmlSchema schema = getOrCreateSchema(schemaCollection, area, service);
+						schema = getOrCreateSchema(schemaCollection, area, service);
 						for (Object dataType : service.getDataTypes().getCompositeOrEnumeration()) {
 							addDataType(schema, dataType);
+						}
+					}
+					if (isCreateBodyTypes) {
+						for (CapabilitySetType cs : service.getCapabilitySet()) {
+							for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
+								for (MessageDetails msgDetails : MessageDetails.fromOp(op)) {
+									if (null == schema) {
+										schema = getOrCreateSchema(schemaCollection, area, service);
+									}
+									addMessageBody(schema, op, msgDetails);
+								}
+							}
 						}
 					}
 				}
@@ -164,6 +191,7 @@ public class XsdGenerator extends Generator {
 				}
 				File targetFile = new File(targetDirectory, filename + XSD_FILE_ENDING);
 
+				@SuppressWarnings("unchecked")
 				Set<String> schemaImports = (Set<String>) metaInfo.get(META_KEY_IMPORTS);
 				if (null != schemaImports) {
 					schemaImports.add(MALXML_NAMESPACE); // always add import for MAL types
@@ -454,7 +482,7 @@ public class XsdGenerator extends Generator {
 	 */
 	private static XmlSchemaType addExtraMalBodyType(XmlSchema schema) {
 		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
-		xsdType.setName("Body");
+		xsdType.setName(XSD_MAL_BODY.getLocalPart());
 		XmlSchemaSequence xsdSequence = new XmlSchemaSequence();
 		xsdType.setParticle(xsdSequence);
 		XmlSchemaAny xsdSeqElem = new XmlSchemaAny();
@@ -462,6 +490,46 @@ public class XsdGenerator extends Generator {
 		xsdSeqElem.setProcessContent(XmlSchemaContentProcessing.LAX);
 		xsdSeqElem.setMinOccurs(0);
 		xsdSeqElem.setMaxOccurs(Long.MAX_VALUE);
+		return xsdType;
+	}
+
+	/**
+	 * Add a schema type corresponding to the message body of one of the messages belonging to a
+	 * certain operation.
+	 * <p>
+	 * This type is not defined in CCSDS 524.3-B-1, but is compatible to the standard Body type
+	 * defined in that document because it is derived from it by restriction. The type is put in the
+	 * same namespace as service-level data types and is named
+	 * {@code {opName}_{INTERACTION_STAGE}_Body}, where {@code {opName}} is the operation name and
+	 * {@code {INTERACTION_STAGE}} is the interaction stage name in upper case.
+	 *
+	 * @param schema the schema to add the type to
+	 * @param op the operation to which the message in {@code msgDetails} belongs to
+	 * @param msgDetails the details of one of the messages belonging to a certain operation
+	 * @return the newly added schema type
+	 */
+	private XmlSchemaType addMessageBody(XmlSchema schema, OperationType op, MessageDetails msgDetails) {
+		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
+		String xsdTypeName = String.format("%s_%s_%s", op.getName(), msgDetails.getStage().name(), XSD_MAL_BODY.getLocalPart());
+		xsdType.setName(xsdTypeName);
+		addDoc(xsdType, msgDetails.getComment());
+		XmlSchemaComplexContent xsdContent = new XmlSchemaComplexContent();
+		xsdType.setContentModel(xsdContent);
+		XmlSchemaComplexContentRestriction xsdRestrcition = new XmlSchemaComplexContentRestriction();
+		xsdContent.setContent(xsdRestrcition);
+		xsdRestrcition.setBaseTypeName(XSD_MAL_BODY);
+
+		XmlSchemaSequence xsdSequence = new XmlSchemaSequence();
+		xsdRestrcition.setParticle(xsdSequence);
+		List<XmlSchemaSequenceMember> xsdSequenceItems = xsdSequence.getItems();
+		for (NamedElementReferenceWithCommentType field : msgDetails.getFields()) {
+			XmlSchemaElement xsdSeqElem = new XmlSchemaElement(schema, false);
+			xsdSequenceItems.add(xsdSeqElem);
+			xsdSeqElem.setName(field.getType().getName()); // element name is type name, not field (body part) name
+			xsdSeqElem.setNillable(field.isCanBeNull());
+			xsdSeqElem.setSchemaTypeName(toQName(schema, field.getType()));
+			addDoc(xsdSeqElem, field.getComment());
+		}
 		return xsdType;
 	}
 
@@ -497,6 +565,7 @@ public class XsdGenerator extends Generator {
 
 		Map<Object, Object> metaInfo = schema.getMetaInfoMap();
 		if (null != metaInfo) {
+			@SuppressWarnings("unchecked")
 			Set<String> schemaImports = (Set<String>) metaInfo.get(META_KEY_IMPORTS);
 			if (null != schemaImports) {
 				schemaImports.add(namespace);

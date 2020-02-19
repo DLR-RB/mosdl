@@ -38,6 +38,9 @@ public class MosdlMojo extends AbstractMojo {
 	@Parameter(property = "generate.xsd")
 	private Boolean xsd;
 
+	@Parameter(property = "generate.xsdBodyTypes")
+	private Boolean createXsdBodyTypes;
+
 	@Parameter(property = "generate.skipValidation")
 	private Boolean skipValidation;
 
@@ -60,9 +63,10 @@ public class MosdlMojo extends AbstractMojo {
 		boolean createXml = null != xml && xml;
 		boolean createMosdl = null != mosdl && mosdl;
 		boolean createXsd = null != xsd && xsd;
+		boolean isCreateXsdBodyTypes = null != createXsdBodyTypes && createXsdBodyTypes;
 		boolean isSkipValidation = null != skipValidation && skipValidation;
 
-		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, createXsd, docType);
+		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, createXsd, isCreateXsdBodyTypes, docType);
 		for (File serviceFileOrDir : serviceSpecs) {
 			logger.info("Compiling service specification in '{}'.", serviceFileOrDir);
 			try {

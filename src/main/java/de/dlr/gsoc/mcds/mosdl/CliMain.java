@@ -25,6 +25,7 @@ public class CliMain {
 				.toggle("xml", "x", "If given MO XML service description file will be generated.")
 				.toggle("mosdl", "m", "If given MOSDL service description file will be generated.")
 				.toggle("xsd", "s", "If given an MO data structure XML Schema file will be generated.")
+				.toggle("create-body-types", "b", "If given specialized non-standard message body XSD types will be generated for operations (only applicable when generating XML Schema files).")
 				.toggle("skip-validation", "sv", "If given try to recover from MOSDL files with errors and do not validate XML input and output files against the service schema. Useful for slightly malformed files.")
 				.optional("doc-type", "t", "doc-type", MosdlGenerator.DocType.class, MosdlGenerator.DocType.BULK, "Type of documentation to create for MOSDL or XSD files (BULK: operation documentation will be generated in bulk; INLINE: operation documentation will be put in-line; SUPPRESS: all documentation is stripped). BULK and INLINE produce the same results for XSD files.")
 				.build()
@@ -35,10 +36,11 @@ public class CliMain {
 		boolean createXml = opts.get("xml");
 		boolean createMosdl = opts.get("mosdl");
 		boolean createXsd = opts.get("xsd");
+		boolean isCreateXsdBodyTypes = opts.get("create-body-types");
 		boolean isSkipValidation = opts.get("skip-validation");
 		MosdlGenerator.DocType docType = opts.get("doc-type");
 
-		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, createXsd, docType);
+		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, createXsd, isCreateXsdBodyTypes, docType);
 		try {
 			runner.execute(new File(targetDirectory), new File(serviceFile));
 			logger.info("Compilation of '{}' successful.", serviceFile);

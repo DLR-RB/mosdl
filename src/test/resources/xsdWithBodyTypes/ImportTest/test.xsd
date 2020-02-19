@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/MC/Parameter" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MC/Parameter"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="CompositeWithImportedType">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="validity" type="ns0:ValidityState"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="CompositeWithImportedTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="CompositeWithImportedType" nillable="true" type="CompositeWithImportedType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="CompositeWithImportedType" type="CompositeWithImportedType"/>
+    <xs:element name="CompositeWithImportedTypeList" type="CompositeWithImportedTypeList"/>
+</xs:schema>

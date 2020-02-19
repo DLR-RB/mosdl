@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc/TestService" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc/TestService">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="InvalidType">
+        <xs:complexContent>
+            <xs:extension base="malxml:Element">
+                <xs:sequence>
+                    <xs:element name="InvalidType" type="InvalidTypeEnum"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="InvalidTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="TOO_LARGE"/>
+            <xs:enumeration value="TOO_SMALL"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="InvalidTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="InvalidType" nillable="true" type="InvalidType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="InvalidType" type="InvalidType"/>
+    <xs:element name="InvalidTypeList" type="InvalidTypeList"/>
+    <xs:complexType name="getValue_REQUEST_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Identifier" type="malxml:Identifier"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="getValue_REQUEST_RESPONSE_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="setValue_SUBMIT_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Identifier" type="malxml:Identifier"/>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="lockValue_REQUEST_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Identifier" type="malxml:Identifier"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="lockValue_REQUEST_RESPONSE_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="listIds_PROGRESS_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Boolean" type="malxml:Boolean"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="listIds_PROGRESS_ACK_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="UInteger" type="malxml:UInteger"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="listIds_PROGRESS_UPDATE_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Identifier" type="malxml:Identifier"/>
+                    <xs:element name="Attribute" nillable="true" type="malxml:AttributeList">
+                        <xs:annotation>
+                            <xs:documentation>Only set if includeValueHistory is true.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="listIds_PROGRESS_RESPONSE_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Duration" type="malxml:Duration"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="monitorValueChanges_PUBSUB_PUBLISH_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="monitorValueChanges_PUBSUB_NOTIFY_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                    <xs:element name="Attribute" nillable="true" type="malxml:Attribute"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

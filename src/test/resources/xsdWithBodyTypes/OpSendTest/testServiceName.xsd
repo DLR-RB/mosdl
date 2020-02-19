@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test/ServiceName" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/test" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test/ServiceName">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/test"/>
+    <xs:complexType name="operationName_SEND_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element name="String" type="malxml:String"/>
+                    <xs:element name="MyType" type="ns0:MyType"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>
