@@ -24,6 +24,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="NewAttributeType" type="malxml:NewAttributeType"/>
-    <xs:element name="NewAttributeTypeList" type="malxml:NewAttributeTypeList"/>
+    <xs:element name="NewAttributeType" nillable="true" type="malxml:NewAttributeType"/>
+    <xs:element name="NewAttributeTypeList" nillable="true" type="malxml:NewAttributeTypeList"/>
 </xs:schema>

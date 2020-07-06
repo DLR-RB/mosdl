@@ -24,6 +24,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="SomeAreaComposite" type="SomeAreaComposite"/>
-    <xs:element name="SomeAreaCompositeList" type="SomeAreaCompositeList"/>
+    <xs:element name="SomeAreaComposite" nillable="true" type="SomeAreaComposite"/>
+    <xs:element name="SomeAreaCompositeList" nillable="true" type="SomeAreaCompositeList"/>
 </xs:schema>

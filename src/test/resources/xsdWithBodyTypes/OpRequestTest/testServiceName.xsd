@@ -6,8 +6,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="String" type="malxml:String"/>
-                    <xs:element name="MyType" type="ns0:MyType"/>
+                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="ns0:MyType"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -16,7 +16,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="UInteger" type="malxml:UInteger"/>
+                    <xs:element ref="malxml:UInteger"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

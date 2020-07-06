@@ -11,6 +11,17 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:complexType abstract="true" name="OrbitStuffList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="OrbitStuff" nillable="true" type="OrbitStuff"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="OrbitStuff" nillable="true" type="OrbitStuff"/>
+    <xs:element name="OrbitStuffList" nillable="true" type="OrbitStuffList"/>
     <xs:complexType name="MoonOrbitStuff">
         <xs:complexContent>
             <xs:extension base="OrbitStuff">
@@ -30,6 +41,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="MoonOrbitStuff" type="MoonOrbitStuff"/>
-    <xs:element name="MoonOrbitStuffList" type="MoonOrbitStuffList"/>
+    <xs:element name="MoonOrbitStuff" nillable="true" type="MoonOrbitStuff"/>
+    <xs:element name="MoonOrbitStuffList" nillable="true" type="MoonOrbitStuffList"/>
 </xs:schema>

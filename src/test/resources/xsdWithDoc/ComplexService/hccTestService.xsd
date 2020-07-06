@@ -25,6 +25,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="InvalidType" type="InvalidType"/>
-    <xs:element name="InvalidTypeList" type="InvalidTypeList"/>
+    <xs:element name="InvalidType" nillable="true" type="InvalidType"/>
+    <xs:element name="InvalidTypeList" nillable="true" type="InvalidTypeList"/>
 </xs:schema>

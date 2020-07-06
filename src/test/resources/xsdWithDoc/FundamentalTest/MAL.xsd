@@ -11,9 +11,31 @@
             <xs:documentation>Only MAL may define new fundamental types.</xs:documentation>
         </xs:annotation>
     </xs:complexType>
+    <xs:complexType abstract="true" name="NewFundamentalTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="NewFundamentalType" nillable="true" type="malxml:NewFundamentalType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="NewFundamentalType" nillable="true" type="malxml:NewFundamentalType"/>
+    <xs:element name="NewFundamentalTypeList" nillable="true" type="malxml:NewFundamentalTypeList"/>
     <xs:complexType abstract="true" name="AnotherFundamentalType">
         <xs:complexContent>
             <xs:extension base="malxml:NewFundamentalType"/>
         </xs:complexContent>
     </xs:complexType>
+    <xs:complexType abstract="true" name="AnotherFundamentalTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="AnotherFundamentalType" nillable="true" type="malxml:AnotherFundamentalType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="AnotherFundamentalType" nillable="true" type="malxml:AnotherFundamentalType"/>
+    <xs:element name="AnotherFundamentalTypeList" nillable="true" type="malxml:AnotherFundamentalTypeList"/>
 </xs:schema>

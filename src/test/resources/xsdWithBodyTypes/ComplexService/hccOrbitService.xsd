@@ -6,7 +6,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Time" type="malxml:Time"/>
+                    <xs:element ref="malxml:Time"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -15,7 +15,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Duration" type="malxml:Duration"/>
+                    <xs:element ref="malxml:Duration"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -24,7 +24,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="OrbitStuff" type="ns0:OrbitStuff"/>
+                    <xs:element ref="ns0:OrbitStuff"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

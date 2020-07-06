@@ -150,7 +150,7 @@ public class XsdGenerator extends Generator {
 					if (MAL_AREA_NAME.equals(area.getName())) {
 						// XSD type and element for message body as defined in CCSDS 524.3-B-1, 3.7.3.2 need to be added explicitly.
 						XmlSchemaType xsdType = addExtraMalBodyType(schema);
-						addCorrespondingElement(schema, xsdType);
+						addCorrespondingElement(schema, xsdType, false);
 					}
 					for (Object dataType : area.getDataTypes().getFundamentalOrAttributeOrComposite()) {
 						addDataType(schema, dataType);
@@ -168,6 +168,7 @@ public class XsdGenerator extends Generator {
 					if (isCreateBodyTypes) {
 						for (CapabilitySetType cs : service.getCapabilitySet()) {
 							for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
+								// TODO: Implement special handling of PUBSUB message bodies.
 								for (MessageDetails msgDetails : MessageDetails.fromOp(op)) {
 									if (null == schema) {
 										schema = getOrCreateSchema(schemaCollection, area, service);
@@ -250,43 +251,37 @@ public class XsdGenerator extends Generator {
 	 * Necessary elements are:
 	 * <ul>
 	 * <li>a new schema type for the data structure,
-	 * <li>if the structure is a concrete Composite, an Enumeration or an Attribute: a new schema
-	 * type for the list of the data structure,
-	 * <li>if the strucutre is a concrete Composite, an Enumeration or an Attribute: a new element
-	 * for using the data structure as MAL message body element,
-	 * <li>if the strucutre is a concrete Composite, an Enumeration or an Attribute: a new element
-	 * for using a list of the data structure as MAL body element
+	 * <li>a new schema type for the list of the data structure,
+	 * <li>a new element for using the data structure as MAL message body element,
+	 * <li>a new element for using a list of the data structure as MAL body element.
 	 * </ul>
 	 *
 	 * @param schema the schema to add all required elements to
 	 * @param dataType the MAL data structure to process
 	 */
 	private void addDataType(XmlSchema schema, Object dataType) {
+		XmlSchemaComplexType xsdType;
 		if (dataType instanceof CompositeType) {
 			CompositeType composite = (CompositeType) dataType;
 			boolean isAbstract = null == composite.getShortFormPart() || 0 == composite.getShortFormPart();
-			XmlSchemaType xsdType = addCompositeType(schema, composite, isAbstract);
-			if (!isAbstract) {
-				XmlSchemaType xsdListType = addCorrespondingListType(schema, xsdType);
-				addCorrespondingElement(schema, xsdType);
-				addCorrespondingElement(schema, xsdListType);
-			}
+			xsdType = addCompositeType(schema, composite, isAbstract);
 		} else if (dataType instanceof EnumerationType) {
 			EnumerationType enumeration = (EnumerationType) dataType;
-			XmlSchemaType xsdType = addEnumerationType(schema, enumeration);
-			XmlSchemaType xsdListType = addCorrespondingListType(schema, xsdType);
-			addCorrespondingElement(schema, xsdType);
-			addCorrespondingElement(schema, xsdListType);
+			xsdType = addEnumerationType(schema, enumeration);
 		} else if (dataType instanceof AttributeType) {
 			AttributeType attribute = (AttributeType) dataType;
-			XmlSchemaType xsdType = addAttributeType(schema, attribute);
-			XmlSchemaType xsdListType = addCorrespondingListType(schema, xsdType);
-			addCorrespondingElement(schema, xsdType);
-			addCorrespondingElement(schema, xsdListType);
+			xsdType = addAttributeType(schema, attribute);
 		} else if (dataType instanceof FundamentalType) {
 			FundamentalType fundamental = (FundamentalType) dataType;
-			addFundamentalType(schema, fundamental);
+			xsdType = addFundamentalType(schema, fundamental);
+		} else {
+			logger.warn("Unsupported data type '{}' cannot be mapped to XML Schema type.", null == dataType ? "null" : dataType.getClass());
+			return;
 		}
+		XmlSchemaComplexType xsdListType = addCorrespondingListType(schema, xsdType);
+		// add elements for use in message bodies
+		addCorrespondingElement(schema, xsdType, true);
+		addCorrespondingElement(schema, xsdListType, true);
 	}
 
 	/**
@@ -297,7 +292,7 @@ public class XsdGenerator extends Generator {
 	 * @param isAbstract {@code true} if the composite is abstract, {@code false} otherwise
 	 * @return the newly added schema type
 	 */
-	private XmlSchemaType addCompositeType(XmlSchema schema, CompositeType composite, boolean isAbstract) {
+	private XmlSchemaComplexType addCompositeType(XmlSchema schema, CompositeType composite, boolean isAbstract) {
 		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
 		xsdType.setName(composite.getName());
 		xsdType.setAbstract(isAbstract);
@@ -333,7 +328,7 @@ public class XsdGenerator extends Generator {
 	 * @param enumeration the MAL Enumeration for which the corresponding schema type shall be added
 	 * @return the newly added schema type
 	 */
-	private XmlSchemaType addEnumerationType(XmlSchema schema, EnumerationType enumeration) {
+	private XmlSchemaComplexType addEnumerationType(XmlSchema schema, EnumerationType enumeration) {
 		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
 		xsdType.setName(enumeration.getName());
 		addDoc(xsdType, enumeration.getComment());
@@ -371,7 +366,7 @@ public class XsdGenerator extends Generator {
 	 * @param attribute the MAL Attribute for which the corresponding schema type shall be added
 	 * @return the newly added schema type
 	 */
-	private XmlSchemaType addAttributeType(XmlSchema schema, AttributeType attribute) {
+	private XmlSchemaComplexType addAttributeType(XmlSchema schema, AttributeType attribute) {
 		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
 		xsdType.setName(attribute.getName());
 		addDoc(xsdType, attribute.getComment());
@@ -399,7 +394,7 @@ public class XsdGenerator extends Generator {
 	 * @param enumeration the MAL Fundamental for which the corresponding schema type shall be added
 	 * @return the newly added schema type
 	 */
-	private XmlSchemaType addFundamentalType(XmlSchema schema, FundamentalType fundamental) {
+	private XmlSchemaComplexType addFundamentalType(XmlSchema schema, FundamentalType fundamental) {
 		XmlSchemaComplexType xsdType = new XmlSchemaComplexType(schema, true);
 		xsdType.setName(fundamental.getName());
 		xsdType.setAbstract(true);
@@ -434,9 +429,10 @@ public class XsdGenerator extends Generator {
 	 * lists of that type
 	 * @return the newly added schema list type
 	 */
-	private static XmlSchemaType addCorrespondingListType(XmlSchema schema, XmlSchemaType xsdType) {
+	private static XmlSchemaComplexType addCorrespondingListType(XmlSchema schema, XmlSchemaComplexType xsdType) {
 		XmlSchemaComplexType xsdListType = new XmlSchemaComplexType(schema, true);
 		xsdListType.setName(xsdType.getName() + "List");
+		xsdListType.setAbstract(xsdType.isAbstract());
 		XmlSchemaComplexContent xsdContent = new XmlSchemaComplexContent();
 		xsdListType.setContentModel(xsdContent);
 		XmlSchemaComplexContentExtension xsdExtension = new XmlSchemaComplexContentExtension();
@@ -461,12 +457,14 @@ public class XsdGenerator extends Generator {
 	 * @param schema the schema to add the type to
 	 * @param xsdType the existing schema type for which an schema element with the same name is
 	 * added
+	 * @param isNillable {@code true} if the element shall be nillable, {@code false} otherwise
 	 * @return the newly added schema element
 	 */
-	private static XmlSchemaElement addCorrespondingElement(XmlSchema schema, XmlSchemaType xsdType) {
+	private static XmlSchemaElement addCorrespondingElement(XmlSchema schema, XmlSchemaType xsdType, boolean isNillable) {
 		XmlSchemaElement element = new XmlSchemaElement(schema, true);
 		element.setName(xsdType.getName());
 		element.setSchemaTypeName(xsdType.getQName());
+		element.setNillable(isNillable);
 		return element;
 	}
 
@@ -515,19 +513,17 @@ public class XsdGenerator extends Generator {
 		addDoc(xsdType, msgDetails.getComment());
 		XmlSchemaComplexContent xsdContent = new XmlSchemaComplexContent();
 		xsdType.setContentModel(xsdContent);
-		XmlSchemaComplexContentRestriction xsdRestrcition = new XmlSchemaComplexContentRestriction();
-		xsdContent.setContent(xsdRestrcition);
-		xsdRestrcition.setBaseTypeName(XSD_MAL_BODY);
+		XmlSchemaComplexContentRestriction xsdRestriction = new XmlSchemaComplexContentRestriction();
+		xsdContent.setContent(xsdRestriction);
+		xsdRestriction.setBaseTypeName(XSD_MAL_BODY);
 
 		XmlSchemaSequence xsdSequence = new XmlSchemaSequence();
-		xsdRestrcition.setParticle(xsdSequence);
+		xsdRestriction.setParticle(xsdSequence);
 		List<XmlSchemaSequenceMember> xsdSequenceItems = xsdSequence.getItems();
 		for (NamedElementReferenceWithCommentType field : msgDetails.getFields()) {
 			XmlSchemaElement xsdSeqElem = new XmlSchemaElement(schema, false);
+			xsdSeqElem.getRef().setTargetQName(toQName(schema, field.getType()));
 			xsdSequenceItems.add(xsdSeqElem);
-			xsdSeqElem.setName(field.getType().getName()); // element name is type name, not field (body part) name
-			xsdSeqElem.setNillable(field.isCanBeNull());
-			xsdSeqElem.setSchemaTypeName(toQName(schema, field.getType()));
 			addDoc(xsdSeqElem, field.getComment());
 		}
 		return xsdType;

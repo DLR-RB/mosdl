@@ -21,6 +21,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="Color" type="Color"/>
-    <xs:element name="ColorList" type="ColorList"/>
+    <xs:element name="Color" nillable="true" type="Color"/>
+    <xs:element name="ColorList" nillable="true" type="ColorList"/>
 </xs:schema>

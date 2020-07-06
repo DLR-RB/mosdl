@@ -23,8 +23,8 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="SomeServiceComposite" type="SomeServiceComposite"/>
-    <xs:element name="SomeServiceCompositeList" type="SomeServiceCompositeList"/>
+    <xs:element name="SomeServiceComposite" nillable="true" type="SomeServiceComposite"/>
+    <xs:element name="SomeServiceCompositeList" nillable="true" type="SomeServiceCompositeList"/>
     <xs:complexType name="ValidityState">
         <xs:complexContent>
             <xs:extension base="malxml:Composite">
@@ -46,6 +46,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="ValidityState" type="ValidityState"/>
-    <xs:element name="ValidityStateList" type="ValidityStateList"/>
+    <xs:element name="ValidityState" nillable="true" type="ValidityState"/>
+    <xs:element name="ValidityStateList" nillable="true" type="ValidityStateList"/>
 </xs:schema>

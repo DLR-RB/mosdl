@@ -23,14 +23,14 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="MyOwnType" type="MyOwnType"/>
-    <xs:element name="MyOwnTypeList" type="MyOwnTypeList"/>
+    <xs:element name="MyOwnType" nillable="true" type="MyOwnType"/>
+    <xs:element name="MyOwnTypeList" nillable="true" type="MyOwnTypeList"/>
     <xs:complexType name="myOnlyOperation_REQUEST_Body">
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="String" nillable="true" type="malxml:String"/>
-                    <xs:element name="UInteger" type="malxml:UIntegerList"/>
+                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="malxml:UIntegerList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -39,8 +39,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="String" type="malxml:String"/>
-                    <xs:element name="MyOwnType" type="MyOwnType"/>
+                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="MyOwnType"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

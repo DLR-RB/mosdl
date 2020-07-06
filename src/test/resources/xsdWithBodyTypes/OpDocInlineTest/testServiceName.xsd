@@ -9,12 +9,12 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="String" type="malxml:String">
+                    <xs:element ref="malxml:String">
                         <xs:annotation>
                             <xs:documentation>Doc for the first param.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="MyType" type="ns0:MyType">
+                    <xs:element ref="ns0:MyType">
                         <xs:annotation>
                             <xs:documentation>Doc for the second param.</xs:documentation>
                         </xs:annotation>
@@ -30,7 +30,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="UInteger" type="malxml:UInteger">
+                    <xs:element ref="malxml:UInteger">
                         <xs:annotation>
                             <xs:documentation>Doc for the only response param.</xs:documentation>
                         </xs:annotation>

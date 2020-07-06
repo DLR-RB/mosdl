@@ -6,8 +6,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="String" type="malxml:String"/>
-                    <xs:element name="MyType" type="ns0:MyType"/>
+                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="ns0:MyType"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

@@ -20,6 +20,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="MyOwnType" type="MyOwnType"/>
-    <xs:element name="MyOwnTypeList" type="MyOwnTypeList"/>
+    <xs:element name="MyOwnType" nillable="true" type="MyOwnType"/>
+    <xs:element name="MyOwnTypeList" nillable="true" type="MyOwnTypeList"/>
 </xs:schema>

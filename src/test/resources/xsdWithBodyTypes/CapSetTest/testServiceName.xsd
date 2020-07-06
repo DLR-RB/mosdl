@@ -12,7 +12,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Identifier" type="malxml:IdentifierList"/>
+                    <xs:element ref="malxml:IdentifierList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -21,7 +21,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Identifier" type="malxml:Identifier"/>
+                    <xs:element ref="malxml:Identifier"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -30,7 +30,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Element" type="malxml:Element"/>
+                    <xs:element ref="malxml:Element"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -39,8 +39,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element name="Identifier" type="malxml:Identifier"/>
-                    <xs:element name="Element" type="malxml:Element"/>
+                    <xs:element ref="malxml:Identifier"/>
+                    <xs:element ref="malxml:Element"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

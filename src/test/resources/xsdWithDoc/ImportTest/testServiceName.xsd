@@ -20,6 +20,6 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element name="ServiceCompositeWithImportedType" type="ServiceCompositeWithImportedType"/>
-    <xs:element name="ServiceCompositeWithImportedTypeList" type="ServiceCompositeWithImportedTypeList"/>
+    <xs:element name="ServiceCompositeWithImportedType" nillable="true" type="ServiceCompositeWithImportedType"/>
+    <xs:element name="ServiceCompositeWithImportedTypeList" nillable="true" type="ServiceCompositeWithImportedTypeList"/>
 </xs:schema>
