@@ -118,8 +118,9 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:Attribute"/>
-                    <xs:element ref="malxml:Attribute"/>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:AttributeList"/>
+                    <xs:element ref="malxml:AttributeList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -128,8 +129,10 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:Attribute"/>
-                    <xs:element ref="malxml:Attribute"/>
+                    <xs:element ref="malxml:Identifier"/>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:AttributeList"/>
+                    <xs:element ref="malxml:AttributeList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

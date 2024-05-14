@@ -5,7 +5,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:StringList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -14,7 +15,9 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:String"/>
+                    <xs:element ref="malxml:Identifier"/>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:StringList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

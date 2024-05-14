@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 package de.dlr.gsoc.mcds.mosdl.generators;
 
+import de.dlr.gsoc.mcds.mosdl.InteractionStage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,6 +50,7 @@ import org.ccsds.schema.serviceschema.CompositeType;
 import org.ccsds.schema.serviceschema.EnumerationType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
+import org.ccsds.schema.serviceschema.ObjectFactory;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ServiceType;
 import org.ccsds.schema.serviceschema.SpecificationType;
@@ -168,12 +171,13 @@ public class XsdGenerator extends Generator {
 					if (isCreateBodyTypes) {
 						for (CapabilitySetType cs : service.getCapabilitySet()) {
 							for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
-								// TODO: Implement special handling of PUBSUB message bodies.
+								// TODO: Implement handling of error message bodies.
 								for (MessageDetails msgDetails : MessageDetails.fromOp(op)) {
 									if (null == schema) {
 										schema = getOrCreateSchema(schemaCollection, area, service);
 									}
-									addMessageBody(schema, op, msgDetails);
+									XmlSchemaType xsdType = addMessageBody(schema, op, msgDetails);
+//									addCorrespondingElement(schema, xsdType, false); // TODO: Remove element, only needed for easier testing
 								}
 							}
 						}
@@ -520,7 +524,50 @@ public class XsdGenerator extends Generator {
 		XmlSchemaSequence xsdSequence = new XmlSchemaSequence();
 		xsdRestriction.setParticle(xsdSequence);
 		List<XmlSchemaSequenceMember> xsdSequenceItems = xsdSequence.getItems();
-		for (NamedElementReferenceWithCommentType field : msgDetails.getFields()) {
+
+		List<NamedElementReferenceWithCommentType> fields;
+		if (msgDetails.getStage() == InteractionStage.PUBSUB_PUBLISH || msgDetails.getStage() == InteractionStage.PUBSUB_NOTIFY) {
+			// According to MAL Tables 3-27 and 3-29: Add extra message fields for PUBLISH and NOTIFY and transform given message fields to lists.
+			fields = new ArrayList<>();
+			ObjectFactory of = new ObjectFactory();
+			if (msgDetails.getStage() == InteractionStage.PUBSUB_NOTIFY) {
+				TypeReference subscriptionIdType = of.createTypeReference();
+				subscriptionIdType.setArea(MAL_AREA_NAME);
+				subscriptionIdType.setName("Identifier");
+				NamedElementReferenceWithCommentType subscriptionIdField = of.createNamedElementReferenceWithCommentType();
+				subscriptionIdField.setName("subscriptionId");
+				subscriptionIdField.setType(subscriptionIdType);
+				fields.add(subscriptionIdField);
+			}
+
+			TypeReference updateHeaderListType = of.createTypeReference();
+			updateHeaderListType.setArea(MAL_AREA_NAME);
+			updateHeaderListType.setName("UpdateHeader");
+			updateHeaderListType.setList(Boolean.TRUE);
+			NamedElementReferenceWithCommentType updateHeadersField = of.createNamedElementReferenceWithCommentType();
+			updateHeadersField.setName("updateHeaders");
+			updateHeadersField.setType(updateHeaderListType);
+			fields.add(updateHeadersField);
+			for (NamedElementReferenceWithCommentType field : msgDetails.getFields()) {
+				// deeply copy field and always set list to true
+				TypeReference typeRefCopy = of.createTypeReference();
+				TypeReference typeRef = field.getType();
+				typeRefCopy.setArea(typeRef.getArea());
+				typeRefCopy.setService(typeRef.getService());
+				typeRefCopy.setName(typeRef.getName());
+				typeRefCopy.setList(Boolean.TRUE);
+				NamedElementReferenceWithCommentType fieldCopy = of.createNamedElementReferenceWithCommentType();
+				fieldCopy.setName(field.getName());
+				fieldCopy.setComment(field.getComment());
+				fieldCopy.setCanBeNull(field.isCanBeNull());
+				fieldCopy.setType(typeRefCopy);
+				fields.add(fieldCopy);
+			}
+		} else {
+			fields = msgDetails.getFields();
+		}
+
+		for (NamedElementReferenceWithCommentType field : fields) {
 			XmlSchemaElement xsdSeqElem = new XmlSchemaElement(schema, false);
 			xsdSeqElem.getRef().setTargetQName(toQName(schema, field.getType()));
 			xsdSequenceItems.add(xsdSeqElem);
