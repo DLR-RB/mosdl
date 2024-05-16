@@ -35,11 +35,17 @@ public class MosdlMojo extends AbstractMojo {
 	@Parameter(property = "generate.mosdl")
 	private Boolean mosdl;
 
+	@Parameter(property = "generate.xsd")
+	private Boolean xsd;
+
+	@Parameter(property = "generate.xsdBodyTypes")
+	private Boolean createXsdBodyTypes;
+
 	@Parameter(property = "generate.skipValidation")
 	private Boolean skipValidation;
 
-	@Parameter(property = "generate.mosdl-doc-type", defaultValue = "BULK")
-	private MosdlGenerator.DocType mosdlDocType;
+	@Parameter(property = "generate.doc-type", defaultValue = "BULK")
+	private MosdlGenerator.DocType docType;
 
 	@Parameter(defaultValue = "${project}", required = true, readonly = true)
 	private MavenProject project;
@@ -56,9 +62,11 @@ public class MosdlMojo extends AbstractMojo {
 
 		boolean createXml = null != xml && xml;
 		boolean createMosdl = null != mosdl && mosdl;
+		boolean createXsd = null != xsd && xsd;
+		boolean isCreateXsdBodyTypes = null != createXsdBodyTypes && createXsdBodyTypes;
 		boolean isSkipValidation = null != skipValidation && skipValidation;
 
-		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, mosdlDocType);
+		Runner runner = new MosdlRunner(isSkipValidation, createXml, createMosdl, createXsd, isCreateXsdBodyTypes, docType);
 		for (File serviceFileOrDir : serviceSpecs) {
 			logger.info("Compiling service specification in '{}'.", serviceFileOrDir);
 			try {

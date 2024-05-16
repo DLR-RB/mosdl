@@ -4,6 +4,7 @@ package de.dlr.gsoc.mcds.mosdl;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 import javax.xml.bind.JAXBElement;
 import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.AreaType;
@@ -30,7 +31,11 @@ public class TestUtils {
 	}
 
 	public static File getResource(String fileName) throws URISyntaxException {
-		return new File(TestUtils.class.getResource(fileName).toURI());
+		URL url = TestUtils.class.getResource(fileName);
+		if (null == url) {
+			return null;
+		}
+		return new File(url.toURI());
 	}
 
 	public static void assertXmlEquals(File expected, File actual) {

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="Color">
+        <xs:annotation>
+            <xs:documentation>Composite representing a color.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="r" type="malxml:Double">
+                        <xs:annotation>
+                            <xs:documentation>The red value between 0 and 1.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="g" type="malxml:Double">
+                        <xs:annotation>
+                            <xs:documentation>The green value between 0 and 1.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="b" type="malxml:Double">
+                        <xs:annotation>
+                            <xs:documentation>The blue value between 0 and 1.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ColorList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Color" nillable="true" type="Color"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Color" nillable="true" type="Color"/>
+    <xs:element name="ColorList" nillable="true" type="ColorList"/>
+    <xs:complexType abstract="true" name="Vehicle">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="maxSpeed" type="malxml:UInteger"/>
+                    <xs:element name="color" nillable="true" type="Color"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType abstract="true" name="VehicleList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Vehicle" nillable="true" type="Vehicle"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Vehicle" nillable="true" type="Vehicle"/>
+    <xs:element name="VehicleList" nillable="true" type="VehicleList"/>
+    <xs:complexType name="Car">
+        <xs:complexContent>
+            <xs:extension base="Vehicle">
+                <xs:sequence>
+                    <xs:element name="fuel" type="FuelType"/>
+                    <xs:element name="licensePlate" type="malxml:Identifier"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="CarList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Car" nillable="true" type="Car"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Car" nillable="true" type="Car"/>
+    <xs:element name="CarList" nillable="true" type="CarList"/>
+    <xs:complexType name="Airplane">
+        <xs:complexContent>
+            <xs:extension base="Vehicle">
+                <xs:sequence>
+                    <xs:element name="numberOfEngines" type="malxml:UInteger"/>
+                    <xs:element name="wingSpan" type="malxml:UInteger"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="AirplaneList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Airplane" nillable="true" type="Airplane"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Airplane" nillable="true" type="Airplane"/>
+    <xs:element name="AirplaneList" nillable="true" type="AirplaneList"/>
+</xs:schema>

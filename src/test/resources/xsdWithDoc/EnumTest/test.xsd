@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="FuelType">
+        <xs:annotation>
+            <xs:documentation>This enumeration denotes the possible fuel types for a car.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="malxml:Element">
+                <xs:sequence>
+                    <xs:element name="FuelType" type="FuelTypeEnum"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="FuelTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="GASOLINE">
+                <xs:annotation>
+                    <xs:documentation>Gasoline, petrol, Benzin.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DIESEL"/>
+            <xs:enumeration value="ELECTRIC"/>
+            <xs:enumeration value="HYDROGEN"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="FuelTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="FuelType" nillable="true" type="FuelType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="FuelType" nillable="true" type="FuelType"/>
+    <xs:element name="FuelTypeList" nillable="true" type="FuelTypeList"/>
+</xs:schema>

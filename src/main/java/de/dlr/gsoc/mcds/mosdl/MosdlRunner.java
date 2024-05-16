@@ -5,6 +5,7 @@ package de.dlr.gsoc.mcds.mosdl;
 import de.dlr.gsoc.mcds.mosdl.generators.Generator;
 import de.dlr.gsoc.mcds.mosdl.generators.MosdlGenerator;
 import de.dlr.gsoc.mcds.mosdl.generators.XmlGenerator;
+import de.dlr.gsoc.mcds.mosdl.generators.XsdGenerator;
 import de.dlr.gsoc.mcds.mosdl.loaders.MosdlSpecLoader;
 import de.dlr.gsoc.mcds.mosdl.loaders.SpecLoader;
 import de.dlr.gsoc.mcds.mosdl.loaders.XmlSpecLoader;
@@ -29,6 +30,8 @@ public class MosdlRunner extends Runner {
 	private final boolean isSkipValidation;
 	private final boolean createXml;
 	private final boolean createMosdl;
+	private final boolean createXsd;
+	private final boolean isCreateXsdBodyTypes;
 	private final MosdlGenerator.DocType docType;
 
 	/**
@@ -38,14 +41,22 @@ public class MosdlRunner extends Runner {
 	 * {@code false} otherwise
 	 * @param createXml {@code true} if MO XML files shall be generated, {@code false} otherwise
 	 * @param createMosdl {@code true} if MOSDL files shall be generated, {@code false} otherwise
-	 * @param docType only applicable if {@code createMosdl} is {@code true}. Determines the type of
-	 * documentation to generate for MOSDL files.
+	 * @param createXsd {@code true} if MO data structure XSD files shall be generated,
+	 * {@code false} otherwise
+	 * @param isCreateXsdBodyTypes {@code true} if generated XSD files shall also contain specific
+	 * types for all message bodies of the defined service operations, {@code false} otherwise. Body
+	 * type specializations are not part of the standard and only applicable if {@code createXsd} is
+	 * {@code true}.
+	 * @param docType only applicable if {@code createMosdl} or {@code createXsd} is {@code true}.
+	 * Determines the type of documentation to generate for MOSDL files.
 	 */
-	public MosdlRunner(boolean isSkipValidation, boolean createXml, boolean createMosdl, MosdlGenerator.DocType docType) {
+	public MosdlRunner(boolean isSkipValidation, boolean createXml, boolean createMosdl, boolean createXsd, boolean isCreateXsdBodyTypes, MosdlGenerator.DocType docType) {
 		this.isSkipValidation = isSkipValidation;
 		this.createXml = createXml;
 		this.createMosdl = createMosdl;
+		this.createXsd = createXsd;
 		this.docType = docType;
+		this.isCreateXsdBodyTypes = isCreateXsdBodyTypes;
 	}
 
 	@Override
@@ -65,6 +76,9 @@ public class MosdlRunner extends Runner {
 		}
 		if (createMosdl) {
 			generators.add(new MosdlGenerator(docType));
+		}
+		if (createXsd) {
+			generators.add(new XsdGenerator(docType != MosdlGenerator.DocType.SUPPRESS, isCreateXsdBodyTypes));
 		}
 		return generators;
 	}

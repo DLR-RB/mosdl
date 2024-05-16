@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test/ServiceName" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/MC/Parameter" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test/ServiceName">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MC/Parameter"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="ServiceCompositeWithImportedType">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="svcValidity" type="ns0:ValidityState"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ServiceCompositeWithImportedTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="ServiceCompositeWithImportedType" nillable="true" type="ServiceCompositeWithImportedType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="ServiceCompositeWithImportedType" nillable="true" type="ServiceCompositeWithImportedType"/>
+    <xs:element name="ServiceCompositeWithImportedTypeList" nillable="true" type="ServiceCompositeWithImportedTypeList"/>
+</xs:schema>

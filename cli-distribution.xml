@@ -21,6 +21,7 @@
 		<fileSet>
 			<includes>
 				<include>LICENSE.txt</include>
+				<include>NOTICE.txt</include>
 				<include>THIRD-PARTY.txt</include>
 				<include>MOSDL.md</include>
 				<include>npp_mosdl.xml</include>

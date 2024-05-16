@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService"/>
+    <xs:complexType abstract="true" name="OrbitStuff">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element name="inclination" type="malxml:Double"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType abstract="true" name="OrbitStuffList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="OrbitStuff" nillable="true" type="OrbitStuff"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="OrbitStuff" nillable="true" type="OrbitStuff"/>
+    <xs:element name="OrbitStuffList" nillable="true" type="OrbitStuffList"/>
+    <xs:complexType name="MoonOrbitStuff">
+        <xs:complexContent>
+            <xs:extension base="OrbitStuff">
+                <xs:sequence>
+                    <xs:element name="fullMoonInfo" type="ns0:MyOwnType"/>
+                    <xs:element name="isMoonFromCheese" type="malxml:Boolean"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="MoonOrbitStuffList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="MoonOrbitStuff" nillable="true" type="MoonOrbitStuff"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="MoonOrbitStuff" nillable="true" type="MoonOrbitStuff"/>
+    <xs:element name="MoonOrbitStuffList" nillable="true" type="MoonOrbitStuffList"/>
+</xs:schema>

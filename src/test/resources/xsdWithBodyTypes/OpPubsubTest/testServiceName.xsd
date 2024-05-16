@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/test/ServiceName" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/test/ServiceName">
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
+    <xs:complexType name="monitor_PUBSUB_PUBLISH_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:StringList"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="monitor_PUBSUB_NOTIFY_Body">
+        <xs:complexContent>
+            <xs:restriction base="malxml:Body">
+                <xs:sequence>
+                    <xs:element ref="malxml:Identifier"/>
+                    <xs:element ref="malxml:UpdateHeaderList"/>
+                    <xs:element ref="malxml:StringList"/>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/MAL">
+    <xs:complexType name="Body">
+        <xs:sequence>
+            <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="Body" type="malxml:Body"/>
+    <xs:complexType name="NewAttributeType">
+        <xs:complexContent>
+            <xs:extension base="malxml:Attribute">
+                <xs:sequence>
+                    <xs:element name="NewAttributeType" type="xs:anyType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="NewAttributeTypeList">
+        <xs:complexContent>
+            <xs:extension base="malxml:Composite">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="NewAttributeType" nillable="true" type="malxml:NewAttributeType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="NewAttributeType" nillable="true" type="malxml:NewAttributeType"/>
+    <xs:element name="NewAttributeTypeList" nillable="true" type="malxml:NewAttributeTypeList"/>
+</xs:schema>

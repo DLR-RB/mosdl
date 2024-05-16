@@ -8,7 +8,9 @@ import de.dlr.gsoc.mcds.mosdl.TestUtils;
 import static de.dlr.gsoc.mcds.mosdl.TestUtils.assertXmlEquals;
 import de.dlr.gsoc.mcds.mosdl.generators.MosdlGenerator;
 import java.io.File;
+import java.util.Arrays;
 import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,10 +29,16 @@ public class MosdlIT {
 		"ServiceCompositeTest", "ServiceCompositeAbstractTest", "ServiceEnumTest", "ServiceErrorTest",
 		"CommentTest", "ImportTest", "ImportComplexTest",
 		"FundamentalTest", "AttributeTest"};
+	private static final String[] COMPLEX_TEST_CASES = {"VerySimpleService", "ComplexService"};
 
 	// do not change method signature without changing MethodSource annotations on test methods
 	static Stream<String> simpleTestCaseProvider() {
 		return Stream.of(SIMPLE_TEST_CASES);
+	}
+
+	// do not change method signature without changing MethodSource annotations on test methods
+	static Stream<String> allTestCaseProvider() {
+		return Stream.concat(Stream.of(SIMPLE_TEST_CASES), Stream.of("VerySimpleService", "ComplexService"));
 	}
 
 	@ParameterizedTest()
@@ -45,7 +53,7 @@ public class MosdlIT {
 		File outputFile = new File(targetDirectory, outputFileName);
 		File expectedFile = TestUtils.getResource(expectedFilePath);
 
-		Runner runner = new MosdlRunner(false, true, false, null);
+		Runner runner = new MosdlRunner(false, true, false, false, false, null);
 		runner.execute(outputFile, inputFile);
 
 		assertXmlEquals(expectedFile, outputFile);
@@ -63,7 +71,7 @@ public class MosdlIT {
 		File outputFile = new File(targetDirectory, outputFileName);
 		File expectedFile = TestUtils.getResource(expectedFilePath);
 
-		Runner runner = new MosdlRunner(false, true, false, null);
+		Runner runner = new MosdlRunner(false, true, false, false, false, null);
 		runner.execute(outputFile, inputFile1, inputFile2);
 
 		assertXmlEquals(expectedFile, outputFile);
@@ -90,13 +98,57 @@ public class MosdlIT {
 		File inputFile = TestUtils.getResource(inputFilePath);
 		File outputFile = new File(xmlTargetDirectory, xmlFileName);
 
-		Runner xmlToMosdlRunner = new MosdlRunner(false, false, true, docType);
+		Runner xmlToMosdlRunner = new MosdlRunner(false, false, true, false, false, docType);
 		xmlToMosdlRunner.execute(mosdlTargetDirectory, inputFile);
 
-		Runner mosdlToXmlRunner = new MosdlRunner(false, true, false, null);
+		Runner mosdlToXmlRunner = new MosdlRunner(false, true, false, false, false, null);
 		mosdlToXmlRunner.execute(outputFile, mosdlTargetDirectory);
 
 		assertXmlEquals(inputFile, outputFile);
+	}
+
+	@ParameterizedTest()
+	@MethodSource("allTestCaseProvider")
+	void mosdlToXsdWithDocTest(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test (with doc): '{}'", input);
+		mosdlToXsdTest(input, "/xsdWithDoc/", targetDirectory, false, MosdlGenerator.DocType.BULK);
+	}
+
+	@ParameterizedTest()
+	@MethodSource("allTestCaseProvider")
+	void mosdlToXsdWithoutDocTest(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test (without doc): '{}'", input);
+		mosdlToXsdTest(input, "/xsdWithoutDoc/", targetDirectory, false, MosdlGenerator.DocType.SUPPRESS);
+	}
+
+	@ParameterizedTest()
+	@MethodSource("allTestCaseProvider")
+	void mosdlToXsdWithBodyTypes(String input, @TempDir File targetDirectory) throws Exception {
+		logger.info("MOSDL to XSD Test (with body types): '{}'", input);
+		mosdlToXsdTest(input, "/xsdWithBodyTypes/", targetDirectory, true, MosdlGenerator.DocType.BULK);
+	}
+
+	private void mosdlToXsdTest(String input, String expectedBaseDir, File targetDirectory, boolean isCreateXsdBodyTypes, MosdlGenerator.DocType docType) throws Exception {
+		String inputFilePath = "/mosdl/" + input + ".mosdl";
+		String expectedDirectoryPath = expectedBaseDir + input;
+
+		File inputFile = TestUtils.getResource(inputFilePath);
+		File outputDirectory = new File(targetDirectory, input);
+		outputDirectory.mkdirs();
+		File expectedDirectory = TestUtils.getResource(expectedDirectoryPath);
+
+		Runner runner = new MosdlRunner(false, false, false, true, isCreateXsdBodyTypes, docType);
+		runner.execute(outputDirectory, inputFile);
+
+		File[] expectedFiles = null == expectedDirectory ? new File[]{} : expectedDirectory.listFiles();
+		File[] outputFiles = outputDirectory.listFiles();
+		assertEquals(expectedFiles.length, outputFiles.length);
+
+		Arrays.sort(expectedFiles);
+		Arrays.sort(outputFiles);
+		for (int i = 0; i < expectedFiles.length; i++) {
+			assertXmlEquals(expectedFiles[i], outputFiles[i]);
+		}
 	}
 
 }
