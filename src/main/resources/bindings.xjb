@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jxb:bindings version="2.1"
-			  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+<jxb:bindings version="3.0"
+			  xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
 			  xmlns:xs="http://www.w3.org/2001/XMLSchema"
 			  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-			  xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+			  xmlns:namespace="urn:jaxb.jvnet.org:plugin:namespace-prefix"
 			  jxb:extensionBindingPrefixes="xjc">
 
 	<jxb:globalBindings>

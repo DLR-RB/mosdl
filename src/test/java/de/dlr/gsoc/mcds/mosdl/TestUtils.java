@@ -5,7 +5,7 @@ package de.dlr.gsoc.mcds.mosdl;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.CapabilitySetType;

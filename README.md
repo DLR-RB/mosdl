@@ -70,7 +70,7 @@ This project can be used in three different ways:
 2. as a plugin for a [Maven](https://maven.apache.org/)-based build process in order to transform MOSDL to/from CCSDS MO XML,
 3. as a Java library for reading and writing MOSDL and CCSDS MO XML files.
 
-You need Java 8 JDK (e.g. [AdoptOpenJDK](https://adoptopenjdk.net/)) if you use this project as Maven plugin or Java library. The stand-alone program should also run fine with a Java 8 JRE. Currently, Java versions other than Java 8 are not supported.
+You need at least Java 11 JDK (e.g. [Eclipse Temurin](https://adoptium.net/)) if you use this project as Maven plugin or Java library. The stand-alone program should also run fine with a Java 11 JRE. Currently, LTS Java versions 11, 17 and 21 are supported.
 
 
 ### Stand-alone usage

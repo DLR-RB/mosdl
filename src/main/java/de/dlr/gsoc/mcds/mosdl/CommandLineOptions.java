@@ -23,6 +23,10 @@ import java.util.stream.Collectors;
  */
 public class CommandLineOptions {
 
+	public static enum ParseResult {
+		UNPARSED, ERROR, SUCCESS, HELP_REQUESTED
+	}
+
 	private final String description;
 	private final Map<String, Option<?>> optionsByLongName;
 	private final Map<String, Option<?>> optionsByShortName;
@@ -36,12 +40,11 @@ public class CommandLineOptions {
 	private final boolean isCaseSensitiveEnumValues;
 	private final boolean isAllowAbbrevEnumValues;
 	private final boolean isPrintUsageOnError;
-	private final boolean isExitOnHelpOrError;
-	private boolean isParsed = false;
+	private ParseResult parseResult = ParseResult.UNPARSED;
 
 	private CommandLineOptions(String description, List<Option<?>> options, String longPrefix, String shortPrefix,
 			boolean isCaseSensitiveLongOptions, boolean isCaseSensitiveShortOptions, boolean isCaseSensitiveEnumValues, boolean isAllowAbbrevEnumValues,
-			boolean isPrintUsageOnError, boolean isExitOnHelpOrError) {
+			boolean isPrintUsageOnError) {
 		this.description = description;
 		this.optionsByLongName = options.stream()
 				.filter(o -> null != o.getLongName() && !o.getLongName().isEmpty())
@@ -72,7 +75,6 @@ public class CommandLineOptions {
 		this.isCaseSensitiveEnumValues = isCaseSensitiveEnumValues;
 		this.isAllowAbbrevEnumValues = isAllowAbbrevEnumValues;
 		this.isPrintUsageOnError = isPrintUsageOnError;
-		this.isExitOnHelpOrError = isExitOnHelpOrError;
 	}
 
 	public CommandLineOptions parse(String... args) {
@@ -84,9 +86,7 @@ public class CommandLineOptions {
 			if (isPrintUsageOnError) {
 				printUsage();
 			}
-			if (isExitOnHelpOrError) {
-				System.exit(-1);
-			}
+			parseResult = ParseResult.ERROR;
 		}
 		return this;
 	}
@@ -110,9 +110,8 @@ public class CommandLineOptions {
 						}
 						if (currentOption.isHelp) {
 							printHelp();
-							if (isExitOnHelpOrError) {
-								System.exit(0);
-							}
+							parseResult = ParseResult.HELP_REQUESTED;
+							return this;
 						}
 						if (currentOption.getArity() == 0 && currentOption.getType().equals(Boolean.class)) {
 							// binary toggle was given - maps to true
@@ -132,9 +131,8 @@ public class CommandLineOptions {
 						}
 						if (currentOption.isHelp) {
 							printHelp();
-							if (isExitOnHelpOrError) {
-								System.exit(0);
-							}
+							parseResult = ParseResult.HELP_REQUESTED;
+							return this;
 						}
 						if (currentOption.getArity() == 0 && currentOption.getType().equals(Boolean.class)) {
 							// binary toggle was given - maps to true
@@ -174,12 +172,16 @@ public class CommandLineOptions {
 		if (!missingOptions.isEmpty()) {
 			throw new IllegalArgumentException("Following required options are missing: " + missingOptions);
 		}
-		isParsed = true;
+		parseResult = ParseResult.SUCCESS;
 		return this;
 	}
 
 	private enum ParseMode {
 		PARSE_OPTION, PARSE_VALUE;
+	}
+
+	public ParseResult getParseResult() {
+		return parseResult;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -217,8 +219,8 @@ public class CommandLineOptions {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getFromNameMap(String name, Map<String, Option<?>> nameMap) {
-		if (!isParsed) {
-			throw new IllegalStateException("Command line arguments need to be parsed before they can be retrieved.");
+		if (parseResult != ParseResult.SUCCESS) {
+			throw new IllegalStateException("Command line arguments need to be parsed successfully before they can be retrieved.");
 		}
 		Option<?> option = nameMap.get(name);
 		if (null != option) {
@@ -343,7 +345,6 @@ public class CommandLineOptions {
 		private boolean isCaseSensitiveEnumValues = false;
 		private boolean isAllowAbbrevEnumValues = true;
 		private boolean isPrintUsageOnError = true;
-		private boolean isExitOnHelpOrError = true;
 		private boolean isAddHelpOptions = true;
 
 		public Builder() {
@@ -355,7 +356,7 @@ public class CommandLineOptions {
 			}
 			return new CommandLineOptions(description, Collections.unmodifiableList(options), longPrefix, shortPrefix,
 					isCaseSensitiveLongOptions, isCaseSensitiveShortOptions, isCaseSensitiveEnumValues, isAllowAbbrevEnumValues,
-					isPrintUsageOnError, isExitOnHelpOrError);
+					isPrintUsageOnError);
 		}
 
 		public <T> Builder required(String longName, String shortName, String placeholderName, Class<T> valueType, String description) {
@@ -428,11 +429,6 @@ public class CommandLineOptions {
 
 		public Builder isAllowAbbrevEnumValues(boolean isAbbreviationAllowed) {
 			this.isAllowAbbrevEnumValues = isAbbreviationAllowed;
-			return this;
-		}
-
-		public Builder exitOnHelpOrError(boolean isExitOnHelpOrError) {
-			this.isExitOnHelpOrError = isExitOnHelpOrError;
 			return this;
 		}
 

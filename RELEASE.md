@@ -30,39 +30,40 @@ All of the following steps happen on the `master` branch. Currently, there is no
 	mvn org.codehaus.mojo:versions-maven-plugin:set -DgenerateBackupPoms=false -DnewVersion=<release version>
 	```
 2. Make sure [`CHANGELOG.md`](CHANGELOG.md) contains all relevant changes for the new release up to <release version>.
-3. Stage all changes in git.
-4. Build, test and deploy to Maven Central (uploading may take one or two minutes):
+3. Make sure [`THIRD-PARTY.txt`](THIRD-PARTY.txt) contains all relevant notices for dependencies (use `mvn dependency:tree` for reviewing a list of dependencies or use `mvn license:third-party-report "-Dlicense.includedScopes=compile,runtime"` for generating a license report HTML file, which you should still review).
+4. Stage all changes in git.
+5. Build, test and deploy to Maven Central (uploading may take one or two minutes):
 	```
 	mvn clean deploy -Prelease
 	```
-5. Release deployed artifacts to Maven Central:
+6. Release deployed artifacts to Maven Central:
 	- Login to https://oss.sonatype.org/
 	- Click `Build Promotion -> Staging Repositories -> <newly created repository>` and examine contents for correctness.
 	- Click `Close` in the top toolbar, click `Confirm` and wait one or two minutes until the close activity has finished (click `Refresh` to see the current state).
 	- Click `Release` in the top toolbar. Wait until status reads `released` (click `Refresh` to see the current state).
-6. Copy contents of `target/mosdl-<release version>` to `.github` folder (except the JAR file; overwrite if necessary).
-7. Stage and commit all changes in git. Commit message:
+7. Copy contents of `target/mosdl-<release version>` to `.github` folder (except the JAR file; overwrite if necessary).
+8. Stage and commit all changes in git. Commit message:
 	```
 	Release v<release version>
 	```
-8. Create annotated release tag in git. Tag name:
+9. Create annotated release tag in git. Tag name:
 	```
 	v<release version>
 	```
-9. Update version number to next snapshot version:
+10. Update version number to next snapshot version:
 	```
 	mvn org.codehaus.mojo:versions-maven-plugin:set -DgenerateBackupPoms=false -DnewVersion=<snapshot version>
 	```
-10. Add new section to top of [`CHANGELOG.md`](CHANGELOG.md):
+11. Add new section to top of [`CHANGELOG.md`](CHANGELOG.md):
 	```
 	### <snapshot version> (unreleased)
 	- Not released yet.
 	```
-11. Stage and commit all changes in git. Commit message:
+12. Stage and commit all changes in git. Commit message:
 	```
 	Version upped to <snapshot version>.
 	```
-12. Create a new release in GitHub:
+13. Create a new release in GitHub:
 	- Use tag `v<release version>`.
 	- Release title: `Release v<release version>`
 	- Copy section `### <release version>` from [`CHANGELOG.md`](CHANGELOG.md) to release description text box.
