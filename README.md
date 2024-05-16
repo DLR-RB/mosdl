@@ -52,7 +52,7 @@ service HelloWorldService {
 
 The snippet above describes a service (`HelloWorldService`) offering one request-response operation (`myOperation`) that takes a single String parameter as request (`hello`) and returns a single String parameter as response (`world`).
 
-The MOSDL compiler can be used to generate an CCSDS MO XML document, which can then be used by third-party software (e.g. [ESA CCSDS MO Stub Generator](https://github.com/esa/CCSDS_MO_StubGenerator/)) to generate documentation, API code for service consumers and providers, and possible other representations.
+The MOSDL compiler can be used to generate an CCSDS MO XML document, which can then be used by third-party software (e.g. [ESA CCSDS MO API Generator](https://github.com/esa/mo-services-java/tree/master/api-generator)) to generate documentation, API code for service consumers and providers, and possible other representations.
 
 
 MOSDL language

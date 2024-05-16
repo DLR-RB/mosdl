@@ -7,8 +7,7 @@ Current version: __${project.version}__
 MOSDL version history
 ---------------------
 
-### 0.2-SNAPSHOT (unreleased)
-- Not released yet.
+### 0.2.0 (2024-05-16)
 - Drop support for Java 8.
 - Add support for Java 11+ (at least up to Java 21).
 - New experimental XSD generator for generating XML Schema files for data structures defined in an MO specification.

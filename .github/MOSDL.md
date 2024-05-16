@@ -150,7 +150,7 @@ Types and errors can be referred to (e.g. in the message signature of an operati
 * Partly qualified: `serviceName.typeName`
 * Unqualified: `typeName`
 
-Only two scopes exist: service-level scope and area-level scope. Using a fully qualified type reference is straight-forward because the referenced type is unique. You can use a partly qualified type reference if you reference types from the same area, but a different service. Use unqualified type references to refer to service-level types from the same service or area-level types from the same area. If you are in service scope this scope will be searched first and only if the type is not found there the enclosing area scope is searched for the type. If you are in area scope only the area scope will be searched for the type.
+Only two scopes exist: service-level scope and area-level scope. Using a fully qualified type reference is straight-forward because the referenced type is unique. You can use a partly qualified type reference if you reference types from the same area, but a different service. Use unqualified type references to refer to service-level types from the same service or area-level types from the same area. If you are in service scope this scope will be searched first and only if the type is not found there the enclosing area scope is searched for the type. If you are in area scope only the area scope will be searched for the type. This also means that you need to use at least a partly qualified name if you refer to a service-level type from area scope.
 
 You can also import types (and errors) from other areas and services using an `import` statement:
 
