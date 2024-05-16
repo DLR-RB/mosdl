@@ -7,7 +7,7 @@ import de.dlr.gsoc.mcds.mosdl.InteractionType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;

@@ -2,28 +2,34 @@ package de.dlr.gsoc.mcds.mosdl.integrationtests;
 
 import de.dlr.gsoc.mcds.mosdl.CliMain;
 import de.dlr.gsoc.mcds.mosdl.TestUtils;
+
 import java.io.File;
 import java.security.Permission;
+
 import org.junit.jupiter.api.AfterAll;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 public class CliMainIT {
 
-	private static SecurityManager oldSecurityMgr;
+	private static CliMain.SystemExiter oldSystemExiter;
 
 	@BeforeAll
 	static void init() {
-		oldSecurityMgr = System.getSecurityManager();
-		System.setSecurityManager(new CatchExitSecurityManager());
+		oldSystemExiter = CliMain.getSystemExiter();
+		CliMain.setSystemExiter(status -> {
+			throw new SystemExitError(status);
+		});
 	}
 
 	@AfterAll
 	static void tearDown() {
-		System.setSecurityManager(oldSecurityMgr);
+		CliMain.setSystemExiter(oldSystemExiter);
 	}
 
 	@Test
@@ -47,22 +53,6 @@ public class CliMainIT {
 		String[] args = {srcFile.getAbsolutePath(), tempDir.getAbsolutePath(), "-m", "--doc-type", "BULK"};
 		CliMain.main(args);
 		assertEquals(1, tempDir.listFiles().length);
-	}
-
-	private static class CatchExitSecurityManager extends SecurityManager {
-
-		@Override
-		public void checkExit(int status) {
-			throw new SystemExitError(status);
-		}
-
-		@Override
-		public void checkPermission(Permission perm) {
-			if (null != oldSecurityMgr) {
-				oldSecurityMgr.checkPermission(perm);
-			}
-		}
-
 	}
 
 	private static class SystemExitError extends Error {
