@@ -7,6 +7,9 @@ Current version: __${project.version}__
 MOSDL version history
 ---------------------
 
+### 0.3-SNAPSHOT (unreleased)
+- Not released yet.
+
 ### 0.2.0 (2024-05-16)
 - Drop support for Java 8.
 - Add support for Java 11+ (at least up to Java 21).
