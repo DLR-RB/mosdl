@@ -5,6 +5,8 @@
             <mal:capabilitySet number="1">
                 <mal:pubsubIP name="monitor" number="1" supportInReplay="false">
                     <mal:messages>
+                        <mal:subscriptionKeys>
+                        </mal:subscriptionKeys>
                         <mal:publishNotify>
                             <mal:field name="eventText" canBeNull="false">
 <mal:type area="MAL" name="String"/>

@@ -145,8 +145,11 @@ public abstract class Generator {
 				messages.add(new MessageDetails(InteractionStage.PROGRESS_UPDATE, atrUpdate.getComment(), atrUpdate));
 				messages.add(new MessageDetails(InteractionStage.PROGRESS_RESPONSE, atrResponse.getComment(), atrResponse));
 			} else if (op instanceof PubSubOperationType) {
-				AnyTypeReference atrPublish = ((PubSubOperationType) op).getMessages().getPublishNotify();
+				PubSubOperationType.Messages msgs = ((PubSubOperationType) op).getMessages();
+				AnyTypeReference atrSubKeys = msgs.getSubscriptionKeys();
+				AnyTypeReference atrPublish = msgs.getPublishNotify();
 				AnyTypeReference atrNotify = atrPublish;
+				messages.add(new MessageDetails(InteractionStage.PUBSUB_SUBKEYS, atrSubKeys.getComment(), atrSubKeys));
 				messages.add(new MessageDetails(InteractionStage.PUBSUB_PUBLISH, atrPublish.getComment(), atrPublish));
 				messages.add(new MessageDetails(InteractionStage.PUBSUB_NOTIFY, atrNotify.getComment(), atrNotify));
 			}

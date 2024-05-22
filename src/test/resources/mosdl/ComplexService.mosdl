@@ -17,7 +17,7 @@ service TestService [3] {
 		-> (processingTime: Duration)
 		throws MAL::TOO_MANY
 
-	pubsub monitorValueChanges <- (oldValue: Attribute?, newValue: Attribute?)
+	pubsub monitorValueChanges() <- (oldValue: Attribute?, newValue: Attribute?)
 
 	/*
 	composite CommentedOut {

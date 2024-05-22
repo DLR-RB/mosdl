@@ -734,6 +734,7 @@ public class MosdlSpecLoader implements SpecLoader {
 		public void exitPubsubOp(MOSDLParser.PubsubOpContext ctx) {
 			PubSubOperationType op = (PubSubOperationType) currentOperation;
 			PubSubOperationType.Messages msgs = new PubSubOperationType.Messages();
+			msgs.setSubscriptionKeys(currentOpMessages.removeFirst());
 			msgs.setPublishNotify(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
 			op.setSupportInReplay(null != ctx.STAR());
@@ -810,6 +811,11 @@ public class MosdlSpecLoader implements SpecLoader {
 		@Override
 		public void enterProgressResponseMsg(MOSDLParser.ProgressResponseMsgContext ctx) {
 			enterMsg(InteractionStage.PROGRESS_RESPONSE, ctx.pmsg().doc());
+		}
+
+		@Override
+		public void enterPubsubSubscriptionKeys(MOSDLParser.PubsubSubscriptionKeysContext ctx) {
+			enterMsg(InteractionStage.PUBSUB_SUBKEYS, ctx.cmsg().doc());
 		}
 
 		@Override

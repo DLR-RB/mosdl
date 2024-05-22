@@ -176,6 +176,10 @@ public class XsdGenerator extends Generator {
 									if (null == schema) {
 										schema = getOrCreateSchema(schemaCollection, area, service);
 									}
+									if (msgDetails.getStage() == InteractionStage.PUBSUB_SUBKEYS) {
+										// pubsub keys are modeled as an interaction stage, but do not correspond to a real MAL message
+										continue;
+									}
 									XmlSchemaType xsdType = addMessageBody(schema, op, msgDetails);
 //									addCorrespondingElement(schema, xsdType, false); // TODO: Remove element, only needed for easier testing
 								}

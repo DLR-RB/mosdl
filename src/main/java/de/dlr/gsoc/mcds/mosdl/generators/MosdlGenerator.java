@@ -162,8 +162,8 @@ public class MosdlGenerator extends Generator {
 									writeMessage("-> ", messages.get(3));
 									break;
 								case PUBSUB:
-									write(" <- ");
 									writeMessage(null, messages.get(0));
+									writeMessage("<- ", messages.get(1));
 									break;
 							}
 							if (!errors.isEmpty()) {

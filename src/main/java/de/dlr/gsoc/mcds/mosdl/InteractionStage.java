@@ -38,5 +38,6 @@ public enum InteractionStage {
 	PUBSUB_DEREGISTER,
 	PUBSUB_DEREGISTER_ACK,
 	PUBSUB_PUBLISH_DEREGISTER,
-	PUBSUB_PUBLISH_DEREGISTER_ACK;
+	PUBSUB_PUBLISH_DEREGISTER_ACK,
+	PUBSUB_SUBKEYS; // not a MAL interaction stage but useful for handling pubsub subscription keys
 }

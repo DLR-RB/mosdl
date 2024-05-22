@@ -111,8 +111,8 @@
           </xsd:element>
           <xsd:element name="errors" type="mal:ErrorDefinitionList" minOccurs="0"/>
         </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
         <xsd:attribute name="number" type="mal:ServiceNumber" use="required"/>
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
         <xsd:attribute name="version" type="mal:VersionNumber" use="required"/>
         <xsd:attribute name="comment" type="xsd:string" use="optional"/>
       </xsd:extension>
@@ -278,6 +278,7 @@
           <xsd:element name="messages">
             <xsd:complexType>
               <xsd:sequence>
+                <xsd:element name="subscriptionKeys" type="mal:AnyTypeReference"/>
                 <xsd:element name="publishNotify" type="mal:AnyTypeReference"/>
               </xsd:sequence>
             </xsd:complexType>
@@ -439,8 +440,8 @@
     <xsd:annotation>
       <xsd:documentation xml:lang="en">Defines a new attribute type. Shall only be present in the MAL Area.</xsd:documentation>
     </xsd:annotation>
-    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
     <xsd:attribute name="shortFormPart" type="mal:ShortFormPart" use="required"/>
+    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
 
@@ -472,14 +473,14 @@
     <xsd:sequence>
       <xsd:element name="item" minOccurs="1" maxOccurs="unbounded">
         <xsd:complexType>
-          <xsd:attribute name="value" type="xsd:NCName" use="required"/>
           <xsd:attribute name="nvalue" type="xsd:unsignedInt" use="required"/>
+          <xsd:attribute name="value" type="xsd:NCName" use="required"/>
           <xsd:attribute name="comment" type="xsd:string" use="optional"/>
         </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
     <xsd:attribute name="shortFormPart" type="mal:ShortFormPart" use="required"/>
+    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
 

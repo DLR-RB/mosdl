@@ -142,6 +142,7 @@
             <mal:capabilitySet number="4">
                 <mal:pubsubIP name="monitorValueChanges" number="8" supportInReplay="false">
                     <mal:messages>
+                        <mal:subscriptionKeys></mal:subscriptionKeys>
                         <mal:publishNotify>
                             <mal:field name="oldValue">
 <mal:type area="MAL" name="Attribute"/>
