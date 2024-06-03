@@ -41,7 +41,7 @@ bmsg        : doc? LARR parameters ;
 parameters  : LPAREN (field (COMMA? field)*)? RPAREN ;
 
 opErrors    : (error | errorRef) (COMMA (error | errorRef))*;
-errorRef    : doc? nonNullableType (COLON extraInfo)? ;
+errorRef    : doc? genericType (COLON extraInfo)? ;
 
 areaLevelDataType : attribute
                   | fundamental
@@ -50,19 +50,21 @@ attribute         : doc? ATTRIBUTE nidentifier ;
 fundamental       : doc? FUNDAMENTAL ID (EXTENDS type)? ;
 
 dataType    : composite
+            | object
             | enumeration ;
 
-composite   : doc? (ABSTRACT COMPOSITE ID | COMPOSITE nidentifier (EXTENDS type)?) LBRACE field* RBRACE ;
-field       : doc? ID COLON nullableType;
+composite   : doc? (ABSTRACT COMPOSITE ID | COMPOSITE nidentifier) (EXTENDS type)? LBRACE field* RBRACE ;
+field       : doc? ID COLON genericType;
+
+object      : doc? (ABSTRACT OBJECT ID | OBJECT nidentifier) ((EXTENDS type)? (IDENTITY ID)? | (IDENTITY ID)? (EXTENDS type)?) LBRACE field* RBRACE ;
 
 enumeration : doc? ENUM nidentifier LBRACE enumItem (COMMA? enumItem)* RBRACE ;
 enumItem    : doc? nidentifier ;
 
 error       : doc? ERROR nidentifier (COLON extraInfo)? ;
-extraInfo   : doc? nonNullableType ;
+extraInfo   : doc? genericType ;
 
-nullableType       : type QUEST? (LT nullableType GT)? ;
-nonNullableType    : type (LT nonNullableType GT)? ;
+genericType        : type QUEST? (LT genericType GT)? ;
 type               : simpleType
                    | qualifiedType
                    | fullyQualifiedType;
@@ -77,11 +79,13 @@ doc                : DOC
 AREA        : 'area' ;
 SERVICE     : 'service' ;
 COMPOSITE   : 'composite' ;
+OBJECT      : 'object' ;
 ENUM        : 'enum' ;
 ATTRIBUTE   : 'attribute' ;
 FUNDAMENTAL : 'fundamental' ;
 ERROR       : 'error' ;
 EXTENDS     : 'extends' ;
+IDENTITY    : 'identity' ;
 IMPORT      : 'import' ;
 THROWS      : 'throws' ;
 ABSTRACT    : 'abstract' ;

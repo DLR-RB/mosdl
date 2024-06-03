@@ -20,6 +20,7 @@ import org.ccsds.schema.serviceschema.RequestOperationType;
 import org.ccsds.schema.serviceschema.ServiceType;
 import org.ccsds.schema.serviceschema.SpecificationType;
 import org.ccsds.schema.serviceschema.SubmitOperationType;
+import org.ccsds.schema.serviceschema.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -112,6 +113,24 @@ public class XmlGenerator extends Generator {
 				((ProgressOperationType) source).setErrors(null);
 			} else if (source instanceof PubSubOperationType && ((PubSubOperationType) source).getErrors().isEmpty()) {
 				((PubSubOperationType) source).setErrors(null);
+			}
+			if (source instanceof TypeReference && ((TypeReference) source).isObjectRef()) {
+				TypeReference typeRef = (TypeReference) source;
+				typeRef.setObjectRef(null);
+				typeRef.setName("ObjectRef<" + typeRef.getName() + ">");
+			}
+		}
+
+		@Override
+		public void afterMarshal(Object source) {
+			if (source instanceof TypeReference && !((TypeReference) source).isObjectRef()) {
+				TypeReference typeRef = (TypeReference) source;
+				if (!typeRef.isObjectRef() && (typeRef.getName().startsWith("ObjectRef<") || typeRef.getName().startsWith("MAL::ObjectRef<")) && typeRef.getName().endsWith(">")) {
+					typeRef.setObjectRef(Boolean.TRUE);
+					int typeStart = typeRef.getName().indexOf("<");
+					String innerTypeName = typeRef.getName().substring(typeStart, typeRef.getName().length() - 1);
+					typeRef.setName(innerTypeName);
+				}
 			}
 		}
 	}

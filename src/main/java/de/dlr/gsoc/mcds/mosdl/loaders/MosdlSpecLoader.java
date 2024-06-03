@@ -6,6 +6,7 @@ import de.dlr.gsoc.mcds.mosdl.InteractionStage;
 import de.dlr.gsoc.mcds.mosdl.MOSDLBaseListener;
 import de.dlr.gsoc.mcds.mosdl.MOSDLLexer;
 import de.dlr.gsoc.mcds.mosdl.MOSDLParser;
+import jakarta.xml.bind.JAXBElement;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.xml.bind.JAXBElement;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -183,11 +184,11 @@ public class MosdlSpecLoader implements SpecLoader {
 	private static class ParseListener extends MOSDLBaseListener {
 
 		private static final String LIST_GENERIC = "List";
+		private static final String OBJECTREF_GENERIC = "ObjectRef";
 		private static final String MAL_AREA = "MAL";
-		private static final String[] MAL_FUNDAMENTALS = {"Blob", "Boolean", "Double", "Duration", "FineTime", "Float", "Identifier",
-			"Integer", "Long", "Octet", "Short", "String", "Time", "UInteger", "ULong", "UOctet", "URI", "UShort",
-			"Attribute", "Composite", "Element"
-		};
+		private static final Set<String> MAL_FUNDAMENTALS = new HashSet<>(Arrays.asList("Attribute", "Composite", "Element", "Object"));
+		private static final Set<String> MAL_ATTRIBUTES = new HashSet<>(Arrays.asList("Blob", "Boolean", "Double", "Duration", "FineTime", "Float", "Identifier",
+				"Integer", "Long", "Octet", "Short", "String", "Time", "UInteger", "ULong", "UOctet", "URI", "UShort", "ObjectRef"));
 		private static final String DOC_TOKEN = "\"\"\"";
 		private static final String LINE_DOC_TOKEN = "///";
 		private static final int START_USER_AREA = 256; // 1: MAL, 2: COM, 3: Common, 4: MC
@@ -244,8 +245,8 @@ public class MosdlSpecLoader implements SpecLoader {
 		 */
 		private void initImportedTypes() {
 			importedTypes.clear();
-			// add fundamental MAL types to imported types by default
-			for (String malDataType : MAL_FUNDAMENTALS) {
+			// add fundamental MAL types and attributes to imported types by default
+			for (String malDataType : Stream.concat(MAL_FUNDAMENTALS.stream(), MAL_ATTRIBUTES.stream()).collect(Collectors.toSet())) {
 				TypeReference typeRef = new TypeReference();
 				typeRef.setArea(MAL_AREA);
 				typeRef.setName(malDataType);
@@ -388,7 +389,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			String doc = getDoc(ctx.doc());
 			if (null != ctx.extraInfo()) {
 				ElementReferenceWithCommentType extraInfo = new ElementReferenceWithCommentType();
-				extraInfo.setType(getType(ctx.extraInfo().nonNullableType()));
+				extraInfo.setType(getType(ctx.extraInfo().genericType(), false));
 				String extraInfoDoc = getDoc(ctx.extraInfo().doc());
 				if (null != currentErrors) {
 					// if active operation merge potential extra info doc of operation
@@ -414,12 +415,12 @@ public class MosdlSpecLoader implements SpecLoader {
 		@Override
 		public void enterErrorRef(MOSDLParser.ErrorRefContext ctx) {
 			ErrorReferenceType errorRef = new ErrorReferenceType();
-			errorRef.setType(getType(ctx.nonNullableType()));
-			String errorName = ctx.nonNullableType().getText();
+			errorRef.setType(getType(ctx.genericType(), false));
+			String errorName = ctx.genericType().getText();
 			errorRef.setComment(currentOpDoc.getErrorDoc(errorName, getDoc(ctx.doc())));
 			if (null != ctx.extraInfo()) {
 				ElementReferenceWithCommentType extraInfo = new ElementReferenceWithCommentType();
-				extraInfo.setType(getType(ctx.extraInfo().nonNullableType()));
+				extraInfo.setType(getType(ctx.extraInfo().genericType(), false));
 				extraInfo.setComment(currentOpDoc.getErrorInfoDoc(errorName, getDoc(ctx.extraInfo().doc())));
 				errorRef.setExtraInformation(extraInfo);
 			}
@@ -512,14 +513,89 @@ public class MosdlSpecLoader implements SpecLoader {
 		}
 
 		@Override
+		public void enterObject(MOSDLParser.ObjectContext ctx) {
+			boolean isAbstract = null != ctx.ABSTRACT();
+			CompositeType compType = new CompositeType();
+			if (isAbstract) {
+				compType.setName(getId(ctx.ID(0)));
+			} else {
+				compType.setName(getName(ctx.nidentifier()));
+			}
+			String identityName = "identity";
+			if (null != ctx.IDENTITY()) {
+				if (isAbstract) {
+					identityName = getId(ctx.ID(1));
+				} else {
+					identityName = getId(ctx.ID(0));
+				}
+			}
+			String comment = getDoc(ctx.doc());
+			if (comment != null) {
+				comment = comment += "\n\n";
+			} else {
+				comment = "";
+			}
+			comment += "identity name: " + identityName;
+			compType.setComment(comment);
+			ElementReferenceType refType = new ElementReferenceType();
+			if (null != ctx.EXTENDS()) {
+				refType.setType(getType(ctx.type()));
+			} else {
+				TypeReference moObjectType = new TypeReference();
+				moObjectType.setArea(MAL_AREA);
+				moObjectType.setName("Object");
+				refType.setType(moObjectType);
+			}
+			compType.setExtends(refType);
+			currentComposite = compType;
+
+			// add object to service or area
+			if (null != currentService) {
+				DataTypeList dataTypeList = currentService.getDataTypes();
+				if (null == dataTypeList) {
+					dataTypeList = new DataTypeList();
+					currentService.setDataTypes(dataTypeList);
+				}
+				if (!isAbstract) {
+					compType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter).longValue());
+				}
+				dataTypeList.getCompositeOrEnumeration().add(compType);
+			} else {
+				AreaDataTypeList dataTypeList = currentArea.getDataTypes();
+				if (null == dataTypeList) {
+					dataTypeList = new AreaDataTypeList();
+					currentArea.setDataTypes(dataTypeList);
+				}
+				if (!isAbstract) {
+					compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+				}
+				dataTypeList.getFundamentalOrAttributeOrComposite().add(compType);
+			}
+		}
+
+		@Override
+		public void exitObject(MOSDLParser.ObjectContext ctx) {
+			currentComposite = null;
+		}
+
+		@Override
 		public void enterField(MOSDLParser.FieldContext ctx) {
 			NamedElementReferenceWithCommentType field = new NamedElementReferenceWithCommentType();
 			field.setName(getId(ctx.ID()));
 			String doc = getDoc(ctx.doc());
-			if (null == ctx.nullableType().QUEST()) {
+			if (null == ctx.genericType().QUEST()) {
 				field.setCanBeNull(Boolean.FALSE);
 			}
-			field.setType(getType(ctx.nullableType()));
+			TypeReference type = getType(ctx.genericType(), true);
+			if (currentStage == InteractionStage.PUBSUB_SUBKEYS) {
+				if (type.isList()) {
+					conditionallyFailOnError("Lists are not allowed for PUBSUB subscription keys.", ctx);
+				}
+				if (!type.isObjectRef() && !(MAL_AREA.equals(type.getArea()) && null == type.getService() && MAL_ATTRIBUTES.contains(type.getName()))) {
+					conditionallyFailOnError("Only Attribute types are allowed for PUBSUB subscription keys, but found '" + getFullyQualifiedName(type) + "' instead.", ctx);
+				}
+			}
+			field.setType(type);
 
 			// fields can be fields of composite or fields of message parameter list
 			if (null != currentComposite) {
@@ -923,58 +999,117 @@ public class MosdlSpecLoader implements SpecLoader {
 			return getId(nvidentifier.ID());
 		}
 
-		private TypeReference getType(final MOSDLParser.NonNullableTypeContext type) {
-			MOSDLParser.NonNullableTypeContext t = type;
+		private TypeReference getType(final MOSDLParser.GenericTypeContext type, boolean isAllowedToBeNullable) {
+			Deque<TypeReference> refs = resolveGeneric(type, isAllowedToBeNullable);
+			TypeReference ref = refs.removeFirst();
+			TypeReference origRef = ref;
 			boolean isList = false;
-			if (null != type.nonNullableType()) {
-				// type is the generic type, nonNullableType the contained type - only LIST_GENERIC as generic is supported
-				if (null != type.type().simpleType() && LIST_GENERIC.equals(getId(type.type().simpleType().ID()))) {
-					isList = true;
-					t = type.nonNullableType();
+			boolean isObjectRef = false;
+			if (ref.isList()) {
+				isList = true;
+				ref = refs.pollFirst();
+				if (null == ref) {
+					conditionallyFailOnError("Missing type parameter for List.", type);
 				} else {
-					conditionallyFailOnError("Only lists are supported as generic types.", type);
-					// recovery: treat as if user had specified a list
-					isList = true;
-					t = type.nonNullableType();
+					if (ref.isList()) {
+						conditionallyFailOnError("Nested lists are not allowed.", type);
+					}
+					if (ref.isObjectRef()) {
+						isObjectRef = true;
+						ref = refs.pollFirst();
+						if (null == ref) {
+							conditionallyFailOnError("Missing type parameter for ObjectRef.", type);
+						}
+					}
+				}
+			} else if (ref.isObjectRef()) {
+				isObjectRef = true;
+				ref = refs.pollFirst();
+				if (null == ref) {
+					conditionallyFailOnError("Missing type parameter for ObjectRef.", type);
+				} else {
+					if (ref.isList()) {
+						conditionallyFailOnError("ObjectRef referring to a List is not allowed.", type);
+					} else if (ref.isObjectRef()) {
+						conditionallyFailOnError("ObjectRef referring to other ObjectRef is not allowed.", type);
+					}
 				}
 			}
-			if (null != t.nonNullableType()) {
-				conditionallyFailOnError("Generics of generics are not allowed.", type);
-			}
 
-			// resolve type
-			TypeReference typeRef = getType(t.type());
-			if (isList) {
-				typeRef.setList(Boolean.TRUE);
+			if (ref == null) {
+				// only for recovery in lax mode
+				origRef.setList(Boolean.FALSE);
+				origRef.setObjectRef(Boolean.FALSE);
+				return origRef;
 			}
-			return typeRef;
+			String name = ref.getName();
+			String suffix = "";
+			if (!refs.isEmpty()) {
+				conditionallyFailOnError("Nested generics are not allowed except for List of ObjectRef.", type);
+			}
+			for (TypeReference tr : refs) {
+				name += "<";
+				if (tr.isList()) {
+					name += LIST_GENERIC;
+				} else if (tr.isObjectRef()) {
+					name += OBJECTREF_GENERIC;
+				} else {
+					name += getFullyQualifiedName(tr);
+				}
+				suffix += ">";
+			}
+			if (isList) {
+				ref.setList(Boolean.TRUE);
+			}
+			if (isObjectRef) {
+				ref.setObjectRef(Boolean.TRUE);
+			}
+			ref.setName(name + suffix);
+			return ref;
 		}
 
-		private TypeReference getType(final MOSDLParser.NullableTypeContext type) {
-			MOSDLParser.NullableTypeContext t = type;
-			boolean isList = false;
-			if (null != type.nullableType()) {
-				// type is the generic type, nonNullableType the contained type - only LIST_GENERIC as generic is supported
-				if (null != type.type().simpleType() && LIST_GENERIC.equals(getId(type.type().simpleType().ID()))) {
-					isList = true;
-					t = type.nullableType();
-				} else {
-					conditionallyFailOnError("Only lists are supported as generic types.", type);
-					// recovery: treat as if user had specified a list
-					isList = true;
-					t = type.nullableType();
-				}
+		private Deque<TypeReference> resolveGeneric(final MOSDLParser.GenericTypeContext type, final boolean isAllowedToBeNullable) {
+			TypeReference outerTypeRef = getType(type.type());
+			boolean isNullable = null != type.QUEST();
+			if (isNullable && !isAllowedToBeNullable) {
+				conditionallyFailOnError("Only a non-nullable type is allowed here. Please remove the question mark (?).", type);
 			}
-			if (null != t.nullableType()) {
-				conditionallyFailOnError("Generics of generics are not allowed.", type);
-			}
-
-			// resolve type
-			TypeReference typeRef = getType(t.type());
+			boolean isList = null != type.genericType() && null != type.type().simpleType() && LIST_GENERIC.equals(getId(type.type().simpleType().ID()));
+			boolean isObjectRef = MAL_AREA.equals(outerTypeRef.getArea()) && null == outerTypeRef.getService() && OBJECTREF_GENERIC.equals(outerTypeRef.getName());
 			if (isList) {
-				typeRef.setList(Boolean.TRUE);
+				outerTypeRef.setList(Boolean.TRUE);
 			}
-			return typeRef;
+			if (isObjectRef) {
+				outerTypeRef.setObjectRef(Boolean.TRUE);
+			}
+			MOSDLParser.GenericTypeContext typeParam = type.genericType();
+			if (null == typeParam) {
+				// there is no further type parameter, i.e. the 'outer' type is the innermost type parameter
+				Deque<TypeReference> innerRef = new LinkedList<>();
+				innerRef.add(outerTypeRef);
+				return innerRef;
+			}
+			Deque<TypeReference> refs = resolveGeneric(typeParam, false);
+			refs.addFirst(outerTypeRef);
+			return refs;
+		}
+
+		private String getFullyQualifiedName(final TypeReference typeRef) {
+			StringBuilder sb = new StringBuilder();
+			boolean isDefaultImport = MAL_AREA.equals(typeRef.getArea())
+					&& null == typeRef.getService()
+					&& (MAL_FUNDAMENTALS.contains(typeRef.getName())
+					|| MAL_ATTRIBUTES.contains(typeRef.getName()));
+			if (!isDefaultImport) {
+				sb.append(getId(typeRef.getArea()));
+				sb.append("::");
+			}
+			if (null != typeRef.getService()) {
+				sb.append(getId(typeRef.getService()));
+				sb.append(".");
+			}
+			sb.append(getId(typeRef.getName()));
+			return sb.toString();
 		}
 
 		private TypeReference getType(final MOSDLParser.TypeContext type) {

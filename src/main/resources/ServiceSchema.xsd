@@ -31,7 +31,7 @@
     </xsd:unique>
     <xsd:unique name="errorName">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en">Ensures that error names are unique.</xsd:documentation>
+        <xsd:documentation xml:lang="en">Ensures that Error names are unique.</xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//mal:error"/>
       <xsd:field    xpath="@name"/>
@@ -80,21 +80,21 @@
           <xsd:element name="service" type="mal:ServiceType" minOccurs="0" maxOccurs="unbounded">
             <xsd:unique name="capabilityNumber">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Capability numbers inside a service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Capability numbers inside a Service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet"/>
               <xsd:field    xpath="@number"/>
             </xsd:unique>
             <xsd:unique name="operationName">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Operation names inside a service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Operation names inside a Service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet/*"/>
               <xsd:field    xpath="@name"/>
             </xsd:unique>
             <xsd:unique name="operationNumber">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Operation numbers inside a service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Operation numbers inside a Service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet/*"/>
               <xsd:field    xpath="@number"/>
@@ -147,7 +147,7 @@
 
   <xsd:complexType name="CapabilitySetType">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Element that represents a Capability set, contains one or more operation specification.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Element that represents a Capability set, contains one or more operation specifications.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -225,7 +225,7 @@
 
   <xsd:complexType name="InvokeOperationType">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Element represents a INVOKE operation.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Element represents an INVOKE operation.</xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
       <xsd:extension base="mal:OperationType">
@@ -371,7 +371,7 @@
 
   <xsd:complexType name="OperationErrorList">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Represents that list of Errors that an operation may raise, these may reference existing error definitions or define new ones.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Represents the list of Errors that an operation may raise, these reference existing error definitions.</xsd:documentation>
     </xsd:annotation>
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="error" type="mal:ErrorDefinitionType"/>
@@ -509,9 +509,10 @@
 
   <xsd:complexType name="TypeReference">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Allows another element in the specification to be referenced, if the area or the service attributes are missing then the area and/or service of the refering element shall be assumed.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Allows another element in the specification to be referenced.</xsd:documentation>
     </xsd:annotation>
     <xsd:attribute name="list" type="xsd:boolean" use="optional" default="false"/>
+    <xsd:attribute name="objectRef" type="xsd:boolean" use="optional" default="false"/>
     <xsd:attribute name="area" type="xsd:NCName" use="required"/>
     <xsd:attribute name="service" type="xsd:NCName" use="optional"/>
     <xsd:attribute name="name" type="xsd:NCName" use="required"/>

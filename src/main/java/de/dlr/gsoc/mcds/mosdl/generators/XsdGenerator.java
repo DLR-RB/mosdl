@@ -574,6 +574,7 @@ public class XsdGenerator extends Generator {
 		for (NamedElementReferenceWithCommentType field : fields) {
 			XmlSchemaElement xsdSeqElem = new XmlSchemaElement(schema, false);
 			xsdSeqElem.getRef().setTargetQName(toQName(schema, field.getType()));
+			xsdSeqElem.setNillable(field.isCanBeNull());
 			xsdSequenceItems.add(xsdSeqElem);
 			addDoc(xsdSeqElem, field.getComment());
 		}

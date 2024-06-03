@@ -54,8 +54,8 @@ public class MosdlGenerator extends Generator {
 	private static final String MOSDL_SPEC_FILE_ENDING = ".mosdl";
 	private static final String MAL_AREA = "MAL";
 	private static final Set<String> MAL_FUNDAMENTALS = new HashSet<>(Arrays.asList("Blob", "Boolean", "Double", "Duration", "FineTime", "Float", "Identifier",
-			"Integer", "Long", "Octet", "Short", "String", "Time", "UInteger", "ULong", "UOctet", "URI", "UShort",
-			"Attribute", "Composite", "Element"));
+			"Integer", "Long", "Octet", "Short", "String", "Time", "UInteger", "ULong", "UOctet", "URI", "UShort", "ObjectRef",
+			"Attribute", "Composite", "Element", "Object"));
 	private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList("area", "service", "composite", "enum", "attribute", "fundamental", "error", "extends", "import", "throws", "abstract", "capability", "send", "submit", "request", "invoke", "progress", "pubsub"));
 	private static final Map<InteractionStage, String> stageToTagMap = new HashMap<>();
 
@@ -294,7 +294,7 @@ public class MosdlGenerator extends Generator {
 			if (!isAbstract) {
 				write(" [", composite.getShortFormPart(), "]");
 			}
-			if (!isAbstract && null != composite.getExtends()) {
+			if (null != composite.getExtends()) {
 				write(" extends ", resolveType(composite.getExtends().getType()));
 			}
 			write(" {");
@@ -354,11 +354,18 @@ public class MosdlGenerator extends Generator {
 				&& null == typeRef.getService()
 				&& MAL_FUNDAMENTALS.contains(typeRef.getName());
 		boolean isSameArea = null != currentArea && currentArea.getName().equals(typeRef.getArea());
-		boolean isSameService = null != currentService && currentService.getName().equals(typeRef.getService());
+		boolean isSameService = (null == currentService && typeRef.getService() == null) || (null != currentService && currentService.getName().equals(typeRef.getService()));
 
 		StringBuilder sb = new StringBuilder();
 		if (typeRef.isList()) {
 			sb.append("List");
+			if (isCanBeNull) {
+				sb.append("?");
+			}
+			sb.append("<");
+		}
+		if (typeRef.isObjectRef()) {
+			sb.append("ObjectRef");
 			if (isCanBeNull) {
 				sb.append("?");
 			}
@@ -373,8 +380,11 @@ public class MosdlGenerator extends Generator {
 			sb.append(".");
 		}
 		sb.append(getId(typeRef.getName()));
-		if (!typeRef.isList() && isCanBeNull) {
+		if (!typeRef.isList() && !typeRef.isObjectRef() && isCanBeNull) {
 			sb.append("?");
+		}
+		if (typeRef.isObjectRef()) {
+			sb.append(">");
 		}
 		if (typeRef.isList()) {
 			sb.append(">");
