@@ -6,9 +6,14 @@ import de.dlr.gsoc.mcds.mosdl.generators.Generator;
 import de.dlr.gsoc.mcds.mosdl.generators.GeneratorException;
 import de.dlr.gsoc.mcds.mosdl.loaders.LoaderException;
 import de.dlr.gsoc.mcds.mosdl.loaders.SpecLoader;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.util.JAXBSource;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import org.ccsds.schema.serviceschema.ObjectFactory;
 import org.ccsds.schema.serviceschema.SpecificationType;
 
 /**
@@ -64,7 +69,15 @@ public abstract class Runner {
 
 		List<Generator> generators = createGenerators();
 		for (Generator generator : generators) {
-			generator.generate(spec, targetDirectory);
+			try {
+				// for each generator create a copy of the spec in case a generator makes changes to the spec
+				JAXBContext srcCtx = JAXBContext.newInstance(SpecificationType.class);
+				JAXBContext dstCtx = JAXBContext.newInstance(SpecificationType.class);
+				SpecificationType specCopy = (SpecificationType) ((JAXBElement) dstCtx.createUnmarshaller().unmarshal(new JAXBSource(srcCtx, new ObjectFactory().createSpecification(spec)))).getValue();
+				generator.generate(specCopy, targetDirectory);
+			} catch (JAXBException ex) {
+				throw new GeneratorException(ex);
+			}
 		}
 	}
 }
