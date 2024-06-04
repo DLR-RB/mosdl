@@ -49,6 +49,7 @@ import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.ObjectFactory;
+import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
@@ -515,39 +516,26 @@ public class MosdlSpecLoader implements SpecLoader {
 		@Override
 		public void enterObject(MOSDLParser.ObjectContext ctx) {
 			boolean isAbstract = null != ctx.ABSTRACT();
-			CompositeType compType = new CompositeType();
+			ObjectType objType = new ObjectType();
 			if (isAbstract) {
-				compType.setName(getId(ctx.ID(0)));
+				objType.setName(getId(ctx.ID(0)));
 			} else {
-				compType.setName(getName(ctx.nidentifier()));
+				objType.setName(getName(ctx.nidentifier()));
 			}
-			String identityName = "identity";
 			if (null != ctx.IDENTITY()) {
 				if (isAbstract) {
-					identityName = getId(ctx.ID(1));
+					objType.setIdentityFieldName(getId(ctx.ID(1)));
 				} else {
-					identityName = getId(ctx.ID(0));
+					objType.setIdentityFieldName(getId(ctx.ID(0)));
 				}
 			}
-			String comment = getDoc(ctx.doc());
-			if (comment != null) {
-				comment = comment += "\n\n";
-			} else {
-				comment = "";
-			}
-			comment += "identity name: " + identityName;
-			compType.setComment(comment);
-			ElementReferenceType refType = new ElementReferenceType();
+			objType.setComment(getDoc(ctx.doc()));
 			if (null != ctx.EXTENDS()) {
+				ElementReferenceType refType = new ElementReferenceType();
 				refType.setType(getType(ctx.type()));
-			} else {
-				TypeReference moObjectType = new TypeReference();
-				moObjectType.setArea(MAL_AREA);
-				moObjectType.setName("Object");
-				refType.setType(moObjectType);
+				objType.setExtends(refType);
 			}
-			compType.setExtends(refType);
-			currentComposite = compType;
+			currentComposite = objType;
 
 			// add object to service or area
 			if (null != currentService) {
@@ -557,9 +545,9 @@ public class MosdlSpecLoader implements SpecLoader {
 					currentService.setDataTypes(dataTypeList);
 				}
 				if (!isAbstract) {
-					compType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter).longValue());
+					objType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter).longValue());
 				}
-				dataTypeList.getCompositeOrEnumeration().add(compType);
+				dataTypeList.getCompositeOrEnumeration().add(objType);
 			} else {
 				AreaDataTypeList dataTypeList = currentArea.getDataTypes();
 				if (null == dataTypeList) {
@@ -567,9 +555,9 @@ public class MosdlSpecLoader implements SpecLoader {
 					currentArea.setDataTypes(dataTypeList);
 				}
 				if (!isAbstract) {
-					compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+					objType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
 				}
-				dataTypeList.getFundamentalOrAttributeOrComposite().add(compType);
+				dataTypeList.getFundamentalOrAttributeOrComposite().add(objType);
 			}
 		}
 

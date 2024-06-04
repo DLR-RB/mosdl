@@ -10,10 +10,16 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Marshaller.Listener;
+import java.util.List;
+import java.util.ListIterator;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import org.ccsds.schema.serviceschema.AreaDataTypeList;
 import org.ccsds.schema.serviceschema.AreaType;
+import org.ccsds.schema.serviceschema.CompositeType;
+import org.ccsds.schema.serviceschema.ElementReferenceType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
+import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
 import org.ccsds.schema.serviceschema.RequestOperationType;
@@ -67,7 +73,7 @@ public class XmlGenerator extends Generator {
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			org.ccsds.schema.serviceschema.ObjectFactory serviceSchemaObjectFactory = new org.ccsds.schema.serviceschema.ObjectFactory();
-			JAXBElement element = serviceSchemaObjectFactory.createSpecification(spec);
+			JAXBElement<SpecificationType> element = serviceSchemaObjectFactory.createSpecification(spec);
 			if (!isSkipValidation) {
 				SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 				Schema schema = schemaFactory.newSchema(XmlSpecLoader.class.getResource(SERVICE_SCHEMA_RESOURCE));
@@ -114,22 +120,38 @@ public class XmlGenerator extends Generator {
 			} else if (source instanceof PubSubOperationType && ((PubSubOperationType) source).getErrors().isEmpty()) {
 				((PubSubOperationType) source).setErrors(null);
 			}
+			// Remove "isObjectRef" of type references and add ObjectRef<...> to name (which breaks XML validity but currently is the only standard way to represent ObjectRefs.
 			if (source instanceof TypeReference && ((TypeReference) source).isObjectRef()) {
 				TypeReference typeRef = (TypeReference) source;
 				typeRef.setObjectRef(null);
 				typeRef.setName("ObjectRef<" + typeRef.getName() + ">");
 			}
-		}
-
-		@Override
-		public void afterMarshal(Object source) {
-			if (source instanceof TypeReference && !((TypeReference) source).isObjectRef()) {
-				TypeReference typeRef = (TypeReference) source;
-				if (!typeRef.isObjectRef() && (typeRef.getName().startsWith("ObjectRef<") || typeRef.getName().startsWith("MAL::ObjectRef<")) && typeRef.getName().endsWith(">")) {
-					typeRef.setObjectRef(Boolean.TRUE);
-					int typeStart = typeRef.getName().indexOf("<");
-					String innerTypeName = typeRef.getName().substring(typeStart, typeRef.getName().length() - 1);
-					typeRef.setName(innerTypeName);
+			// Replace all Objects with Composites that inherit from MAL::Object (except when the object inherits from another Object/Composite in which case inheritance is not changes).
+			// A possibly set identity field name is lost, but currently there is no standard way to capture this information.
+			if (source instanceof AreaDataTypeList) {
+				List<Object> dataTypes = ((AreaDataTypeList) source).getFundamentalOrAttributeOrComposite();
+				ListIterator<Object> iterator = dataTypes.listIterator();
+				while (iterator.hasNext()) {
+					Object dataType = iterator.next();
+					if (dataType instanceof ObjectType) {
+						ObjectType obj = (ObjectType) dataType;
+						CompositeType comp = new CompositeType();
+						comp.setComment(obj.getComment());
+						if (null != obj.getExtends()) {
+							comp.setExtends(obj.getExtends());
+						} else {
+							TypeReference objRef = new TypeReference();
+							objRef.setArea("MAL");
+							objRef.setName("Object");
+							ElementReferenceType ref = new ElementReferenceType();
+							ref.setType(objRef);
+							comp.setExtends(ref);
+						}
+						comp.setName(obj.getName());
+						comp.setShortFormPart(obj.getShortFormPart());
+						comp.getField().addAll(obj.getField());
+						iterator.set(comp);
+					}
 				}
 			}
 		}

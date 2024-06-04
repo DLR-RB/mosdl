@@ -31,6 +31,7 @@ import org.ccsds.schema.serviceschema.ErrorReferenceType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
+import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
@@ -290,9 +291,16 @@ public class MosdlGenerator extends Generator {
 			if (isAbstract) {
 				write("abstract ");
 			}
-			write("composite ", getId(composite.getName()));
+			if (composite instanceof ObjectType) {
+				write("object ", getId(composite.getName()));
+			} else {
+				write("composite ", getId(composite.getName()));
+			}
 			if (!isAbstract) {
 				write(" [", composite.getShortFormPart(), "]");
+			}
+			if (composite instanceof ObjectType && null != ((ObjectType) composite).getIdentityFieldName()) {
+				write(" identity ", ((ObjectType) composite).getIdentityFieldName());
 			}
 			if (null != composite.getExtends()) {
 				write(" extends ", resolveType(composite.getExtends().getType()));

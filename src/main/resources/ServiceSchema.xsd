@@ -26,7 +26,7 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">Ensures that Type names are unique.</xsd:documentation>
       </xsd:annotation>
-      <xsd:selector xpath=".//mal:fundamental|.//mal:composite|.//mal:attribute|.//mal:enumeration"/>
+      <xsd:selector xpath=".//mal:fundamental|.//mal:composite|.//mal:attribute|.//mal:enumeration|.//mal:object"/>
       <xsd:field    xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="errorName">
@@ -105,7 +105,7 @@
               <xsd:annotation>
                 <xsd:documentation xml:lang="en">Ensures that type short forms are unique.</xsd:documentation>
               </xsd:annotation>
-              <xsd:selector xpath=".//mal:composite|.//mal:attribute|.//mal:enumeration"/>
+              <xsd:selector xpath=".//mal:composite|.//mal:attribute|.//mal:enumeration|.//mal:object"/>
               <xsd:field    xpath="@shortFormPart"/>
             </xsd:unique>
           </xsd:element>
@@ -308,7 +308,7 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
           <xsd:element name="fundamental" type="mal:FundamentalType">
             <xsd:annotation>
-              <xsd:documentation xml:lang="en">Only to be used for Element, Attribute, and Composite. Shall only be present in the MAL Area type definitions.</xsd:documentation>
+              <xsd:documentation xml:lang="en">Only to be used for Element, Attribute, Composite, and Object. Shall only be present in the MAL Area type definitions.</xsd:documentation>
             </xsd:annotation>
           </xsd:element>
           <xsd:element name="attribute" type="mal:AttributeType">
@@ -332,6 +332,15 @@
               </xsd:annotation>
               <xsd:selector xpath="mal:item"/>
               <xsd:field    xpath="@nvalue"/>
+            </xsd:unique>
+          </xsd:element>
+          <xsd:element name="object" type="mal:ObjectType">
+            <xsd:unique name="areaObjectFieldName">
+              <xsd:annotation>
+                <xsd:documentation xml:lang="en">Field names inside an Object must be unique.</xsd:documentation>
+              </xsd:annotation>
+              <xsd:selector xpath="mal:field"/>
+              <xsd:field    xpath="@name"/>
             </xsd:unique>
           </xsd:element>
         </xsd:choice>
@@ -423,7 +432,7 @@
 
   <xsd:complexType name="FundamentalType">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Represents one of the three fundamental types, element, attribute, or composite.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Represents one of the four fundamental types, element, attribute, composite, or object.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="extends" type="mal:ElementReferenceType" minOccurs="0" maxOccurs="1">
@@ -482,6 +491,17 @@
     <xsd:attribute name="shortFormPart" type="mal:ShortFormPart" use="required"/>
     <xsd:attribute name="name" type="xsd:NCName" use="required"/>
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="ObjectType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">Represents an object type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="mal:CompositeType">
+        <xsd:attribute name="identityFieldName" type="xsd:NCName" use="optional"/>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="NamedElementReferenceWithCommentType">
