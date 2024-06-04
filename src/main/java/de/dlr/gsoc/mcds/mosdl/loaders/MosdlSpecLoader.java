@@ -809,10 +809,11 @@ public class MosdlSpecLoader implements SpecLoader {
 			currentOperation.setComment(currentOpDoc.getOperationDoc());
 			CapabilitySetType cs = currentCapabilitySet;
 			if (null == cs) {
-				// if operation defined outside of capability set, put it in its own cap set
+				// if operation defined outside of capability set, put it in a new cap set and leave the cap set active for inclusion of subsequent operations
 				cs = new CapabilitySetType();
 				cs.setNumber(claimNumber((TerminalNode) null, capabilitySetCounter));
 				currentService.getCapabilitySet().add(cs);
+				currentCapabilitySet = cs;
 			}
 			currentOpMessages.clear();
 			currentErrors = null;

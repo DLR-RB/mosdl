@@ -122,10 +122,13 @@ public class MosdlGenerator extends Generator {
 					writeDoc(service.getComment());
 					writeLine("service ", getId(service.getName()), " [", service.getNumber(), "] {");
 					indent();
+					boolean hasDefaultCapSet = service.getCapabilitySet().size() == 1 && service.getCapabilitySet().get(0).getNumber() == 1;
 					for (CapabilitySetType cs : service.getCapabilitySet()) {
 						writeDoc(cs.getComment());
-						writeLine("capability [", cs.getNumber(), "] {");
-						indent();
+						if (!hasDefaultCapSet) {
+							writeLine("capability [", cs.getNumber(), "] {");
+							indent();
+						}
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
 							InteractionType interaction = getInteractionType(op);
 							List<MessageDetails> messages = MessageDetails.fromOp(op);
@@ -207,8 +210,10 @@ public class MosdlGenerator extends Generator {
 							writeLine();
 							writeLine();
 						}
-						outdent();
-						writeLine("}");
+						if (!hasDefaultCapSet) {
+							outdent();
+							writeLine("}");
+						}
 						writeLine();
 					}
 					if (null != service.getDataTypes()) {
