@@ -65,8 +65,6 @@ public class TestUtils {
 		ServiceType loadedService = loadedArea.getService().get(0);
 		assertEquals("TestSvc", loadedService.getName());
 		assertEquals(1, loadedService.getNumber());
-		assertNull(loadedService.getDataTypes());
-		assertTrue(loadedService.getErrors().isEmpty());
 		assertNull(loadedService.getComment());
 		assertEquals(1, loadedService.getCapabilitySet().size());
 
@@ -79,7 +77,6 @@ public class TestUtils {
 		assertEquals("testRequest", loadedOp.getName());
 		assertEquals(1, loadedOp.getNumber());
 		assertNull(loadedOp.getComment());
-		assertFalse(loadedOp.isSupportInReplay());
 		assertEquals(RequestOperationType.class, loadedOp.getClass());
 
 		RequestOperationType loadedReqOp = (RequestOperationType) loadedOp;
@@ -103,7 +100,6 @@ public class TestUtils {
 
 		TypeReference loadedInFieldType = loadedInField.getType();
 		assertEquals("MAL", loadedInFieldType.getArea());
-		assertNull(loadedInFieldType.getService());
 		assertEquals("String", loadedInFieldType.getName());
 		assertTrue(loadedInFieldType.isList());
 
@@ -124,7 +120,6 @@ public class TestUtils {
 
 		TypeReference loadedOutFieldType = loadedOutField.getType();
 		assertEquals("MAL", loadedOutFieldType.getArea());
-		assertNull(loadedOutFieldType.getService());
 		assertEquals("Integer", loadedOutFieldType.getName());
 		assertFalse(loadedOutFieldType.isList());
 	}

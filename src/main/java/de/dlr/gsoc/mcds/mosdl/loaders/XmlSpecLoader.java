@@ -34,7 +34,7 @@ public class XmlSpecLoader implements SpecLoader {
 	private static final Logger logger = LoggerFactory.getLogger(XmlSpecLoader.class);
 
 	private static final String XML_SPEC_FILE_ENDING = ".xml";
-	private static final String SERVICE_SCHEMA_RESOURCE = "/COMSchema.xsd";
+	private static final String SERVICE_SCHEMA_RESOURCE = "/ServiceSchema.xsd";
 
 	private final boolean isSkipValidation;
 	private File file;
@@ -115,7 +115,7 @@ public class XmlSpecLoader implements SpecLoader {
 					if (dataType instanceof CompositeType && null != ((CompositeType) dataType).getExtends()) {
 						CompositeType comp = (CompositeType) dataType;
 						TypeReference ref = comp.getExtends().getType();
-						boolean isObject = "MAL".equals(ref.getArea()) && null == ref.getService() && "Object".equals(ref.getName());
+						boolean isObject = "MAL".equals(ref.getArea()) && "Object".equals(ref.getName());
 						if (isObject) {
 							ObjectType obj = new ObjectType();
 							obj.setComment(comp.getComment());

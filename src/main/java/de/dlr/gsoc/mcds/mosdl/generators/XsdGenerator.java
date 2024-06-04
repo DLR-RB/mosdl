@@ -161,13 +161,6 @@ public class XsdGenerator extends Generator {
 				}
 				for (ServiceType service : area.getService()) {
 					XmlSchema schema = null;
-					if (null != service.getDataTypes()) {
-						logger.debug("Generating schema for service '{}' of area '{}'.", service.getName(), area.getName());
-						schema = getOrCreateSchema(schemaCollection, area, service);
-						for (Object dataType : service.getDataTypes().getCompositeOrEnumeration()) {
-							addDataType(schema, dataType);
-						}
-					}
 					if (isCreateBodyTypes) {
 						for (CapabilitySetType cs : service.getCapabilitySet()) {
 							for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
@@ -557,7 +550,6 @@ public class XsdGenerator extends Generator {
 				TypeReference typeRefCopy = of.createTypeReference();
 				TypeReference typeRef = field.getType();
 				typeRefCopy.setArea(typeRef.getArea());
-				typeRefCopy.setService(typeRef.getService());
 				typeRefCopy.setName(typeRef.getName());
 				typeRefCopy.setList(Boolean.TRUE);
 				NamedElementReferenceWithCommentType fieldCopy = of.createNamedElementReferenceWithCommentType();
@@ -605,7 +597,7 @@ public class XsdGenerator extends Generator {
 	 * @return the XML qualified name corresponding to the MAL type reference
 	 */
 	private static QName toQName(XmlSchema schema, TypeReference typeRef) {
-		String namespace = toNamespace(typeRef.getArea(), typeRef.getService());
+		String namespace = toNamespace(typeRef.getArea(), null);
 		String typeName = typeRef.getName();
 		if (typeRef.isList()) {
 			typeName += "List";

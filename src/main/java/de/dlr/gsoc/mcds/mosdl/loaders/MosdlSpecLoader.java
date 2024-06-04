@@ -39,7 +39,6 @@ import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.AttributeType;
 import org.ccsds.schema.serviceschema.CapabilitySetType;
 import org.ccsds.schema.serviceschema.CompositeType;
-import org.ccsds.schema.serviceschema.DataTypeList;
 import org.ccsds.schema.serviceschema.ElementReferenceType;
 import org.ccsds.schema.serviceschema.ElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.EnumerationType;
@@ -195,7 +194,6 @@ public class MosdlSpecLoader implements SpecLoader {
 		private static final int START_USER_AREA = 256; // 1: MAL, 2: COM, 3: Common, 4: MC
 		private static final int START_USER_SERVICE = 1;
 		private static final int START_USER_AREATYPE = 1;
-		private static final int START_USER_SERVICETYPE = 1;
 		private static final int START_USER_CAPABILITYSET = 1;
 		private static final int START_USER_OPERATION = 1;
 		private static final int START_USER_ERROR = 1;
@@ -216,13 +214,11 @@ public class MosdlSpecLoader implements SpecLoader {
 		private final AtomicInteger areaCounter = new AtomicInteger(START_USER_AREA);
 		private final AtomicInteger serviceCounter = new AtomicInteger(START_USER_SERVICE);
 		private final AtomicInteger areaTypeCounter = new AtomicInteger(START_USER_AREATYPE);
-		private final AtomicInteger serviceTypeCounter = new AtomicInteger(START_USER_SERVICETYPE);
 		private final AtomicInteger capabilitySetCounter = new AtomicInteger(START_USER_CAPABILITYSET);
 		private final AtomicInteger operationCounter = new AtomicInteger(START_USER_OPERATION);
 		private final AtomicInteger enumItemCounter = new AtomicInteger(START_ENUM_VALUE);
 		private final AtomicInteger errorCounter = new AtomicInteger(START_USER_ERROR);
 		private final Map<String, TypeReference> importedTypes = new HashMap<>();
-		private final Map<String, Set<TypeReference>> postponedTypes = new HashMap<>();
 		private final ObjectFactory of = new ObjectFactory();
 
 		/**
@@ -272,9 +268,6 @@ public class MosdlSpecLoader implements SpecLoader {
 				maxArea = Math.max(maxArea, area.getNumber());
 				for (ServiceType service : area.getService()) {
 					maxService = Math.max(maxService, service.getNumber());
-					for (ErrorDefinitionType error : service.getErrors()) {
-						maxError = Math.max(maxError, (int) error.getNumber());
-					}
 					for (CapabilitySetType cs : service.getCapabilitySet()) {
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
 							if (op instanceof SubmitOperationType) {
@@ -368,15 +361,9 @@ public class MosdlSpecLoader implements SpecLoader {
 		@Override
 		public void enterTypeImport(MOSDLParser.TypeImportContext ctx) {
 			MOSDLParser.FullyQualifiedTypeContext fqt = ctx.fullyQualifiedType();
-			String typeName;
 			TypeReference typeRef = new TypeReference();
 			typeRef.setArea(getId(fqt.ID(0)));
-			if (fqt.ID().size() == 2) {
-				typeName = getId(fqt.ID(1));
-			} else {
-				typeRef.setService(getId(fqt.ID(1)));
-				typeName = getId(fqt.ID(2));
-			}
+			String typeName = getId(fqt.ID(1));
 			typeRef.setName(typeName);
 			importedTypes.put(typeName, typeRef);
 		}
@@ -404,9 +391,6 @@ public class MosdlSpecLoader implements SpecLoader {
 				// if active operation add error to that (and merge potential error doc of operation)
 				error.setComment(currentOpDoc.getErrorDoc(errorName, doc));
 				currentErrors.add(error);
-			} else if (null != currentService) {
-				error.setComment(doc);
-				currentService.getErrors().add(error);
 			} else {
 				error.setComment(doc);
 				currentArea.getErrors().add(error);
@@ -439,29 +423,6 @@ public class MosdlSpecLoader implements SpecLoader {
 
 		@Override
 		public void exitService(MOSDLParser.ServiceContext ctx) {
-			// get all service-level data types that are also contained in the postponed types list
-			// and set the service name for the stored type reference
-			if (null != currentService.getDataTypes()) {
-				currentService.getDataTypes().getCompositeOrEnumeration().stream()
-						.map(dt -> {
-							if (dt instanceof CompositeType) {
-								return ((CompositeType) dt).getName();
-							} else {
-								return ((EnumerationType) dt).getName();
-							}
-						})
-						.filter(postponedTypes::containsKey)
-						.forEach(typeName -> postponedTypes.get(typeName).forEach(typeRef -> typeRef.setService(currentService.getName())));
-			}
-			// do the same for service-level errors
-			currentService.getErrors().stream()
-					.map(e -> e.getName())
-					.filter(postponedTypes::containsKey)
-					.forEach(errorName -> postponedTypes.get(errorName).forEach(typeRef -> typeRef.setService(currentService.getName())));
-
-			// clear also all area-level type references because they have been declared area-level by default
-			postponedTypes.clear();
-			serviceTypeCounter.set(START_USER_SERVICETYPE);
 			capabilitySetCounter.set(START_USER_CAPABILITYSET);
 			operationCounter.set(START_USER_OPERATION);
 			currentService = null;
@@ -484,28 +445,16 @@ public class MosdlSpecLoader implements SpecLoader {
 			}
 			currentComposite = compType;
 
-			// add composite to service or area
-			if (null != currentService) {
-				DataTypeList dataTypeList = currentService.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new DataTypeList();
-					currentService.setDataTypes(dataTypeList);
-				}
-				if (!isAbstract) {
-					compType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter).longValue());
-				}
-				dataTypeList.getCompositeOrEnumeration().add(compType);
-			} else {
-				AreaDataTypeList dataTypeList = currentArea.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new AreaDataTypeList();
-					currentArea.setDataTypes(dataTypeList);
-				}
-				if (!isAbstract) {
-					compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
-				}
-				dataTypeList.getFundamentalOrAttributeOrComposite().add(compType);
+			// add composite to area
+			AreaDataTypeList dataTypeList = currentArea.getDataTypes();
+			if (null == dataTypeList) {
+				dataTypeList = new AreaDataTypeList();
+				currentArea.setDataTypes(dataTypeList);
 			}
+			if (!isAbstract) {
+				compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+			}
+			dataTypeList.getFundamentalOrAttributeOrComposite().add(compType);
 		}
 
 		@Override
@@ -537,28 +486,16 @@ public class MosdlSpecLoader implements SpecLoader {
 			}
 			currentComposite = objType;
 
-			// add object to service or area
-			if (null != currentService) {
-				DataTypeList dataTypeList = currentService.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new DataTypeList();
-					currentService.setDataTypes(dataTypeList);
-				}
-				if (!isAbstract) {
-					objType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter).longValue());
-				}
-				dataTypeList.getCompositeOrEnumeration().add(objType);
-			} else {
-				AreaDataTypeList dataTypeList = currentArea.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new AreaDataTypeList();
-					currentArea.setDataTypes(dataTypeList);
-				}
-				if (!isAbstract) {
-					objType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
-				}
-				dataTypeList.getFundamentalOrAttributeOrComposite().add(objType);
+			// add object to area
+			AreaDataTypeList dataTypeList = currentArea.getDataTypes();
+			if (null == dataTypeList) {
+				dataTypeList = new AreaDataTypeList();
+				currentArea.setDataTypes(dataTypeList);
 			}
+			if (!isAbstract) {
+				objType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+			}
+			dataTypeList.getFundamentalOrAttributeOrComposite().add(objType);
 		}
 
 		@Override
@@ -579,7 +516,7 @@ public class MosdlSpecLoader implements SpecLoader {
 				if (type.isList()) {
 					conditionallyFailOnError("Lists are not allowed for PUBSUB subscription keys.", ctx);
 				}
-				if (!type.isObjectRef() && !(MAL_AREA.equals(type.getArea()) && null == type.getService() && MAL_ATTRIBUTES.contains(type.getName()))) {
+				if (!type.isObjectRef() && !(MAL_AREA.equals(type.getArea()) && MAL_ATTRIBUTES.contains(type.getName()))) {
 					conditionallyFailOnError("Only Attribute types are allowed for PUBSUB subscription keys, but found '" + getFullyQualifiedName(type) + "' instead.", ctx);
 				}
 			}
@@ -605,24 +542,14 @@ public class MosdlSpecLoader implements SpecLoader {
 			enumType.setComment(getDoc(ctx.doc()));
 			currentEnum = enumType;
 
-			// add enum to service or area
-			if (null != currentService) {
-				DataTypeList dataTypeList = currentService.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new DataTypeList();
-					currentService.setDataTypes(dataTypeList);
-				}
-				enumType.setShortFormPart(claimNumber(ctx.nidentifier(), serviceTypeCounter));
-				dataTypeList.getCompositeOrEnumeration().add(enumType);
-			} else {
-				AreaDataTypeList dataTypeList = currentArea.getDataTypes();
-				if (null == dataTypeList) {
-					dataTypeList = new AreaDataTypeList();
-					currentArea.setDataTypes(dataTypeList);
-				}
-				enumType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter));
-				dataTypeList.getFundamentalOrAttributeOrComposite().add(enumType);
+			// add enum to area
+			AreaDataTypeList dataTypeList = currentArea.getDataTypes();
+			if (null == dataTypeList) {
+				dataTypeList = new AreaDataTypeList();
+				currentArea.setDataTypes(dataTypeList);
 			}
+			enumType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter));
+			dataTypeList.getFundamentalOrAttributeOrComposite().add(enumType);
 		}
 
 		@Override
@@ -749,7 +676,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			SendOperationType.Messages msgs = new SendOperationType.Messages();
 			msgs.setSend(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -758,7 +684,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			SubmitOperationType.Messages msgs = new SubmitOperationType.Messages();
 			msgs.setSubmit(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -768,7 +693,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			msgs.setRequest(currentOpMessages.removeFirst());
 			msgs.setResponse(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -779,7 +703,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			msgs.setAcknowledgement(currentOpMessages.removeFirst());
 			msgs.setResponse(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -791,7 +714,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			msgs.setUpdate(currentOpMessages.removeFirst());
 			msgs.setResponse(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -801,7 +723,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			msgs.setSubscriptionKeys(currentOpMessages.removeFirst());
 			msgs.setPublishNotify(currentOpMessages.removeFirst());
 			op.setMessages(msgs);
-			op.setSupportInReplay(null != ctx.STAR());
 		}
 
 		@Override
@@ -1064,7 +985,7 @@ public class MosdlSpecLoader implements SpecLoader {
 				conditionallyFailOnError("Only a non-nullable type is allowed here. Please remove the question mark (?).", type);
 			}
 			boolean isList = null != type.genericType() && null != type.type().simpleType() && LIST_GENERIC.equals(getId(type.type().simpleType().ID()));
-			boolean isObjectRef = MAL_AREA.equals(outerTypeRef.getArea()) && null == outerTypeRef.getService() && OBJECTREF_GENERIC.equals(outerTypeRef.getName());
+			boolean isObjectRef = MAL_AREA.equals(outerTypeRef.getArea()) && OBJECTREF_GENERIC.equals(outerTypeRef.getName());
 			if (isList) {
 				outerTypeRef.setList(Boolean.TRUE);
 			}
@@ -1086,16 +1007,11 @@ public class MosdlSpecLoader implements SpecLoader {
 		private String getFullyQualifiedName(final TypeReference typeRef) {
 			StringBuilder sb = new StringBuilder();
 			boolean isDefaultImport = MAL_AREA.equals(typeRef.getArea())
-					&& null == typeRef.getService()
 					&& (MAL_FUNDAMENTALS.contains(typeRef.getName())
 					|| MAL_ATTRIBUTES.contains(typeRef.getName()));
 			if (!isDefaultImport) {
 				sb.append(getId(typeRef.getArea()));
 				sb.append("::");
-			}
-			if (null != typeRef.getService()) {
-				sb.append(getId(typeRef.getService()));
-				sb.append(".");
 			}
 			sb.append(getId(typeRef.getName()));
 			return sb.toString();
@@ -1106,34 +1022,17 @@ public class MosdlSpecLoader implements SpecLoader {
 			if (null != type.fullyQualifiedType()) {
 				MOSDLParser.FullyQualifiedTypeContext fqt = type.fullyQualifiedType();
 				typeRef.setArea(getId(fqt.ID(0)));
-				if (fqt.ID().size() == 2) {
-					typeRef.setName(getId(fqt.ID(1)));
-				} else {
-					typeRef.setService(getId(fqt.ID(1)));
-					typeRef.setName(getId(fqt.ID(2)));
-				}
-			} else if (null != type.qualifiedType()) {
-				typeRef.setArea(currentArea.getName());
-				typeRef.setService(getId(type.qualifiedType().ID(0)));
-				typeRef.setName(getId(type.qualifiedType().ID(1)));
+				typeRef.setName(getId(fqt.ID(1)));
 			} else {
-				// simple type can refer to imported type, type of current service or type of current area.
-				// Imported types can be resolved directly.
-				// If we have a service in scope, we need to postpone type resolution until the service goes
-				// out of scope because we need to have a list of all types defined by the service in order
-				// to decide whether an area-level or a service-level type was meant.
+				// simple type can refer to imported type or type of current area.
+				// Imported types can be resolved directly, area-level types as well.
 				String typeName = getId(type.simpleType().ID());
 				typeRef.setName(typeName);
 				TypeReference importedType = importedTypes.get(typeName);
 				if (null != importedType) {
 					typeRef.setArea(importedType.getArea());
-					typeRef.setService(importedType.getService());
-				} else if (null == currentService) {
-					typeRef.setArea(currentArea.getName());
 				} else {
-					// postpone final type resolution until we can decide whether a current service or current area type is meant
 					typeRef.setArea(currentArea.getName());
-					postponedTypes.computeIfAbsent(typeName, t -> new HashSet<>()).add(typeRef);
 				}
 			}
 			return typeRef;

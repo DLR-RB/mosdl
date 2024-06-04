@@ -14,12 +14,12 @@ service     : doc? SERVICE nidentifier LBRACE (capability | operation | dataType
 capability  : doc? CAPABILITY (LBRACK NUMBER RBRACK)? LBRACE operation* RBRACE ;
 
 operation   : doc? (sendOp | submitOp | requestOp | invokeOp | progressOp | pubsubOp) ;
-sendOp      : SEND STAR? nidentifier sendMsg ;
-submitOp    : SUBMIT STAR? nidentifier submitMsg (THROWS opErrors)? ;
-requestOp   : REQUEST STAR? nidentifier requestMsg requestResponseMsg (THROWS opErrors)? ;
-invokeOp    : INVOKE STAR? nidentifier invokeMsg invokeAckMsg invokeResponseMsg (THROWS opErrors)? ;
-progressOp  : PROGRESS STAR? nidentifier progressMsg progressAckMsg progressUpdateMsg progressResponseMsg (THROWS opErrors)? ;
-pubsubOp    : PUBSUB STAR? nidentifier pubsubSubscriptionKeys pubsubMsg (THROWS opErrors)? ;
+sendOp      : SEND nidentifier sendMsg ;
+submitOp    : SUBMIT nidentifier submitMsg (THROWS opErrors)? ;
+requestOp   : REQUEST nidentifier requestMsg requestResponseMsg (THROWS opErrors)? ;
+invokeOp    : INVOKE nidentifier invokeMsg invokeAckMsg invokeResponseMsg (THROWS opErrors)? ;
+progressOp  : PROGRESS nidentifier progressMsg progressAckMsg progressUpdateMsg progressResponseMsg (THROWS opErrors)? ;
+pubsubOp    : PUBSUB nidentifier pubsubSubscriptionKeys pubsubMsg (THROWS opErrors)? ;
 
 sendMsg                : cmsg;
 submitMsg              : cmsg;
@@ -66,11 +66,9 @@ extraInfo   : doc? genericType ;
 
 genericType        : type QUEST? (LT genericType GT)? ;
 type               : simpleType
-                   | qualifiedType
                    | fullyQualifiedType;
 simpleType         : ID ;
-qualifiedType      : ID DOT ID ;
-fullyQualifiedType : ID DBLCOLON (ID DOT)? ID ;
+fullyQualifiedType : ID DBLCOLON ID ;
 nidentifier        : ID (LBRACK NUMBER RBRACK)? ;
 nvidentifier       : ID (LBRACK (NUMBER | DOT NUMBER | NUMBER DOT NUMBER) RBRACK)? ;
 doc                : DOC

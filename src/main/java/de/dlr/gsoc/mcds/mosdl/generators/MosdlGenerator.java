@@ -137,9 +137,6 @@ public class MosdlGenerator extends Generator {
 							writeOpDoc(op, messages, errors, hasErrorDoc);
 							writeIndent();
 							write(interaction.name().toLowerCase(), " ");
-							if (op.isSupportInReplay()) {
-								write("*");
-							}
 							write(getId(op.getName()), " [", op.getNumber(), "] ");
 							indent();
 							switch (interaction) {
@@ -216,13 +213,6 @@ public class MosdlGenerator extends Generator {
 						}
 						writeLine();
 					}
-					if (null != service.getDataTypes()) {
-						for (Object dataType : service.getDataTypes().getCompositeOrEnumeration()) {
-							writeDataType(dataType);
-							writeLine();
-						}
-					}
-					writeErrors(service.getErrors());
 					outdent();
 					writeLine("}");
 					writeLine();
@@ -364,10 +354,8 @@ public class MosdlGenerator extends Generator {
 
 	private String resolveType(TypeReference typeRef, boolean isCanBeNull) {
 		boolean isFundamental = MAL_AREA.equals(typeRef.getArea())
-				&& null == typeRef.getService()
 				&& MAL_FUNDAMENTALS.contains(typeRef.getName());
 		boolean isSameArea = null != currentArea && currentArea.getName().equals(typeRef.getArea());
-		boolean isSameService = (null == currentService && typeRef.getService() == null) || (null != currentService && currentService.getName().equals(typeRef.getService()));
 
 		StringBuilder sb = new StringBuilder();
 		if (typeRef.isList()) {
@@ -384,13 +372,9 @@ public class MosdlGenerator extends Generator {
 			}
 			sb.append("<");
 		}
-		if (!isFundamental && !(isSameArea && isSameService)) { // Simple check for same area alone can lead to wrong type references if a type with same name is present in the service and the area.
+		if (!isFundamental && !isSameArea) {
 			sb.append(getId(typeRef.getArea()));
 			sb.append("::");
-		}
-		if (null != typeRef.getService() && !isSameService) {
-			sb.append(getId(typeRef.getService()));
-			sb.append(".");
 		}
 		sb.append(getId(typeRef.getName()));
 		if (!typeRef.isList() && !typeRef.isObjectRef() && isCanBeNull) {

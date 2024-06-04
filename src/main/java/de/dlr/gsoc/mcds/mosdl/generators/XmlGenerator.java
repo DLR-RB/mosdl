@@ -23,7 +23,6 @@ import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
 import org.ccsds.schema.serviceschema.RequestOperationType;
-import org.ccsds.schema.serviceschema.ServiceType;
 import org.ccsds.schema.serviceschema.SpecificationType;
 import org.ccsds.schema.serviceschema.SubmitOperationType;
 import org.ccsds.schema.serviceschema.TypeReference;
@@ -107,8 +106,6 @@ public class XmlGenerator extends Generator {
 		public void beforeMarshal(Object source) {
 			if (source instanceof AreaType && ((AreaType) source).getErrors().isEmpty()) {
 				((AreaType) source).setErrors(null);
-			} else if (source instanceof ServiceType && ((ServiceType) source).getErrors().isEmpty()) {
-				((ServiceType) source).setErrors(null);
 			} else if (source instanceof SubmitOperationType && ((SubmitOperationType) source).getErrors().isEmpty()) {
 				((SubmitOperationType) source).setErrors(null);
 			} else if (source instanceof RequestOperationType && ((RequestOperationType) source).getErrors().isEmpty()) {

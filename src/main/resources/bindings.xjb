@@ -20,14 +20,4 @@
 			<namespace:prefix name="xsi" namespaceURI="http://www.w3.org/2001/XMLSchema-instance" />
 		</jxb:bindings>
 	</jxb:bindings>
-
-	<jxb:bindings schemaLocation="COMSchema.xsd" node="/xs:schema">
-		<jxb:schemaBindings>
-			<!-- Java package where to put generated model code for COMSchema. -->
-			<!-- <jxb:package name="de.dlr.gsoc.mcds.moparse.com"/> -->
-		</jxb:schemaBindings>
-		<jxb:bindings>
-			<namespace:prefix name="com" />
-		</jxb:bindings>
-	</jxb:bindings>
 </jxb:bindings>
