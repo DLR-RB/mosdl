@@ -208,6 +208,7 @@ public class MosdlSpecLoader implements SpecLoader {
 		private EnumerationType currentEnum;
 		private CompositeType currentComposite;
 		private final Deque<MessageBodyType> currentOpMessages = new ArrayDeque<>();
+		private List<ErrorReferenceType> currentOpErrorRefs;
 		private final AtomicInteger areaCounter = new AtomicInteger(START_USER_AREA);
 		private final AtomicInteger serviceCounter = new AtomicInteger(START_USER_SERVICE);
 		private final AtomicInteger areaTypeCounter = new AtomicInteger(START_USER_AREATYPE);
@@ -356,6 +357,7 @@ public class MosdlSpecLoader implements SpecLoader {
 				extraInfo.setComment(currentOpDoc.getErrorInfoDoc(errorName, getDoc(ctx.extraInfo().doc())));
 				errorRef.setExtraInformation(extraInfo);
 			}
+			currentOpErrorRefs.add(errorRef);
 		}
 
 		@Override
@@ -575,6 +577,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			SubmitOperationType op = new SubmitOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
+			currentOpErrorRefs = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -583,6 +586,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			RequestOperationType op = new RequestOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
+			currentOpErrorRefs = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -591,6 +595,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			InvokeOperationType op = new InvokeOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
+			currentOpErrorRefs = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -599,6 +604,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			ProgressOperationType op = new ProgressOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
+			currentOpErrorRefs = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -607,6 +613,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			PubSubOperationType op = new PubSubOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
+			currentOpErrorRefs = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -677,6 +684,7 @@ public class MosdlSpecLoader implements SpecLoader {
 				currentCapabilitySet = cs;
 			}
 			currentOpMessages.clear();
+			currentOpErrorRefs = null;
 			cs.getSendIPOrSubmitIPOrRequestIP().add(currentOperation);
 			currentOperation = null;
 			currentOpDoc = null;
