@@ -6,7 +6,6 @@ import de.dlr.gsoc.mcds.mosdl.InteractionStage;
 import de.dlr.gsoc.mcds.mosdl.MOSDLBaseListener;
 import de.dlr.gsoc.mcds.mosdl.MOSDLLexer;
 import de.dlr.gsoc.mcds.mosdl.MOSDLParser;
-import jakarta.xml.bind.JAXBElement;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -33,7 +32,6 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.AreaDataTypeList;
 import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.AttributeType;
@@ -48,7 +46,6 @@ import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.MessageBodyType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
-import org.ccsds.schema.serviceschema.ObjectFactory;
 import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
@@ -211,7 +208,6 @@ public class MosdlSpecLoader implements SpecLoader {
 		private EnumerationType currentEnum;
 		private CompositeType currentComposite;
 		private final Deque<MessageBodyType> currentOpMessages = new ArrayDeque<>();
-		private List<Object> currentErrors;
 		private final AtomicInteger areaCounter = new AtomicInteger(START_USER_AREA);
 		private final AtomicInteger serviceCounter = new AtomicInteger(START_USER_SERVICE);
 		private final AtomicInteger areaTypeCounter = new AtomicInteger(START_USER_AREATYPE);
@@ -220,7 +216,6 @@ public class MosdlSpecLoader implements SpecLoader {
 		private final AtomicInteger enumItemCounter = new AtomicInteger(START_ENUM_VALUE);
 		private final AtomicInteger errorCounter = new AtomicInteger(START_USER_ERROR);
 		private final Map<String, TypeReference> importedTypes = new HashMap<>();
-		private final ObjectFactory of = new ObjectFactory();
 
 		/**
 		 * Create a new listener instance.
@@ -267,44 +262,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			int maxError = START_USER_ERROR - 1;
 			for (AreaType area : spec.getArea()) {
 				maxArea = Math.max(maxArea, area.getNumber());
-				for (ServiceType service : area.getService()) {
-					maxService = Math.max(maxService, service.getNumber());
-					for (CapabilitySetType cs : service.getCapabilitySet()) {
-						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
-							if (op instanceof SubmitOperationType) {
-								for (Object error : ((SubmitOperationType) op).getErrors()) {
-									if (error instanceof ErrorDefinitionType) {
-										maxError = Math.max(maxError, (int) ((ErrorDefinitionType) error).getNumber());
-									}
-								}
-							} else if (op instanceof RequestOperationType) {
-								for (Object error : ((RequestOperationType) op).getErrors()) {
-									if (error instanceof ErrorDefinitionType) {
-										maxError = Math.max(maxError, (int) ((ErrorDefinitionType) error).getNumber());
-									}
-								}
-							} else if (op instanceof InvokeOperationType) {
-								for (Object error : ((InvokeOperationType) op).getErrors()) {
-									if (error instanceof ErrorDefinitionType) {
-										maxError = Math.max(maxError, (int) ((ErrorDefinitionType) error).getNumber());
-									}
-								}
-							} else if (op instanceof ProgressOperationType) {
-								for (Object error : ((ProgressOperationType) op).getErrors()) {
-									if (error instanceof ErrorDefinitionType) {
-										maxError = Math.max(maxError, (int) ((ErrorDefinitionType) error).getNumber());
-									}
-								}
-							} else if (op instanceof PubSubOperationType) {
-								for (Object error : ((PubSubOperationType) op).getErrors()) {
-									if (error instanceof ErrorDefinitionType) {
-										maxError = Math.max(maxError, (int) ((ErrorDefinitionType) error).getNumber());
-									}
-								}
-							}
-						}
-					}
-				}
 				if (null != area.getDataTypes()) {
 					for (Object dataType : area.getDataTypes().getFundamentalOrAttributeOrComposite()) {
 						int typeNumber = 0;
@@ -380,22 +337,11 @@ public class MosdlSpecLoader implements SpecLoader {
 				ElementReferenceWithCommentType extraInfo = new ElementReferenceWithCommentType();
 				extraInfo.setType(getType(ctx.extraInfo().genericType(), false));
 				String extraInfoDoc = getDoc(ctx.extraInfo().doc());
-				if (null != currentErrors) {
-					// if active operation merge potential extra info doc of operation
-					extraInfo.setComment(currentOpDoc.getErrorInfoDoc(errorName, extraInfoDoc));
-				} else {
-					extraInfo.setComment(extraInfoDoc);
-				}
+				extraInfo.setComment(extraInfoDoc);
 				error.setExtraInformation(extraInfo);
 			}
-			if (null != currentErrors) {
-				// if active operation add error to that (and merge potential error doc of operation)
-				error.setComment(currentOpDoc.getErrorDoc(errorName, doc));
-				currentErrors.add(error);
-			} else {
-				error.setComment(doc);
-				currentArea.getErrors().add(error);
-			}
+			error.setComment(doc);
+			currentArea.getErrors().add(error);
 		}
 
 		@Override
@@ -410,7 +356,6 @@ public class MosdlSpecLoader implements SpecLoader {
 				extraInfo.setComment(currentOpDoc.getErrorInfoDoc(errorName, getDoc(ctx.extraInfo().doc())));
 				errorRef.setExtraInformation(extraInfo);
 			}
-			currentErrors.add(errorRef);
 		}
 
 		@Override
@@ -630,7 +575,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			SubmitOperationType op = new SubmitOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
-			currentErrors = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -639,7 +583,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			RequestOperationType op = new RequestOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
-			currentErrors = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -648,7 +591,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			InvokeOperationType op = new InvokeOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
-			currentErrors = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -657,7 +599,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			ProgressOperationType op = new ProgressOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
-			currentErrors = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -666,7 +607,6 @@ public class MosdlSpecLoader implements SpecLoader {
 			PubSubOperationType op = new PubSubOperationType();
 			op.setName(getName(ctx.nidentifier()));
 			op.setNumber(claimNumber(ctx.nidentifier(), operationCounter));
-			currentErrors = op.getErrors();
 			currentOperation = op;
 		}
 
@@ -737,7 +677,6 @@ public class MosdlSpecLoader implements SpecLoader {
 				currentCapabilitySet = cs;
 			}
 			currentOpMessages.clear();
-			currentErrors = null;
 			cs.getSendIPOrSubmitIPOrRequestIP().add(currentOperation);
 			currentOperation = null;
 			currentOpDoc = null;

@@ -65,7 +65,6 @@ public class MosdlGenerator extends Generator {
 	private Writer currentWriter = null;
 	private int currentIndent = 0;
 	private AreaType currentArea;
-	private ServiceType currentService;
 
 	static {
 		for (InteractionStage stage : InteractionStage.values()) {
@@ -135,7 +134,6 @@ public class MosdlGenerator extends Generator {
 				boolean isDefaultSvcNumbers = isDefaultSequence(svcNumberSequence);
 				// TODO: imports
 				for (ServiceType service : area.getService()) {
-					currentService = service;
 					writeDoc(service.getComment());
 					if (isDefaultSvcNumbers) {
 						writeLine("service ", getId(service.getName()), " {");
@@ -158,7 +156,7 @@ public class MosdlGenerator extends Generator {
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
 							InteractionType interaction = getInteractionType(op);
 							List<MessageDetails> messages = MessageDetails.fromOp(op);
-							List<Object> errors = getErrorsFromOp(op, interaction);
+							List<ErrorReferenceType> errors = getErrorsFromOp(op, interaction);
 							boolean hasErrorDoc = errors.stream().anyMatch(e -> hasErrorDoc(e));
 							writeOpDoc(op, messages, errors, hasErrorDoc);
 							writeIndent();
@@ -205,16 +203,12 @@ public class MosdlGenerator extends Generator {
 								if (isMultiline) {
 									indent();
 									writeLine();
-									Iterator<Object> errorIter = errors.iterator();
+									Iterator<ErrorReferenceType> errorIter = errors.iterator();
 									while (errorIter.hasNext()) {
-										Object error = errorIter.next();
-										if (error instanceof ErrorReferenceType) {
-											writeDoc(((ErrorReferenceType) error).getComment());
-										} else if (error instanceof ErrorDefinitionType) {
-											writeDoc(((ErrorDefinitionType) error).getComment());
-										}
+										ErrorReferenceType error = errorIter.next();
+										writeDoc(error.getComment());
 										writeIndent();
-										writeOpError(error);
+										writeError(error);
 										if (errorIter.hasNext()) {
 											write(",");
 											writeLine();
@@ -223,10 +217,10 @@ public class MosdlGenerator extends Generator {
 									outdent();
 								} else {
 									write(" ");
-									Iterator<Object> errorIter = errors.iterator();
+									Iterator<ErrorReferenceType> errorIter = errors.iterator();
 									while (errorIter.hasNext()) {
-										Object error = errorIter.next();
-										writeOpError(error);
+										ErrorReferenceType error = errorIter.next();
+										writeError(error);
 										if (errorIter.hasNext()) {
 											write(", ");
 										}
@@ -246,7 +240,6 @@ public class MosdlGenerator extends Generator {
 					outdent();
 					writeLine("}");
 					writeLine();
-					currentService = null;
 				}
 
 				if (null != area.getDataTypes()) {
@@ -391,7 +384,7 @@ public class MosdlGenerator extends Generator {
 		for (ErrorDefinitionType error : errorList) {
 			writeDoc(error.getComment());
 			writeIndent();
-			writeError(error, true);
+			writeError(error);
 			writeLine();
 			writeLine();
 		}
@@ -438,22 +431,14 @@ public class MosdlGenerator extends Generator {
 		return sb.toString();
 	}
 
-	private void writeOpError(Object error) throws IOException {
-		if (error instanceof ErrorReferenceType) {
-			writeError((ErrorReferenceType) error);
-		} else if (error instanceof ErrorDefinitionType) {
-			writeError((ErrorDefinitionType) error, false);
-		}
-	}
-
 	private void writeError(ErrorReferenceType errorRef) throws IOException {
 		write(resolveType(errorRef.getType()));
 		writeErrorExtraInfo(errorRef.getExtraInformation(), false);
 	}
 
-	private void writeError(ErrorDefinitionType error, boolean isAreaOrServiceLevel) throws IOException {
+	private void writeError(ErrorDefinitionType error) throws IOException {
 		write("error ", getId(error.getName()), " [", error.getNumber(), "]");
-		writeErrorExtraInfo(error.getExtraInformation(), isAreaOrServiceLevel);
+		writeErrorExtraInfo(error.getExtraInformation(), true);
 	}
 
 	private void writeErrorExtraInfo(ElementReferenceWithCommentType extraInfo, boolean isAreaOrServiceLevel) throws IOException {
@@ -472,7 +457,7 @@ public class MosdlGenerator extends Generator {
 		}
 	}
 
-	private void writeOpDoc(OperationType op, List<MessageDetails> messages, List<Object> errors, boolean hasErrorDoc) throws IOException {
+	private void writeOpDoc(OperationType op, List<MessageDetails> messages, List<ErrorReferenceType> errors, boolean hasErrorDoc) throws IOException {
 		switch (docType) {
 			case SUPPRESS:
 				return;
@@ -515,24 +500,11 @@ public class MosdlGenerator extends Generator {
 		if (hasErrorDoc) {
 			sb.append(System.lineSeparator());
 		}
-		for (Object error : errors) {
+		for (ErrorReferenceType error : errors) {
 			// write error doc
-			String errorName;
-			String errorComment;
-			String extraComment;
-			if (error instanceof ErrorReferenceType) {
-				ErrorReferenceType errRef = (ErrorReferenceType) error;
-				errorName = resolveType(errRef.getType());
-				errorComment = errRef.getComment();
-				extraComment = null == errRef.getExtraInformation() ? null : errRef.getExtraInformation().getComment();
-			} else if (error instanceof ErrorDefinitionType) {
-				ErrorDefinitionType errDef = (ErrorDefinitionType) error;
-				errorName = errDef.getName();
-				errorComment = errDef.getComment();
-				extraComment = null == errDef.getExtraInformation() ? null : errDef.getExtraInformation().getComment();
-			} else {
-				continue;
-			}
+			String errorName = resolveType(error.getType());
+			String errorComment = error.getComment();
+			String extraComment = null == error.getExtraInformation() ? null : error.getExtraInformation().getComment();
 			if (null != errorComment) {
 				sb.append(System.lineSeparator());
 				sb.append("@error ");
@@ -556,8 +528,8 @@ public class MosdlGenerator extends Generator {
 		writeDoc(doc);
 	}
 
-	private List<Object> getErrorsFromOp(OperationType op, InteractionType interaction) {
-		List<Object> errors;
+	private List<ErrorReferenceType> getErrorsFromOp(OperationType op, InteractionType interaction) {
+		List<ErrorReferenceType> errors;
 		switch (interaction) {
 			case SEND:
 				return Collections.emptyList();

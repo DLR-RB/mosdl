@@ -341,10 +341,9 @@
     <xsd:annotation>
       <xsd:documentation xml:lang="en">Represents the list of Errors that an operation may raise, these reference existing error definitions.</xsd:documentation>
     </xsd:annotation>
-    <xsd:choice maxOccurs="unbounded">
-      <xsd:element name="error" type="mal:ErrorDefinitionType"/>
-      <xsd:element name="errorRef" type="mal:ErrorReferenceType"/>
-    </xsd:choice>
+    <xsd:sequence>
+      <xsd:element name="errorRef" type="mal:ErrorReferenceType" maxOccurs="unbounded"/>
+    </xsd:sequence>
   </xsd:complexType>
 
   <xsd:complexType name="ErrorDefinitionList">

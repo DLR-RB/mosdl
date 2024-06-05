@@ -10,7 +10,7 @@ area        : doc? AREA nvidentifier
 
 typeImport  : IMPORT fullyQualifiedType ;
 
-service     : doc? SERVICE nidentifier LBRACE (capability | operation | dataType | error)* RBRACE ;
+service     : doc? SERVICE nidentifier LBRACE (capability | operation | dataType)* RBRACE ;
 capability  : doc? CAPABILITY (LBRACK NUMBER RBRACK)? LBRACE operation* RBRACE ;
 
 operation   : doc? (sendOp | submitOp | requestOp | invokeOp | progressOp | pubsubOp) ;
@@ -40,7 +40,7 @@ pmsg        : doc? RARR parameters ;
 bmsg        : doc? LARR parameters ;
 parameters  : LPAREN (field (COMMA? field)*)? RPAREN ;
 
-opErrors    : (error | errorRef) (COMMA (error | errorRef))*;
+opErrors    : errorRef (COMMA errorRef)*;
 errorRef    : doc? genericType (COLON extraInfo)? ;
 
 areaLevelDataType : attribute
