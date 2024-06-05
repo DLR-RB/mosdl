@@ -143,6 +143,11 @@ public class MosdlGenerator extends Generator {
 						writeLine("service ", getId(service.getName()), " [", service.getNumber(), "] {");
 					}
 					indent();
+					List<Long> opNumberSequence = service.getCapabilitySet().stream()
+							.flatMap(cs -> cs.getSendIPOrSubmitIPOrRequestIP().stream())
+							.map(op -> (long) op.getNumber())
+							.collect(Collectors.toList());
+					boolean isDefaultOpNumbers = isDefaultSequence(opNumberSequence);
 					boolean isDefaultCapSet = service.getCapabilitySet().size() == 1 && service.getCapabilitySet().get(0).getNumber() == 1;
 					for (CapabilitySetType cs : service.getCapabilitySet()) {
 						writeDoc(cs.getComment());
@@ -150,8 +155,6 @@ public class MosdlGenerator extends Generator {
 							writeLine("capability [", cs.getNumber(), "] {");
 							indent();
 						}
-						List<Long> opNumberSequence = cs.getSendIPOrSubmitIPOrRequestIP().stream().map(op -> (long) op.getNumber()).collect(Collectors.toList());
-						boolean isDefaultOpNumbers = isDefaultSequence(opNumberSequence);
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
 							InteractionType interaction = getInteractionType(op);
 							List<MessageDetails> messages = MessageDetails.fromOp(op);
