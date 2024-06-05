@@ -46,6 +46,7 @@ import org.ccsds.schema.serviceschema.ErrorDefinitionType;
 import org.ccsds.schema.serviceschema.ErrorReferenceType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
+import org.ccsds.schema.serviceschema.MessageBodyType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.ObjectFactory;
 import org.ccsds.schema.serviceschema.ObjectType;
@@ -209,7 +210,7 @@ public class MosdlSpecLoader implements SpecLoader {
 		private InteractionStage currentStage;
 		private EnumerationType currentEnum;
 		private CompositeType currentComposite;
-		private final Deque<AnyTypeReference> currentOpMessages = new ArrayDeque<>();
+		private final Deque<MessageBodyType> currentOpMessages = new ArrayDeque<>();
 		private List<Object> currentErrors;
 		private final AtomicInteger areaCounter = new AtomicInteger(START_USER_AREA);
 		private final AtomicInteger serviceCounter = new AtomicInteger(START_USER_SERVICE);
@@ -529,9 +530,8 @@ public class MosdlSpecLoader implements SpecLoader {
 			} else {
 				field.setComment(currentOpDoc.getParamDoc(currentStage, field.getName(), doc));
 				// add field to parameter list of current message
-				JAXBElement<NamedElementReferenceWithCommentType> wrappedField = of.createField(field);
-				AnyTypeReference currentMsg = currentOpMessages.getLast();
-				currentMsg.getAny().add(wrappedField);
+				MessageBodyType currentMsg = currentOpMessages.getLast();
+				currentMsg.getField().add(field);
 			}
 		}
 
@@ -811,7 +811,7 @@ public class MosdlSpecLoader implements SpecLoader {
 
 		private void enterMsg(final InteractionStage stage, final MOSDLParser.DocContext doc) {
 			currentStage = stage;
-			AnyTypeReference msg = new AnyTypeReference();
+			MessageBodyType msg = new MessageBodyType();
 			String completeDoc = currentOpDoc.getMessageDoc(stage, getDoc(doc));
 			msg.setComment(completeDoc);
 			currentOpMessages.addLast(msg);

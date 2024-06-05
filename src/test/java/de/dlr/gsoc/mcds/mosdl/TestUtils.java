@@ -5,10 +5,9 @@ package de.dlr.gsoc.mcds.mosdl;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import jakarta.xml.bind.JAXBElement;
-import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.CapabilitySetType;
+import org.ccsds.schema.serviceschema.MessageBodyType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.RequestOperationType;
@@ -48,7 +47,7 @@ public class TestUtils {
 				.build();
 		assertFalse(xmlDiff.hasDifferences(), () -> xmlDiff.toString());
 	}
-	
+
 	public static void assertEqualsMinimalTestSpec(SpecificationType loadedSpec) {
 		assertNull(loadedSpec.getComment());
 		assertEquals(1, loadedSpec.getArea().size());
@@ -83,17 +82,13 @@ public class TestUtils {
 		assertTrue(loadedReqOp.getErrors().isEmpty());
 		assertNotNull(loadedReqOp.getMessages());
 
-		AnyTypeReference loadedReqMsg = loadedReqOp.getMessages().getRequest();
+		MessageBodyType loadedReqMsg = loadedReqOp.getMessages().getRequest();
 		assertNotNull(loadedReqMsg);
 		assertNull(loadedReqMsg.getComment());
-		assertEquals(1, loadedReqMsg.getAny().size());
-		assertEquals(JAXBElement.class, loadedReqMsg.getAny().get(0).getClass());
+		assertEquals(1, loadedReqMsg.getField().size());
 
-		JAXBElement loadedReqField = (JAXBElement) loadedReqMsg.getAny().get(0);
-		assertNotNull(loadedReqField.getValue());
-		assertEquals(NamedElementReferenceWithCommentType.class, loadedReqField.getValue().getClass());
-
-		NamedElementReferenceWithCommentType loadedInField = (NamedElementReferenceWithCommentType) loadedReqField.getValue();
+		NamedElementReferenceWithCommentType loadedInField = loadedReqMsg.getField().get(0);
+		assertNotNull(loadedInField);
 		assertEquals("in", loadedInField.getName());
 		assertFalse(loadedInField.isCanBeNull());
 		assertNull(loadedInField.getComment());
@@ -103,17 +98,13 @@ public class TestUtils {
 		assertEquals("String", loadedInFieldType.getName());
 		assertTrue(loadedInFieldType.isList());
 
-		AnyTypeReference loadedRespMsg = loadedReqOp.getMessages().getResponse();
+		MessageBodyType loadedRespMsg = loadedReqOp.getMessages().getResponse();
 		assertNotNull(loadedRespMsg);
 		assertNull(loadedRespMsg.getComment());
-		assertEquals(1, loadedRespMsg.getAny().size());
-		assertEquals(JAXBElement.class, loadedRespMsg.getAny().get(0).getClass());
+		assertEquals(1, loadedRespMsg.getField().size());
 
-		JAXBElement loadedRespField = (JAXBElement) loadedRespMsg.getAny().get(0);
-		assertNotNull(loadedRespField.getValue());
-		assertEquals(NamedElementReferenceWithCommentType.class, loadedRespField.getValue().getClass());
-
-		NamedElementReferenceWithCommentType loadedOutField = (NamedElementReferenceWithCommentType) loadedRespField.getValue();
+		NamedElementReferenceWithCommentType loadedOutField = loadedRespMsg.getField().get(0);
+		assertNotNull(loadedOutField);
 		assertEquals("out", loadedOutField.getName());
 		assertTrue(loadedOutField.isCanBeNull());
 		assertNull(loadedOutField.getComment());

@@ -7,9 +7,8 @@ import de.dlr.gsoc.mcds.mosdl.InteractionType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.xml.bind.JAXBElement;
-import org.ccsds.schema.serviceschema.AnyTypeReference;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
+import org.ccsds.schema.serviceschema.MessageBodyType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
@@ -71,10 +70,10 @@ public abstract class Generator {
 		private final String comment;
 		private final List<NamedElementReferenceWithCommentType> fields;
 
-		private MessageDetails(InteractionStage stage, String comment, AnyTypeReference atr) {
+		private MessageDetails(InteractionStage stage, String comment, MessageBodyType msgBody) {
 			this.stage = stage;
 			this.comment = comment;
-			this.fields = anyTypeRefsToFields(atr);
+			this.fields = msgBody.getField();
 		}
 
 		/**
@@ -115,57 +114,45 @@ public abstract class Generator {
 		public static List<MessageDetails> fromOp(OperationType op) {
 			List<MessageDetails> messages = new ArrayList<>();
 			if (op instanceof SendOperationType) {
-				AnyTypeReference atrSend = ((SendOperationType) op).getMessages().getSend();
+				MessageBodyType atrSend = ((SendOperationType) op).getMessages().getSend();
 				messages.add(new MessageDetails(InteractionStage.SEND, atrSend.getComment(), atrSend));
 			} else if (op instanceof SubmitOperationType) {
-				AnyTypeReference atrSubmit = ((SubmitOperationType) op).getMessages().getSubmit();
+				MessageBodyType atrSubmit = ((SubmitOperationType) op).getMessages().getSubmit();
 				messages.add(new MessageDetails(InteractionStage.SUBMIT, atrSubmit.getComment(), atrSubmit));
 			} else if (op instanceof RequestOperationType) {
 				RequestOperationType.Messages msgs = ((RequestOperationType) op).getMessages();
-				AnyTypeReference atrRequest = msgs.getRequest();
-				AnyTypeReference atrResponse = msgs.getResponse();
+				MessageBodyType atrRequest = msgs.getRequest();
+				MessageBodyType atrResponse = msgs.getResponse();
 				messages.add(new MessageDetails(InteractionStage.REQUEST, atrRequest.getComment(), atrRequest));
 				messages.add(new MessageDetails(InteractionStage.REQUEST_RESPONSE, atrResponse.getComment(), atrResponse));
 			} else if (op instanceof InvokeOperationType) {
 				InvokeOperationType.Messages msgs = ((InvokeOperationType) op).getMessages();
-				AnyTypeReference atrInvoke = msgs.getInvoke();
-				AnyTypeReference atrAck = msgs.getAcknowledgement();
-				AnyTypeReference atrResponse = msgs.getResponse();
+				MessageBodyType atrInvoke = msgs.getInvoke();
+				MessageBodyType atrAck = msgs.getAcknowledgement();
+				MessageBodyType atrResponse = msgs.getResponse();
 				messages.add(new MessageDetails(InteractionStage.INVOKE, atrInvoke.getComment(), atrInvoke));
 				messages.add(new MessageDetails(InteractionStage.INVOKE_ACK, atrAck.getComment(), atrAck));
 				messages.add(new MessageDetails(InteractionStage.INVOKE_RESPONSE, atrResponse.getComment(), atrResponse));
 			} else if (op instanceof ProgressOperationType) {
 				ProgressOperationType.Messages msgs = ((ProgressOperationType) op).getMessages();
-				AnyTypeReference atrProgress = msgs.getProgress();
-				AnyTypeReference atrAck = msgs.getAcknowledgement();
-				AnyTypeReference atrUpdate = msgs.getUpdate();
-				AnyTypeReference atrResponse = msgs.getResponse();
+				MessageBodyType atrProgress = msgs.getProgress();
+				MessageBodyType atrAck = msgs.getAcknowledgement();
+				MessageBodyType atrUpdate = msgs.getUpdate();
+				MessageBodyType atrResponse = msgs.getResponse();
 				messages.add(new MessageDetails(InteractionStage.PROGRESS, atrProgress.getComment(), atrProgress));
 				messages.add(new MessageDetails(InteractionStage.PROGRESS_ACK, atrAck.getComment(), atrAck));
 				messages.add(new MessageDetails(InteractionStage.PROGRESS_UPDATE, atrUpdate.getComment(), atrUpdate));
 				messages.add(new MessageDetails(InteractionStage.PROGRESS_RESPONSE, atrResponse.getComment(), atrResponse));
 			} else if (op instanceof PubSubOperationType) {
 				PubSubOperationType.Messages msgs = ((PubSubOperationType) op).getMessages();
-				AnyTypeReference atrSubKeys = msgs.getSubscriptionKeys();
-				AnyTypeReference atrPublish = msgs.getPublishNotify();
-				AnyTypeReference atrNotify = atrPublish;
+				MessageBodyType atrSubKeys = msgs.getSubscriptionKeys();
+				MessageBodyType atrPublish = msgs.getPublishNotify();
+				MessageBodyType atrNotify = atrPublish;
 				messages.add(new MessageDetails(InteractionStage.PUBSUB_SUBKEYS, atrSubKeys.getComment(), atrSubKeys));
 				messages.add(new MessageDetails(InteractionStage.PUBSUB_PUBLISH, atrPublish.getComment(), atrPublish));
 				messages.add(new MessageDetails(InteractionStage.PUBSUB_NOTIFY, atrNotify.getComment(), atrNotify));
 			}
 			return messages;
-		}
-
-		private static List<NamedElementReferenceWithCommentType> anyTypeRefsToFields(AnyTypeReference atr) {
-			List<NamedElementReferenceWithCommentType> fields = new ArrayList<>();
-			for (Object o : atr.getAny()) {
-				JAXBElement jObject = (JAXBElement) o;
-				if (NamedElementReferenceWithCommentType.class.isAssignableFrom(jObject.getDeclaredType())) {
-					NamedElementReferenceWithCommentType field = (NamedElementReferenceWithCommentType) jObject.getValue();
-					fields.add(field);
-				}
-			}
-			return fields;
 		}
 	}
 
