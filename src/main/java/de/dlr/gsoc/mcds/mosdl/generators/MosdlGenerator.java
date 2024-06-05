@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.AttributeType;
 import org.ccsds.schema.serviceschema.CapabilitySetType;
@@ -104,6 +105,20 @@ public class MosdlGenerator extends Generator {
 		this.docType = docType;
 	}
 
+	private boolean isDefaultSequence(List<Long> numberList) {
+		long prevNumber = 0;
+		for (long n : numberList) {
+			if (n == 0) {
+				continue;
+			}
+			if (n == -1 || n - prevNumber != 1) {
+				return false;
+			}
+			prevNumber = n;
+		}
+		return true;
+	}
+
 	@Override
 	public void generate(SpecificationType spec, File targetDirectory) throws GeneratorException {
 		logger.debug("Generating MOSDL file(s) into directory '{}'.", targetDirectory);
@@ -116,19 +131,27 @@ public class MosdlGenerator extends Generator {
 				writeDoc(area.getComment());
 				writeLine("area ", getId(area.getName()), " [", area.getNumber(), area.getVersion() == 1 ? "" : "." + area.getVersion(), "]");
 				writeLine();
+				List<Long> svcNumberSequence = area.getService().stream().map(svc -> (long) svc.getNumber()).collect(Collectors.toList());
+				boolean isDefaultSvcNumbers = isDefaultSequence(svcNumberSequence);
 				// TODO: imports
 				for (ServiceType service : area.getService()) {
 					currentService = service;
 					writeDoc(service.getComment());
-					writeLine("service ", getId(service.getName()), " [", service.getNumber(), "] {");
+					if (isDefaultSvcNumbers) {
+						writeLine("service ", getId(service.getName()), " {");
+					} else {
+						writeLine("service ", getId(service.getName()), " [", service.getNumber(), "] {");
+					}
 					indent();
-					boolean hasDefaultCapSet = service.getCapabilitySet().size() == 1 && service.getCapabilitySet().get(0).getNumber() == 1;
+					boolean isDefaultCapSet = service.getCapabilitySet().size() == 1 && service.getCapabilitySet().get(0).getNumber() == 1;
 					for (CapabilitySetType cs : service.getCapabilitySet()) {
 						writeDoc(cs.getComment());
-						if (!hasDefaultCapSet) {
+						if (!isDefaultCapSet) {
 							writeLine("capability [", cs.getNumber(), "] {");
 							indent();
 						}
+						List<Long> opNumberSequence = cs.getSendIPOrSubmitIPOrRequestIP().stream().map(op -> (long) op.getNumber()).collect(Collectors.toList());
+						boolean isDefaultOpNumbers = isDefaultSequence(opNumberSequence);
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
 							InteractionType interaction = getInteractionType(op);
 							List<MessageDetails> messages = MessageDetails.fromOp(op);
@@ -137,7 +160,11 @@ public class MosdlGenerator extends Generator {
 							writeOpDoc(op, messages, errors, hasErrorDoc);
 							writeIndent();
 							write(interaction.name().toLowerCase(), " ");
-							write(getId(op.getName()), " [", op.getNumber(), "] ");
+							if (isDefaultOpNumbers) {
+								write(getId(op.getName()), " ");
+							} else {
+								write(getId(op.getName()), " [", op.getNumber(), "] ");
+							}
 							indent();
 							switch (interaction) {
 								case SEND:
@@ -207,7 +234,7 @@ public class MosdlGenerator extends Generator {
 							writeLine();
 							writeLine();
 						}
-						if (!hasDefaultCapSet) {
+						if (!isDefaultCapSet) {
 							outdent();
 							writeLine("}");
 						}
@@ -220,8 +247,23 @@ public class MosdlGenerator extends Generator {
 				}
 
 				if (null != area.getDataTypes()) {
+					List<Long> typeNumberSequence = area.getDataTypes().getFundamentalOrAttributeOrComposite().stream()
+							.map(dt -> {
+								if (dt instanceof CompositeType) {
+									Long sfp = ((CompositeType) dt).getShortFormPart();
+									if (null == sfp || sfp == 0) {
+										return 0L;
+									}
+									return sfp;
+								} else if (dt instanceof EnumerationType) {
+									return ((EnumerationType) dt).getShortFormPart();
+								}
+								return -1L;
+							})
+							.collect(Collectors.toList());
+					boolean isDefaultTypeNumbers = isDefaultSequence(typeNumberSequence);
 					for (Object dataType : area.getDataTypes().getFundamentalOrAttributeOrComposite()) {
-						writeDataType(dataType);
+						writeDataType(dataType, isDefaultTypeNumbers);
 						writeLine();
 					}
 				}
@@ -229,7 +271,7 @@ public class MosdlGenerator extends Generator {
 				writeErrors(area.getErrors());
 				currentArea = null;
 				currentWriter.close();
-				logger.debug("Generated MOSDL file '{}", targetFile);
+				logger.debug("Generated MOSDL file '{}'.", targetFile);
 			} catch (IOException ex) {
 				throw new GeneratorException(ex);
 			}
@@ -277,7 +319,7 @@ public class MosdlGenerator extends Generator {
 		write(")");
 	}
 
-	private void writeDataType(Object dataType) throws IOException {
+	private void writeDataType(Object dataType, boolean isDefaultTypeNumbers) throws IOException {
 		if (dataType instanceof CompositeType) {
 			CompositeType composite = (CompositeType) dataType;
 			writeDoc(composite.getComment());
@@ -291,7 +333,7 @@ public class MosdlGenerator extends Generator {
 			} else {
 				write("composite ", getId(composite.getName()));
 			}
-			if (!isAbstract) {
+			if (!isAbstract && !isDefaultTypeNumbers) {
 				write(" [", composite.getShortFormPart(), "]");
 			}
 			if (composite instanceof ObjectType && null != ((ObjectType) composite).getIdentityFieldName()) {
@@ -312,7 +354,11 @@ public class MosdlGenerator extends Generator {
 		} else if (dataType instanceof EnumerationType) {
 			EnumerationType enumeration = (EnumerationType) dataType;
 			writeDoc(enumeration.getComment());
-			writeLine("enum ", getId(enumeration.getName()), " [", enumeration.getShortFormPart(), "] {");
+			if (isDefaultTypeNumbers) {
+				writeLine("enum ", getId(enumeration.getName()), " {");
+			} else {
+				writeLine("enum ", getId(enumeration.getName()), " [", enumeration.getShortFormPart(), "] {");
+			}
 			indent();
 			for (EnumerationType.Item item : enumeration.getItem()) {
 				writeDoc(item.getComment());
