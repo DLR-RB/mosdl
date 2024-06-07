@@ -373,6 +373,7 @@ public class MosdlSpecLoader implements SpecLoader {
 		public void exitService(MOSDLParser.ServiceContext ctx) {
 			capabilitySetCounter.set(START_USER_CAPABILITYSET);
 			operationCounter.set(START_USER_OPERATION);
+			currentCapabilitySet = null;
 			currentService = null;
 		}
 

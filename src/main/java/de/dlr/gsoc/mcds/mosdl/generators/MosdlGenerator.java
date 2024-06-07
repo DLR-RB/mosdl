@@ -153,7 +153,13 @@ public class MosdlGenerator extends Generator {
 							writeLine("capability [", cs.getNumber(), "] {");
 							indent();
 						}
+						boolean isFirstSvcInCapSet = true;
 						for (OperationType op : cs.getSendIPOrSubmitIPOrRequestIP()) {
+							if (isFirstSvcInCapSet) {
+								isFirstSvcInCapSet = false;
+							} else {
+								writeLine();
+							}
 							InteractionType interaction = getInteractionType(op);
 							List<MessageDetails> messages = MessageDetails.fromOp(op);
 							List<ErrorReferenceType> errors = getErrorsFromOp(op, interaction);
@@ -229,13 +235,12 @@ public class MosdlGenerator extends Generator {
 							}
 							outdent();
 							writeLine();
-							writeLine();
 						}
 						if (!isDefaultCapSet) {
 							outdent();
 							writeLine("}");
+							writeLine();
 						}
-						writeLine();
 					}
 					outdent();
 					writeLine("}");

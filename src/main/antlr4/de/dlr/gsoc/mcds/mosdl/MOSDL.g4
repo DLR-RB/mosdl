@@ -10,7 +10,7 @@ area        : doc? AREA nvidentifier
 
 typeImport  : IMPORT fullyQualifiedType ;
 
-service     : doc? SERVICE nidentifier LBRACE (capability | operation | dataType)* RBRACE ;
+service     : doc? SERVICE nidentifier LBRACE (capability | operation)* RBRACE ;
 capability  : doc? CAPABILITY (LBRACK NUMBER RBRACK)? LBRACE operation* RBRACE ;
 
 operation   : doc? (sendOp | submitOp | requestOp | invokeOp | progressOp | pubsubOp) ;

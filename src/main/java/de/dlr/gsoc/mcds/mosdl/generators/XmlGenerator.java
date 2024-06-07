@@ -19,6 +19,7 @@ import org.ccsds.schema.serviceschema.AreaType;
 import org.ccsds.schema.serviceschema.CompositeType;
 import org.ccsds.schema.serviceschema.ElementReferenceType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
+import org.ccsds.schema.serviceschema.ObjectFactory;
 import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
@@ -37,7 +38,7 @@ public class XmlGenerator extends Generator {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlGenerator.class);
 
-	private static final String SERVICE_SCHEMA_RESOURCE = "/COMSchema.xsd";
+	private static final String SERVICE_SCHEMA_RESOURCE = "/ServiceSchema.xsd";
 	private static final String XML_SPEC_FILE_ENDING = ".xml";
 	private static final String DEFAULT_FILENAME = "spec";
 	private final boolean isSkipValidation;
@@ -71,8 +72,7 @@ public class XmlGenerator extends Generator {
 			JAXBContext jaxbContext = JAXBContext.newInstance(SpecificationType.class);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			org.ccsds.schema.serviceschema.ObjectFactory serviceSchemaObjectFactory = new org.ccsds.schema.serviceschema.ObjectFactory();
-			JAXBElement<SpecificationType> element = serviceSchemaObjectFactory.createSpecification(spec);
+			JAXBElement<SpecificationType> element = new ObjectFactory().createSpecification(spec);
 			if (!isSkipValidation) {
 				SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 				Schema schema = schemaFactory.newSchema(XmlSpecLoader.class.getResource(SERVICE_SCHEMA_RESOURCE));

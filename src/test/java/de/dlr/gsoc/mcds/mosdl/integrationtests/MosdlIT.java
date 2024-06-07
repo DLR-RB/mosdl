@@ -26,7 +26,6 @@ public class MosdlIT {
 		"ServiceTest", "CapSetTest", "OpTest", "OpDocInlineTest", "OpDocBulkTest",
 		"OpSendTest", "OpSubmitTest", "OpRequestTest", "OpInvokeTest", "OpProgressTest", "OpPubsubTest",
 		"CompositeTest", "CompositeAbstractTest", "EnumTest", "ErrorTest",
-		"ServiceCompositeTest", "ServiceCompositeAbstractTest", "ServiceEnumTest", "ServiceErrorTest",
 		"CommentTest", "ImportTest", "ImportComplexTest",
 		"FundamentalTest", "AttributeTest"};
 	private static final String[] COMPLEX_TEST_CASES = {"VerySimpleService", "ComplexService"};
