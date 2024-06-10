@@ -125,7 +125,7 @@ public class MosdlSpecLoader implements SpecLoader {
 	@Override
 	public SpecificationType load() throws LoaderException {
 		List<File> inputFiles = Arrays.stream(files)
-				.flatMap(f -> f.isDirectory() ? Arrays.stream(f.listFiles()) : Stream.of(f))
+				.flatMap(f -> f.isDirectory() ? Arrays.stream(f.listFiles()).sorted() : Stream.of(f))
 				.filter(MosdlSpecLoader::isLoadable)
 				.collect(Collectors.toList());
 
