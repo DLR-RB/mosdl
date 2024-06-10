@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc/VerySimpleService">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc">
     <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
     <xs:complexType name="MyOwnType">
+        <xs:annotation>
+            <xs:documentation>The only data type in this file.</xs:documentation>
+        </xs:annotation>
         <xs:complexContent>
             <xs:extension base="malxml:Composite">
                 <xs:sequence>

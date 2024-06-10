@@ -534,6 +534,7 @@ public class XsdGenerator extends Generator {
 				NamedElementReferenceWithCommentType subscriptionIdField = of.createNamedElementReferenceWithCommentType();
 				subscriptionIdField.setName("subscriptionId");
 				subscriptionIdField.setType(subscriptionIdType);
+				subscriptionIdField.setCanBeNull(Boolean.FALSE);
 				fields.add(subscriptionIdField);
 			}
 
@@ -544,6 +545,7 @@ public class XsdGenerator extends Generator {
 			NamedElementReferenceWithCommentType updateHeadersField = of.createNamedElementReferenceWithCommentType();
 			updateHeadersField.setName("updateHeaders");
 			updateHeadersField.setType(updateHeaderListType);
+			updateHeadersField.setCanBeNull(Boolean.FALSE);
 			fields.add(updateHeadersField);
 			for (NamedElementReferenceWithCommentType field : msgDetails.getFields()) {
 				// deeply copy field and always set list to true

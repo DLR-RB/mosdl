@@ -1,32 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc/TestService" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc/TestService">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ccsds.org/schema/malxml/hcc/TestService" xmlns:malxml="http://www.ccsds.org/schema/malxml/MAL" xmlns:ns0="http://www.ccsds.org/schema/malxml/MC" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://www.ccsds.org/schema/malxml/hcc/TestService">
     <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
-    <xs:complexType name="InvalidType">
-        <xs:complexContent>
-            <xs:extension base="malxml:Element">
-                <xs:sequence>
-                    <xs:element name="InvalidType" type="InvalidTypeEnum"/>
-                </xs:sequence>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:simpleType name="InvalidTypeEnum">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="TOO_LARGE"/>
-            <xs:enumeration value="TOO_SMALL"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:complexType name="InvalidTypeList">
-        <xs:complexContent>
-            <xs:extension base="malxml:Composite">
-                <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="InvalidType" nillable="true" type="InvalidType"/>
-                </xs:sequence>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element name="InvalidType" nillable="true" type="InvalidType"/>
-    <xs:element name="InvalidTypeList" nillable="true" type="InvalidTypeList"/>
+    <xs:import namespace="http://www.ccsds.org/schema/malxml/MC"/>
     <xs:complexType name="getValue_REQUEST_Body">
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
@@ -40,7 +15,8 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:Attribute"/>
+                    <xs:element nillable="true" ref="malxml:Attribute"/>
+                    <xs:element ref="ns0:Validity"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -50,7 +26,7 @@
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
                     <xs:element ref="malxml:Identifier"/>
-                    <xs:element ref="malxml:Attribute"/>
+                    <xs:element nillable="true" ref="malxml:Attribute"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -68,7 +44,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:Attribute"/>
+                    <xs:element nillable="true" ref="malxml:Attribute"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -96,7 +72,7 @@
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
                     <xs:element ref="malxml:Identifier"/>
-                    <xs:element ref="malxml:AttributeList">
+                    <xs:element nillable="true" ref="malxml:AttributeList">
                         <xs:annotation>
                             <xs:documentation>Only set if includeValueHistory is true.</xs:documentation>
                         </xs:annotation>
@@ -119,8 +95,8 @@
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
                     <xs:element ref="malxml:UpdateHeaderList"/>
-                    <xs:element ref="malxml:AttributeList"/>
-                    <xs:element ref="malxml:AttributeList"/>
+                    <xs:element nillable="true" ref="malxml:AttributeList"/>
+                    <xs:element nillable="true" ref="malxml:AttributeList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -131,8 +107,8 @@
                 <xs:sequence>
                     <xs:element ref="malxml:Identifier"/>
                     <xs:element ref="malxml:UpdateHeaderList"/>
-                    <xs:element ref="malxml:AttributeList"/>
-                    <xs:element ref="malxml:AttributeList"/>
+                    <xs:element nillable="true" ref="malxml:AttributeList"/>
+                    <xs:element nillable="true" ref="malxml:AttributeList"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>

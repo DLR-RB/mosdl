@@ -7,7 +7,7 @@
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
                     <xs:element ref="malxml:String"/>
-                    <xs:element ref="ns0:MyType"/>
+                    <xs:element nillable="true" ref="ns0:MyType"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
@@ -25,7 +25,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:String"/>
+                    <xs:element nillable="true" ref="malxml:String"/>
                     <xs:element ref="malxml:Attribute"/>
                 </xs:sequence>
             </xs:restriction>

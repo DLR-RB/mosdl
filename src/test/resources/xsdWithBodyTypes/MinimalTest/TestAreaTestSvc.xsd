@@ -14,7 +14,7 @@
         <xs:complexContent>
             <xs:restriction base="malxml:Body">
                 <xs:sequence>
-                    <xs:element ref="malxml:Integer"/>
+                    <xs:element nillable="true" ref="malxml:Integer"/>
                 </xs:sequence>
             </xs:restriction>
         </xs:complexContent>
