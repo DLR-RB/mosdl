@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
-    <mal:area name="test" number="4711" version="1">
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema">
+    <mal:area number="4711" name="test" version="1">
         <mal:dataTypes>
-            <mal:enumeration name="FuelType" shortFormPart="1" comment="This enumeration denotes the possible fuel types for a car.">
-                <mal:item value="GASOLINE" nvalue="1" comment="Gasoline, petrol, Benzin."/>
-                <mal:item value="DIESEL" nvalue="2"/>
-                <mal:item value="ELECTRIC" nvalue="4"/>
-                <mal:item value="HYDROGEN" nvalue="5"/>
+            <mal:enumeration shortFormPart="1" name="FuelType" comment="This enumeration denotes the possible fuel types for a car.">
+                <mal:item nvalue="1" value="GASOLINE" comment="Gasoline, petrol, Benzin."/>
+                <mal:item nvalue="2" value="DIESEL"/>
+                <mal:item nvalue="4" value="ELECTRIC"/>
+                <mal:item nvalue="5" value="HYDROGEN"/>
             </mal:enumeration>
         </mal:dataTypes>
     </mal:area>

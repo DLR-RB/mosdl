@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
-    <mal:area name="test" number="4711" version="1">
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema">
+    <mal:area number="4711" name="test" version="1">
         <mal:service name="ServiceName" number="1">
-            <mal:dataTypes>
-                <mal:composite name="ServiceCompositeWithImportedType" shortFormPart="1">
-                    <mal:field name="svcValidity" canBeNull="false">
-                        <mal:type area="MC" service="Parameter" name="ValidityState"/>
-                    </mal:field>
-                </mal:composite>
-            </mal:dataTypes>
+            <mal:capabilitySet number="1">
+                <mal:sendIP name="serviceOp" number="1">
+                    <mal:messages>
+                        <mal:send>
+                            <mal:field name="fieldOfImportedType" canBeNull="false">
+<mal:type area="MC" name="ValidityState"/>
+                            </mal:field>
+                        </mal:send>
+                    </mal:messages>
+                </mal:sendIP>
+            </mal:capabilitySet>
         </mal:service>
         <mal:dataTypes>
             <mal:composite name="CompositeWithImportedType" shortFormPart="1">
                 <mal:field name="validity" canBeNull="false">
-                    <mal:type area="MC" service="Parameter" name="ValidityState"/>
+                    <mal:type area="MC" name="ValidityState"/>
                 </mal:field>
             </mal:composite>
         </mal:dataTypes>

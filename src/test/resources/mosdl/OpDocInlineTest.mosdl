@@ -12,14 +12,12 @@ service ServiceName {
 		throws
 			/// Documentation for the INTERAL error.
 			MAL::INTERNAL,
-			/// Documentation for MY_OWN_ERROR.
-			MY_OWN_ERROR:
-				/// Some number helpful for understanding this error.
-				Integer,
 			"""
 			Multi-line documentation
-			for the in-line defined MY_INLINE_ERROR.
+			for the reference to MY_OWN_ERROR.
 			"""
-			error MY_INLINE_ERROR [666] : """Human readable error cause.""" String
+			MY_OWN_ERROR:
+				/// Some number helpful for understanding this error.
+				Integer
 }
 

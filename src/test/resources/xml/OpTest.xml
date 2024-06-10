@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema" xmlns:com="http://www.ccsds.org/schema/COMSchema">
-    <mal:area name="test" number="4711" version="1">
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema">
+    <mal:area number="4711" name="test" version="1">
         <mal:service name="ServiceName" number="1">
             <mal:capabilitySet number="1">
-                <mal:requestIP name="myOperation" number="42" supportInReplay="false">
+                <mal:requestIP name="myOperation" number="42">
                     <mal:messages>
                         <mal:request>
                             <mal:field name="firstParam" canBeNull="false">
@@ -32,16 +32,9 @@
                         <mal:errorRef>
                             <mal:type area="test" name="ANOTHER_ERROR"/>
                         </mal:errorRef>
-                        <mal:error name="MY_INLINE_ERROR" number="666">
-                            <mal:extraInformation>
-<mal:type area="MAL" name="String"/>
-                            </mal:extraInformation>
-                        </mal:error>
                     </mal:errors>
                 </mal:requestIP>
-            </mal:capabilitySet>
-            <mal:capabilitySet number="2">
-                <mal:requestIP name="getFileNames" number="43" supportInReplay="true">
+                <mal:requestIP name="getFileNames" number="43">
                     <mal:messages>
                         <mal:request>
                             <mal:field name="directory" canBeNull="false">

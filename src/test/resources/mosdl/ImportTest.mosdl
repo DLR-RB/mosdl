@@ -1,11 +1,9 @@
 area test [4711]
 
-import MC::Parameter.ValidityState
+import MC::ValidityState
 
 service ServiceName {
-	composite ServiceCompositeWithImportedType {
-		svcValidity: ValidityState
-	}
+	send serviceOp (fieldOfImportedType: ValidityState)
 }
 
 composite CompositeWithImportedType {

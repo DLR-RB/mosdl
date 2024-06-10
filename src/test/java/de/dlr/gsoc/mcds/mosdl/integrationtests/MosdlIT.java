@@ -60,6 +60,7 @@ public class MosdlIT {
 
 	@Test
 	void complexMosdlToXmlTest(@TempDir File targetDirectory) throws Exception {
+		// reversed lexicographic order of the input files is on purpose - the order affects auto-generated numbers
 		String inputFilePath1 = "/mosdl/VerySimpleService.mosdl";
 		String inputFilePath2 = "/mosdl/ComplexService.mosdl";
 		String outputFileName = "MosdlDocExample.xml";
