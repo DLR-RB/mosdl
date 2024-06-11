@@ -29,6 +29,9 @@
 <mal:type area="MAL" name="Integer"/>
                             </mal:extraInformation>
                         </mal:errorRef>
+                        <mal:errorRef>
+                            <mal:type area="test" name="ANOTHER_ERROR"/>
+                        </mal:errorRef>
                     </mal:errors>
                 </mal:requestIP>
             </mal:capabilitySet>

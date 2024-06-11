@@ -1,7 +1,7 @@
 MOSDL - Mission Operations Service Description Language
 =======================================================
 
-The Mission Operations Service Description Language MOSDL can be used to describe [CCSDS MO services](https://public.ccsds.org/Pubs/521x0b2e1.pdf) in terms of operations and data types. It is supposed to be a concise notation that serves as a basis for documentation, code generation, quick iteration and discussion without the need for graphical tools or manual or assisted XML editing. Where possible sensible defaults are chosen so that the service author can omit information that he deems unnecessary (e.g. service or data type numbers). Yet it remains possible to specify this information if full control is needed.
+The Mission Operations Service Description Language MOSDL can be used to describe [CCSDS MO services](https://public.ccsds.org/Pubs/521x0b3.pdf) in terms of operations and data types. It is supposed to be a concise notation that serves as a basis for documentation, code generation, quick iteration and discussion without the need for graphical tools or manual or assisted XML editing. Where possible sensible defaults are chosen so that the service author can omit information that he deems unnecessary (e.g. service or data type numbers). Yet it remains possible to specify this information if full control is needed.
 
 MOSDL files can be read in by the MOSDL compiler. It can emit a CCSDS MO XML compliant specification file and CCSDS MO XML specifications can be transformed back into MOSDL.
 
@@ -58,13 +58,13 @@ service ServiceName {
         -> (...) throws SOME_ERROR
     
     pubsub monitor <- (...)
-    
-    composite ServiceLevelType {
-        ...
-    }
 }
 
 composite AreaLevelType {
+    ...
+}
+
+object SomeObject {
     ...
 }
 
@@ -115,7 +115,7 @@ send fourthOperation("request": String)
 
 ### Areas
 
-Think of an area similar to a Java package: It is a namespace for services, data types and errors. The area is mandatory, therefore you have to start each MOSDL file with an area statement. Optional documentation comes right before the `area` keyword, the optional area number and are version are put in square brackets after the area name:
+Think of an area similar to a Java package: It is a namespace for services, data types and errors. The area is mandatory, therefore you have to start each MOSDL file with an area statement. Optional documentation comes right before the `area` keyword, the optional area number and area version are put in square brackets after the area name:
 
 ```
 """
@@ -144,21 +144,20 @@ area full [4711.2]      // name: 'full',        number: 4711,                   
 
 ### Type references and imports
 
-Types and errors can be referred to (e.g. in the message signature of an operation) using three different notations:
+Types and errors can be referred to (e.g. in the message signature of an operation) using two different notations:
 
-* Fully qualified: `areaName::typeName` (for area-level types and errors) and `areaName::serviceName.typeName` (for service-level types and errors)
-* Partly qualified: `serviceName.typeName`
+* Fully qualified: `areaName::typeName` (for area-level types and errors)
 * Unqualified: `typeName`
 
-Only two scopes exist: service-level scope and area-level scope. Using a fully qualified type reference is straight-forward because the referenced type is unique. You can use a partly qualified type reference if you reference types from the same area, but a different service. Use unqualified type references to refer to service-level types from the same service or area-level types from the same area. If you are in service scope this scope will be searched first and only if the type is not found there the enclosing area scope is searched for the type. If you are in area scope only the area scope will be searched for the type. This also means that you need to use at least a partly qualified name if you refer to a service-level type from area scope.
+Only one scope exists: area-level scope. Using a fully qualified type reference is straight-forward because the referenced type is unique. Use unqualified type references to refer to area-level types from the same area.
 
-You can also import types (and errors) from other areas and services using an `import` statement:
+You can also import types (and errors) from other areas using an `import` statement:
 
 ```
-import MC::Parameter.ValidityState
+import MC::ValidityState
 ```
 
-This allows you to refer to the imported types by unqualified reference (simply `ValidityState` in this example). Import statements come directly after the `area` statement and always need to refer to foreign types using fully qualified references. If one of your imported types collides with one of your defined types, the imported type will shadow your defined type and you need to use a partly or fully qualified reference to refer to your defined type.
+This allows you to refer to the imported types by unqualified reference (simply `ValidityState` in this example). Import statements come directly after the `area` statement and always need to refer to foreign types using fully qualified references. If one of your imported types collides with one of your defined types, the imported type will shadow your defined type and you need to use a fully qualified reference to refer to your defined type.
 
 All fundamental MAL data types are imported implicitly from the `MAL` area and are listed here:
 
@@ -180,9 +179,11 @@ All fundamental MAL data types are imported implicitly from the `MAL` area and a
 * UOctet
 * URI
 * UShort
+* ObjectRef
 * Attribute
 * Element
 * Composite
+* Object
 
 
 ### Services
@@ -192,29 +193,23 @@ You can specify one or more services in a file, though it is recommended to use 
 ```
 /// Documentation for service 'ServiceName'. This service will get number 1 auto-assigned.
 service ServiceName {
-    // all service contents (data types, operations, errors) come here
+    // all service contents (capability sets, operations) come here
 }
 ```
 
-You can put capability sets, operations, data types and errors inside a service. If an operation is put directly into a service without enclosing capability set, the operation is implicitly put in its own capability set.
+You can put capability sets and operations inside a service. If an operation is put directly into a service without enclosing capability set, the operation is implicitly put in its own capability set together with any other consecutive operation without enclosing capability set.
 
 
 ### Operations
 
 Operations are specified using a keyword denoting the interaction pattern, the message signatures (i.e. data types contained in the exchanged messages) and the possible errors. Message signatures look like typed parameter lists enclosed in parentheses: `(firstMessagePart: FirstType, secondMessagePart: SecondType)`. Commas between message parts are optional so that you can put them on separate lines easily. Stylized arrows denote the direction of a message: No arrow for messages originating from a consumer, `->` for messages from provider to consumer, `<-` for messages from provider to broker or broker to consumer.
 
-As usual, operation numbers are optional. If they are specified, they are put in square brackets after the operation name. Errors that can be raised by the operation need to be put in a `throws` clause. Multiple errors are comma-separated. Errors can either be referenced from service-level or area-level errors or they can be defined in-line using the `error` keyword (see the 'Errors' section for details). It is possible to specify a data type to use as extra information object for an error after a colon (the same considerations apply here as outlined in the 'Errors' section). As an example a REQUEST operation with name `myOperation` and number `42` might look like this:
+As usual, operation numbers are optional. If they are specified, they are put in square brackets after the operation name. Errors that can be raised by the operation need to be put in a `throws` clause. Multiple errors are comma-separated. Errors must reference area-level errors. It is possible to specify a data type to use as extra information object for an error after a colon (the same considerations apply here as outlined in the 'Errors' section). As an example a REQUEST operation with name `myOperation` and number `42` might look like this:
 
 ```
 request myOperation [42] (firstParam: String, secondParam: MyType)
     -> (someResponseNumber: UInteger)
-    throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR, error MY_INLINE_ERROR [666] : String
-```
-
-It is possible to mark side-effect free operations by an asterisk right before the operation name. This corresponds to the *support in replay* feature of MO and generally should be used for operations that can be invoked without changing any state. Example:
-
-```
-request *getFileNames(directory: String) -> (fileNames: List<String>)
+    throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR
 ```
 
 Documentation is allowed in several places:
@@ -222,7 +217,7 @@ Documentation is allowed in several places:
 * before the interaction pattern keyword for operation documentation,
 * before the message arrow (or if no arrow is present before the opening parenthesis) for message documentation,
 * before the name for each parameter in the message parts list for message parts documentation,
-* before the `error` keyword or error reference for error documentation,
+* before the error reference for error documentation,
 * before the data type of the extra information for extra information documentation.
 
 Using all of these becomes difficult to read but shall be demonstrated here as an example, using the same operation as above:
@@ -239,15 +234,14 @@ request myOperation [42]
     throws
         /// Documentation for the INTERAL error.
         MAL::INTERNAL,
-        /// Documentation for MY_OWN_ERROR.
+        """
+        Multi-line documentation
+        for the reference to MY_OWN_ERROR.
+        """
         MY_OWN_ERROR:
             /// Some number helpful for understanding this error.
             Integer,
-        """
-        Multi-line documentation
-        for the in-line defined MY_INLINE_ERROR.
-        """
-        error MY_INLINE_ERROR [666] : """Human readable error cause.""" String
+		ANOTHER_ERROR
 ```
 
 Documentation before the interaction pattern keyword is treated specially: In order to keep the specification readable you can use (similar to Javadoc or Doxygen) special tags to document messages belonging to the operation, parameters of each message, and each error. In this case you do not need any further documentation directly at each of these elements (known as "in-line" documentation). If you have both "bulk" and in-line documentation they are merged with a line-break separator.
@@ -265,6 +259,7 @@ Tags for documenting messages (no parameter expected). Which ones you can use de
 * `@progress` for PROGRESS messages
 * `@update` for PROGRESS_UPDATE messages
 * `@publish` for PUBSUB_PUBLISH and PUBSUB_NOTIFY messages
+* `@subkeys` for PUBSUB subscription keys
 
 Tags for documenting message parameters. The parameter name has to be given as parameter. Again, it depends on the interaction pattern which ones you can use:
 
@@ -277,11 +272,12 @@ Tags for documenting message parameters. The parameter name has to be given as p
 * `@progressparam`
 * `@updateparam`
 * `@publishparam`
+* `@subkeysparam`
 
-Tags for documenting errors. The error name (in case of in-line error definitions) or the error type (in case of error references) has to be given as parameter. If you give an error type, it has to be literally the same as the one used in the code, i.e. if you use an unqualified type reference you have to use an unqualified reference here as well, and if you use a fully qualified reference you have to use a fully qualified reference here as well:
+Tags for documenting errors. The error type has to be given as parameter. If you give an error type, it has to be literally the same as the one used in the code, i.e. if you use an unqualified type reference you have to use an unqualified reference here as well, and if you use a fully qualified reference you have to use a fully qualified reference here as well:
 
-* `@error` for errors and error references
-* `@errorinfo` for the extra information field of the error or error reference
+* `@error` for error references
+* `@errorinfo` for the extra information field of the error reference
 
 Any other tags are reserved but will be ignored currently. Rewriting the previous example in terms of bulk documentation looks like the following:
 
@@ -297,15 +293,14 @@ This is the operation documentation.
 @responseparam someResponseNumber: Doc for the only response param.
 
 @error     MAL::INTERNAL  : Documentation for the INTERAL error.
-@error     MY_OWN_ERROR   : Documentation for MY_OWN_ERROR.
+@error     MY_OWN_ERROR   : Multi-line documentation
+for the reference to MY_OWN_ERROR.
 @errorinfo MY_OWN_ERROR   : Some number helpful for understanding this error.
-@error     MY_INLINE_ERROR: Multi-line documentation
-for the in-line defined MY_INLINE_ERROR.
 @errorinfo MY_INLINE_ERROR: Human readable error cause.
 """
 request myOperation [42] (firstParam: String, secondParam: MyType)
     -> (someResponseNumber: UInteger)
-    throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR, error MY_INLINE_ERROR [666] : String
+    throws MAL::INTERNAL, MY_OWN_ERROR: Integer, ANOTHER_ERROR
 ```
 
 All possible MO interaction pattern can be expressed:
@@ -359,14 +354,14 @@ All four messages (PROGRESS, ACK, UPDATE and RESPONSE) have to be specified. The
 #### PUBSUB operation
 
 ```
-pubsub monitor <- (eventText: String)
+pubsub monitor(packetId: UShort) <- (eventText: String)
 ```
 
-The only message you can specify here is the PUBLISH/NOTIFY message. All other messages (SUBSCRIBE, UNSUBSCRIBE, ...) are generated according to the PUBSUB pattern and their contents are fixed by MO. PUBLISH is the message from provider to broker and NOTIFY the message from broker to consumer. Message contents are identical for both messages, therefore you only can specify one message here. Please note the left-pointing arrow, as opposed to the right-pointing arrow for the other interaction patterns.
+The first message is not a real message, but the specification of the subscription keys usable for this operation. All message fields must be Attribute types. The only real message you can specify here is the PUBLISH/NOTIFY message. All other messages (SUBSCRIBE, UNSUBSCRIBE, ...) are generated according to the PUBSUB pattern and their contents are fixed by MO. PUBLISH is the message from provider to broker and NOTIFY the message from broker to consumer. Message contents are identical for both messages, therefore you only can specify one message here. Please note the left-pointing arrow, as opposed to the right-pointing arrow for the other interaction patterns.
 
 #### Capability sets
 
-MO allows to group operations into capability sets as a means to tailor a service specification. Each capability set is referred to by number, but as usual MOSDL does not require you to specify the number explicitly. Capability sets do not have names. If you do not care about capability sets you do not need to use them. In this case MOSDL assigns an own capability set for each operation. Documentation comes right before the `capability` keyword. Capability sets do not open a new scope, i.e. the scope is still that of the enclosing service. Example:
+MO allows to group operations into capability sets as a means to tailor a service specification. Each capability set is referred to by number, but as usual MOSDL does not require you to specify the number explicitly. Capability sets do not have names. If you do not care about capability sets you do not need to use them. In this case MOSDL assigns an own capability set for all consecutive operations without explicitly assigned capability set. Documentation comes right before the `capability` keyword. Capability sets do not affect operation numbering. Example:
 
 ```
 /// Basic operations for just getting definitions.
@@ -384,28 +379,26 @@ capability {
 
 ### Data types
 
-Data types can be specified on area or service level by using the respective keywords for the possible specifications, `composite` and `enumeration`. On area-level a third keyword (`fundamental`) is possible, but only MAL itself is allowed to use it. These fundamental MAL data types are automatically imported and can be used with unqualified references. The `Attribute` and `Element` data types are abstract and need to be filled in by concrete types when they are used during program execution. `Attribute` stands for any of the 18 concrete basic MAL types, `Element` for any concrete type (also NULL and list types).
+Data types can be specified on area level by using the respective keywords for the possible specifications, `composite`, `object` and `enumeration`. A third keyword (`fundamental`) is possible, but only MAL itself is allowed to use it. These fundamental MAL data types are automatically imported and can be used with unqualified references. The `Attribute` and `Element` data types are abstract and need to be filled in by concrete types when they are used during program execution. `Attribute` stands for any of the 19 concrete basic MAL types, `Element` for any concrete type (also list types).
 
 #### Nullable types
 
-For every type a corresponding nullable type exists that additionally allows a NULL value denoting the absence of any value. The nullable type that corresponds to a type `MyType` is simply `MyType?`, i.e. with a following question mark.
+For every type a corresponding nullable type exists that additionally allows a NULL value denoting the absence of any value. The nullable type that corresponds to a type `MyType` is simply `MyType?`, i.e. with a following question mark. Nullable types may only be used for composite and object fields as well as message body types, they cannot be used as type of list values or ObjectRefs.
 
 #### Lists
 
-For every type a corresponding list type exists. The list type that correspond to a type `MyType` is simply `List<MyType>`. You can freely combine list and nullable types:
+For every type a corresponding list type exists. The list type that correspond to a type `MyType` is simply `List<MyType>`. Lists themselves may be nullable (depending on the context), but list elements are not allowed to be NULL. If you need that, wrap your list elements in a composite.
 
 * non-nullable list type of non-nullable elements: `List<MyType>`
 * nullable list type of non-nullable elements: `List?<MyType>`
-* non-nullable list type of nullable elements: `List<MyType?>`
-* nullable list type of nullable elements: `List?<MyType?>`
+* not allowed: non-nullable list type of nullable elements: `List<MyType?>`
+* not allowed: nullable list type of nullable elements: `List?<MyType?>`
 
-Because MAL (currently) does not know lists of non-nullable elements the first two examples are equivalent to the last two. Nonetheless, you still should make clear whether NULL values can be expected as list elements, even if it "only" serves as documentation.
-
-Please note that according to MAL the only place where you can use lists of abstract types is as last part of a message.
+Lists may be defined of concrete or of abstract types. In the latter case list elements may be of different types as long as they inherit from the abstract type (so called "heterogenous" list).
 
 #### Composites
 
-Composites are user-defined structures with a name, defined using the `composite` keyword and curly braces enclosing the list of composite fields. Only concrete composites have a number, called the *short form part* in MAL language. As usual, the number is optional in MOSDL and is auto-assigned if left out. Abstract composites are denoted using the `abstract` keyword and may be the ancestor for other composites that inherit from or *extend* the abstract composite. MAL does not allow extending concrete composites nor does it allow multiple extension. Composite fields have a name and a type. The only abstract type allowed as field type is `Attribute`.
+Composites are user-defined structures with a name, defined using the `composite` keyword and curly braces enclosing the list of composite fields. Only concrete composites have a number, called the *short form part* in MAL language. As usual, the number is optional in MOSDL and is auto-assigned if left out. Abstract composites are denoted using the `abstract` keyword and may be the ancestor for other composites that inherit from or *extend* the abstract composite. MAL does not allow extending concrete composites nor does it allow extension from multiple composites at the same time (however, a multi-step inheritance hierarchy is fine). Composite fields have a name and a type and may be nullable. Composite field types may be abstract types. In this case the composite itself does not automatically become abstract itslef.
 
 Documentation for the composite comes before the `composite` keyword (or for abstract composites before the `abstract` keyword). Each field may be documented right before the name of the field. Example:
 
@@ -438,7 +431,7 @@ composite Airplane [42] extends Vehicle {
 
 #### Enumerations
 
-Enumerations are user-defined types with a finite fixed set of countable values. They are defined using the `enum` keyword, a name, an optional short form part and a set of value items enclosed in curly braces. Each item may be assigned a number value. If left out one is assigned automatically. Commas between value items are optional.
+Enumerations are user-defined types with a set of countable values. They are defined using the `enum` keyword, a name, an optional short form part and a set of value items enclosed in curly braces. Each item may be assigned a number value. If left out one is assigned automatically. Commas between value items are optional.
 
 Documentation comes before the `enum` keyword for the enumeration and before the value item for the value.
 
@@ -455,9 +448,9 @@ enum FuelType {
 
 ### Errors
 
-Errors can be defined on area-level, on service-level or in-line when specifying operations using the `error` keyword followed by the error name, an optional error number (auto-generated if left out) and an optional (colon-separated) type for any extra information associated with the error. You cannot put a nullable type here because the extra information type is always treated to be nullable, i.e. you must always be prepared to receive NULL instead of a value. You can only specify a single data type for extra information. If you need to provide more complex data, define a composite type to use here.
+Errors can be defined on area-level using the `error` keyword followed by the error name, an optional error number (auto-generated if left out) and an optional (colon-separated) type for any extra information associated with the error. You cannot put a nullable type here because the extra information type is always treated to be nullable, i.e. you must always be prepared to receive NULL instead of a value. You can only specify a single data type for extra information. If you need to provide more complex data, define a composite type to use here. An operation specification may override the extra information type.
 
-Documentation comes before the `error` keyword for the error and before the extra information type for the extra information documentation. For in-line error definitions on operations you may alternatively provide error documentation in the bulk documentation using `@error` and `@errorinfo` tags. Please note that this kind of documentation is currently not allowed for area-level and service-level errors. Examples:
+Documentation comes before the `error` keyword for the error and before the extra information type for the extra information documentation. For extra information on operations you may alternatively provide documentation in the bulk documentation using `@errorinfo` tags. Please note that this kind of documentation is currently not allowed for area-level errors. Examples:
 
 ```
 /// Simple error that does not contain extra information.
@@ -481,15 +474,15 @@ This a very simple service with
 just one operation and one data type.
 """
 service VerySimpleService {
-    request myOnlyOperation (text: String?, numbers: List<UInteger?>)
+    request myOnlyOperation (text: String?, numbers: List<UInteger>)
         -> (answer: String, myInstance: MyOwnType)
         throws MY_ONLY_ERROR
+}
 
-    /// The only data type of this service.
-    composite MyOwnType {
-        numberList: List<UInteger?>
-        isFullMoon: Boolean?
-    }
+/// The only data type in this file.
+composite MyOwnType {
+    numberList: List<UInteger>
+    isFullMoon: Boolean?
 }
 
 error MY_ONLY_ERROR [12345]
@@ -500,41 +493,41 @@ File `ComplexService.mosdl`:
 ```
 area hcc [4711.2]
 
-import hcc::VerySimpleService.MyOwnType
+import MC::Validity
 
 service TestService [3] {
-    request *getValue(id: Identifier) -> (value: Attribute?) throws NOT_FOUND
+    request getValue(id: Identifier) -> (value: Attribute?, validity: Validity) throws NOT_FOUND
 
     capability {
-        submit setValue [5](id: Identifier, newValue: Attribute?) throws NOT_FOUND, error INVALID: InvalidType
+        submit setValue [5](id: Identifier, newValue: Attribute?) throws NOT_FOUND, INVALID: InvalidType
         request lockValue(id: Identifier) -> (lockedValue: Attribute?) throws NOT_FOUND
     }
 
     /// @progressparam valueHistory: Determines whether to include value history.
-    progress *listIds(includeValueHistory: Boolean)
+    progress listIds(includeValueHistory: Boolean)
         -> (expectedNumberOfIds: UInteger)
-        -> (id: Identifier, """Only set if includeValueHistory is true. """ valueHistory: List?<Attribute?>)*
+        -> (id: Identifier, """Only set if includeValueHistory is true. """ valueHistory: List?<Attribute>)*
         -> (processingTime: Duration)
         throws MAL::TOO_MANY
 
-    pubsub monitorValueChanges <- (oldValue: Attribute?, newValue: Attribute?)
-
-    /*
-    composite CommentedOut {
-        ... - this composite is completely ignored; it is not even a valid composite
-    }
-    */
-
-    enum InvalidType { // TODO: Maybe add some more values?
-        TOO_LARGE
-        TOO_SMALL
-    }
+    pubsub monitorValueChanges() <- (oldValue: Attribute?, newValue: Attribute?)
 }
+
+/*
+composite CommentedOut {
+    ... - this composite is completely ignored; it is not even a valid composite
+}
+*/
 
 service OrbitService {
     invoke calculate(timestamp: Time)
         -> (expectedTimeUntilAnswer: Duration)
         -> (answer: OrbitStuff)
+}
+
+enum InvalidType { // TODO: Maybe add some more values?
+    TOO_LARGE
+    TOO_SMALL
 }
 
 abstract composite OrbitStuff {
@@ -547,4 +540,5 @@ composite MoonOrbitStuff extends OrbitStuff {
 }
 
 error NOT_FOUND [0xFFFE]
+error INVALID [0xFFFD]
 ```

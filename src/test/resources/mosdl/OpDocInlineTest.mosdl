@@ -18,6 +18,7 @@ service ServiceName {
 			"""
 			MY_OWN_ERROR:
 				/// Some number helpful for understanding this error.
-				Integer
+				Integer,
+			ANOTHER_ERROR
 }
 

@@ -22,7 +22,7 @@ public class CliMain {
 	public static void main(String[] args) throws Exception {
 		CommandLineOptions opts = CommandLineOptions.create()
 				.description("Compiler for MOSDL - Mission Operations Service Description Language for CCSDS MO Services (version " + APP_VERSION + ")")
-				.required("service-descr", String.class, "MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language.")
+				.required("service-descr", String.class, "MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language (sorted lexicographically for processing).")
 				.optional("target-dir", String.class, ".", "Target directory for generated files.")
 				.toggle("xml", "x", "If given MO XML service description file will be generated.")
 				.toggle("mosdl", "m", "If given MOSDL service description file will be generated.")

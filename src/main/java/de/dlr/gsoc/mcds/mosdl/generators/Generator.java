@@ -51,7 +51,7 @@ public abstract class Generator {
 	/**
 	 * Performs generation of artifacts based on a supplied MO service specification.
 	 *
-	 * @param spec the specification to create artifacts for
+	 * @param spec the specification to create artifacts for. Note: The generator may modify the specification during artifact generation.
 	 * @param targetDirectory the directory where to put the generated artifacts. Depending on the
 	 * generator it can also be possible to supply a file here.
 	 * @throws GeneratorException thrown if any error occurs during generating the artifacts

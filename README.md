@@ -1,11 +1,11 @@
 MOSDL - Mission Operations Service Description Language
 =======================================================
 
-MOSDL is a language that can be used to specify [CCSDS Mission Operations (MO) services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/). For a detailed description of the service description primitives refer to [CCSDS 521.0-B-2 MO Message Abstraction Layer](https://public.ccsds.org/Pubs/521x0b2e1.pdf).
+MOSDL is a language that can be used to specify [CCSDS Mission Operations (MO) services](https://ccsdsmo.github.io/). It is similar to the *interface definition languages* of other remote procedure call systems (RPC) like [Google gRPC](https://grpc.io/) or [Apache Thrift](https://thrift.apache.org/). For a detailed description of the service description primitives refer to [CCSDS 521.0-B-3 MO Message Abstraction Layer](https://public.ccsds.org/Pubs/521x0b3.pdf).
 
 The standardized service description format of CCSDS MO services is an XML format described by an [XML Schema](https://sanaregistry.org/r/moschemas). However, these XML documents can be difficult to edit, iterate and reason about. MOSDL provides an alternative to the CCSDS MO XML format. MOSDL documents can be compiled to standards-compliant XML documents using the compiler contained in this project. It is also possible to transform CCSDS MO XML documents back to MOSDL documents.
 
-Besides transforming MO specifications from one representation to another this project can also be used for generating other artifacts from these specifications: This project ships with a generator which creates XML Schema documents for data structures contained in MO specifications. Generated XML Schema documents conform to standard [CCSDS 524.3-B-1 MO-MAL Binding to HTTP Transport and XML Encoding](https://public.ccsds.org/Pubs/524x3b1.pdf).
+Besides transforming MO specifications from one representation to another this project can also be used for generating other artifacts from these specifications: This project ships with an (experimental!) generator which creates XML Schema documents for data structures contained in MO specifications. Generated XML Schema documents conform to standard [CCSDS 524.3-B-1 MO-MAL Binding to HTTP Transport and XML Encoding](https://public.ccsds.org/Pubs/524x3b1.pdf).
 
 MOSDL has been developed at the German Space Operations Center GSOC, which is part of [DLR, the German Aerospace Center](https://www.dlr.de/).
 
@@ -25,6 +25,7 @@ Table of contents
         - [Write a specification](#write-a-specification)
         - [Write other artifacts](#write-other-artifacts)
         - [Glueing together loading and writing of a specification](#glueing-together-loading-and-writing-of-a-specification)
+- [Version information](#version-information)
 - [Source code and compilation](#source-code-and-compilation)
     - [Source code](#source-code)
     - [Compilation](#compilation)
@@ -52,7 +53,7 @@ service HelloWorldService {
 
 The snippet above describes a service (`HelloWorldService`) offering one request-response operation (`myOperation`) that takes a single String parameter as request (`hello`) and returns a single String parameter as response (`world`).
 
-The MOSDL compiler can be used to generate an CCSDS MO XML document, which can then be used by third-party software (e.g. [ESA CCSDS MO API Generator](https://github.com/esa/mo-services-java/tree/master/api-generator)) to generate documentation, API code for service consumers and providers, and possible other representations.
+The MOSDL compiler can be used to generate a CCSDS MO XML document, which can then be used by third-party software (e.g. [ESA CCSDS MO API Generator](https://github.com/esa/mo-services-java/tree/master/api-generator)) to generate documentation, API code for service consumers and providers, and possible other representations.
 
 
 MOSDL language
@@ -70,7 +71,7 @@ This project can be used in three different ways:
 2. as a plugin for a [Maven](https://maven.apache.org/)-based build process in order to transform MOSDL to/from CCSDS MO XML,
 3. as a Java library for reading and writing MOSDL and CCSDS MO XML files.
 
-You need at least Java 11 JDK (e.g. [Eclipse Temurin](https://adoptium.net/)) if you use this project as Maven plugin or Java library. The stand-alone program should also run fine with a Java 11 JRE. Currently, LTS Java versions 11, 17 and 21 are supported.
+You need at least Java 11 JDK (e.g. [Eclipse Temurin](https://adoptium.net/)) if you use this project as Maven plugin or Java library. The stand-alone program should also run fine with a Java 11 JRE. Currently, LTS Java versions 11, 17 and 21 are supported. For more information refer to the [version compatibility section](#version-information) and the [change log](CHANGELOG.md).
 
 
 ### Stand-alone usage
@@ -91,7 +92,7 @@ Compiler for MOSDL - Mission Operations Service Description Language for CCSDS M
 Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-b|--create-body-types] [-sv|--skip-validation] [-t|--doc-type <doc-type>] [-h|--help] 
 
 <service-descr>
-        MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language.
+        MO service description file (CCSDS MO XML or MOSDL service description language) or directory containing files in MOSDL service description language (sorted lexicographically for processing).
         (required)
 <target-dir>
         Target directory for generated files.
@@ -101,7 +102,7 @@ Usage: <service-descr> [<target-dir>] [-x|--xml] [-m|--mosdl] [-s|--xsd] [-b|--c
 -m, --mosdl
         If given MOSDL service description file will be generated.
 -s, --xsd
-        If given an MO data structure XML Schema file will be generated.
+        If given an MO data structure XML Schema file will be generated (EXPERIMENTAL).
 -b, --create-body-types
         If given specialized non-standard message body XSD types will be generated for operations (only applicable when generating XML Schema files).
 -sv, --skip-validation
@@ -152,10 +153,10 @@ Reference all your service description XML/MOSDL files or directories in the `<s
 
 The following configuration options are available:
 
-* `<serviceSpecs>`: Required. List the service specification files you wish to generate code for here. You can specify a service description XML file here, a single MOSDL file or a directory containing multiple MOSDL files that together form a single service specification.
+* `<serviceSpecs>`: Required. List the service specification files you wish to generate code for here. You can specify a service description XML file here, a single MOSDL file or a directory containing multiple MOSDL files that together form a single service specification. Files in a directory are sorted lexicographically for processing.
 * `<xml>`: Optional. Set to `true` if you want to generate the service description XML files.
 * `<mosdl>`: Optional. Set to `true` if you want to generate the service description MOSDL files.
-* `<xsd>`: Optional. Set to `true` if you want to generate XSD files for data structures contained in the service descriptions.
+* `<xsd>`: Optional. Set to `true` if you want to generate XSD files for data structures contained in the service descriptions (EXPERIMENTAL).
 * `<xsdBodyTypes>`: Optional. Set to `true` if you want to generate specialized non-standard message body XSD types for operations (only applicable when generating XSD files).
 * `<skipValidation>`: Optional. Set to `true` if you want to skip validation of XML input and output files against the service schema.
 * `<docType>`: Optional, one of `BULK` (default), `INLINE` or `SUPPRESS`. Use`BULK` to create bulk operation documentation using tags for messages, parameters and errors. Use `INLINE` if you want to attach documentation directly to these elements instead of using special tags. Set to `SUPPRESS` if you want to strip documentation when creating MOSDL files. Also controls documentation generation for XSD files, but there is no difference between `BULK` and `INLINE`. Has no effect if no MOSDL or XSD files are created.
@@ -211,7 +212,7 @@ generator.generate(spec, targetDirectory);
 
 #### Write other artifacts
 
-A third `Generator` implementation is shipped that allows you to write XML Schema documents for data structures contained in MO specifications (`XsdGenerator`).
+A third `Generator` implementation is shipped that allows you to write XML Schema documents for data structures contained in MO specifications (`XsdGenerator`). Currently, this generator is considered to be experimental because an update to the [CCSDS 524.3-B-1 MO-MAL Binding to HTTP Transport and XML Encoding](https://public.ccsds.org/Pubs/524x3b1.pdf) standard is pending that supports the latest iteration of MAL.
 
 Example:
 
@@ -224,6 +225,14 @@ generator.generate(spec, targetDirectory);
 #### Glueing together loading and writing of a specification
 
 An abstract `Runner` class is provided with an `execute()` method that loads a set of `SpecLoader`s, tries to load a specification with one of them, loads a set of `Generator`s and writes out the loaded specification using all of them. Methods `createSpecLoaders()` and `createGenerators()` need to be implemented by a subclass. A concrete subclass `MosdlRunner` is provided that creates all of the above mentioned specification loaders and generators. If you want to include your own specification loader or generator you can subclass `Runner` (or `MosdlRunner`) yourself.
+
+
+Version information
+-------------------
+
+Generally, this project strives to support CCSDS Mission Operations Services defined in terms of the latest version of the CCSDS Message Abstraction Layer (MAL), which currently is Issue 3 from March 2024 ([CCSDS 521.0-B-3](https://public.ccsds.org/Pubs/521x0b3.pdf)). Service specifications (either MOSDL or XML) defined in terms of older MAL versions are only supported by older releases. Supported Java versions generally include current LTS versions.
+
+Please refer to the [change log](CHANGELOG.md) for a version compatibility table, the announcement of breaking changes regarding MAL issues, Java language support, MOSDL syntax and XML schemas, and version migration guides.
 
 
 Source code and compilation
@@ -242,7 +251,7 @@ git clone https://github.com/DLR-RB/mosdl.git
 
 ### Compilation
 
-The only requirements for compiling the project yourself are a Java 8 JDK (e.g. [AdoptOpenJDK](https://adoptopenjdk.net/)) and [Maven 3](https://maven.apache.org/). Currently, Java versions other than Java 8 are not supported.
+The only requirements for compiling the project yourself are a Java 11 JDK (e.g. [Eclipse Temurin](https://adoptium.net/)) and [Maven 3](https://maven.apache.org/). Currently, all Java LTS versions >= 11 are not supported.
 
 This project uses a standard [Maven](https://maven.apache.org/)-based build process. You can compile the source yourself by simply issuing 
 

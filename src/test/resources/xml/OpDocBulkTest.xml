@@ -23,7 +23,7 @@
                         <mal:errorRef comment="Documentation for the INTERAL error.">
                             <mal:type area="MAL" name="INTERNAL"/>
                         </mal:errorRef>
-                        <mal:errorRef comment="Documentation for MY_OWN_ERROR.">
+                        <mal:errorRef comment="Multi-line documentation&#13;&#10;	for the reference to MY_OWN_ERROR.">
                             <mal:type area="test" name="MY_OWN_ERROR"/>
                             <mal:extraInformation comment="Some number helpful for understanding this error.">
 <mal:type area="MAL" name="Integer"/>

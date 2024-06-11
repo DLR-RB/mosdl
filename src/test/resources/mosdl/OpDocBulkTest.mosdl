@@ -12,7 +12,8 @@ service ServiceName {
 	@responseparam someResponseNumber: Doc for the only response param.
 
 	@error     MAL::INTERNAL  : Documentation for the INTERAL error.
-	@error     MY_OWN_ERROR   : Documentation for MY_OWN_ERROR.
+	@error     MY_OWN_ERROR   : Multi-line documentation
+	for the reference to MY_OWN_ERROR.
 	@errorinfo MY_OWN_ERROR   : Some number helpful for understanding this error.
 	"""
 	request myOperation [42] (firstParam: String, secondParam: MyType)
