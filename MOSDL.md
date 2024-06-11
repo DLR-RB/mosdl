@@ -429,6 +429,26 @@ composite Airplane [42] extends Vehicle {
 }
 ```
 
+### Objects
+
+Objects are similar to composites but in addition have a unique identity and can be referenced unambiguously. They are defined exactly like composites but with the `object` keyword. The same rules as for composites apply. All objects implicitly inherit from `MAL::Object` (but still may extend another abstract composite) and include an identity field of type `MAL::ObjectIdentity` as first field. By default the field name is `identity`, but it can be renamed if another name is more appropriate for the service model. Use the `identity` keyword followed by the new identity field name for that. Example:
+
+```
+object Person identity name {
+	address: String
+	birthdate: Timestamp
+}
+```
+
+Objects can be referenced using the `ObjectRef<...>` attribute. You need to specify the type of the referenced object between the angle brackets. If you want to accept any type of object you may use `ObjectRef<Element>`. Example:
+
+```
+composite Invoice {
+	customer: ObjectRef<Person>
+	invoiceTotal: Integer
+}
+```
+
 #### Enumerations
 
 Enumerations are user-defined types with a set of countable values. They are defined using the `enum` keyword, a name, an optional short form part and a set of value items enclosed in curly braces. Each item may be assigned a number value. If left out one is assigned automatically. Commas between value items are optional.

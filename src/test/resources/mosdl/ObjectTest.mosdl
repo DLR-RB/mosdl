@@ -1,0 +1,11 @@
+area test [4711]
+
+object Person identity name {
+	address: String
+	birthdate: Timestamp
+}
+
+composite Invoice {
+	customer: ObjectRef<Person>
+	invoiceTotal: Integer
+}

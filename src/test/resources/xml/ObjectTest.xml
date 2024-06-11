@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema">
+    <mal:area number="4711" name="test" version="1">
+        <mal:dataTypes>
+            <mal:composite name="Person" shortFormPart="1">
+                <mal:extends>
+                    <mal:type area="MAL" name="Object"/>
+                </mal:extends>
+                <mal:field name="address" canBeNull="false">
+                    <mal:type area="MAL" name="String"/>
+                </mal:field>
+                <mal:field name="birthdate" canBeNull="false">
+                    <mal:type area="test" name="Timestamp"/>
+                </mal:field>
+            </mal:composite>
+            <mal:composite name="Invoice" shortFormPart="2">
+                <mal:field name="customer" canBeNull="false">
+                    <mal:type area="test" name="ObjectRef&lt;Person&gt;"/>
+                </mal:field>
+                <mal:field name="invoiceTotal" canBeNull="false">
+                    <mal:type area="MAL" name="Integer"/>
+                </mal:field>
+            </mal:composite>
+        </mal:dataTypes>
+    </mal:area>
+</mal:specification>
