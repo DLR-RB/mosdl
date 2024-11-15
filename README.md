@@ -166,7 +166,7 @@ The Maven plugin uses the logging functionality provided by Maven. Therefore, de
 
 ### Usage as a Java library
 
-The Java library is available on the [Maven Central Repository](https://search.maven.org/artifact/${project.groupId}/${project.artifactId}). Add a dependency to your Maven `pom.xml` file:
+The Java library is available on the [Maven Central Repository](https://central.sonatype.com/artifact/${project.groupId}/${project.artifactId}). Add a dependency to your Maven `pom.xml` file:
 
 ```xml
 <dependency>

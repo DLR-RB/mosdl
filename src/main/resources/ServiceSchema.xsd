@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.ccsds.org/schema/ServiceSchema"
-            xmlns:mal="http://www.ccsds.org/schema/ServiceSchema"
+            targetNamespace="http://www.ccsds.org/schema/ServiceSchema-v003"
+            xmlns:mal="http://www.ccsds.org/schema/ServiceSchema-v003"
             elementFormDefault="qualified">
 
   <xsd:element name="specification" type="mal:SpecificationType">
@@ -26,12 +26,12 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">Ensures that Type names are unique.</xsd:documentation>
       </xsd:annotation>
-      <xsd:selector xpath=".//mal:fundamental|.//mal:composite|.//mal:attribute|.//mal:enumeration|.//mal:object"/>
+      <xsd:selector xpath=".//mal:fundamental|.//mal:composite|.//mal:attribute|.//mal:enumeration"/>
       <xsd:field    xpath="@name"/>
     </xsd:unique>
     <xsd:unique name="errorName">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en">Ensures that Error names are unique.</xsd:documentation>
+        <xsd:documentation xml:lang="en">Ensures that error names are unique.</xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath=".//mal:error"/>
       <xsd:field    xpath="@name"/>
@@ -80,21 +80,21 @@
           <xsd:element name="service" type="mal:ServiceType" minOccurs="0" maxOccurs="unbounded">
             <xsd:unique name="capabilityNumber">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Capability numbers inside a Service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Capability numbers inside a service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet"/>
               <xsd:field    xpath="@number"/>
             </xsd:unique>
             <xsd:unique name="operationName">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Operation names inside a Service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Operation names inside a service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet/*"/>
               <xsd:field    xpath="@name"/>
             </xsd:unique>
             <xsd:unique name="operationNumber">
               <xsd:annotation>
-                <xsd:documentation xml:lang="en">Operation numbers inside a Service should be unique.</xsd:documentation>
+                <xsd:documentation xml:lang="en">Operation numbers inside a service should be unique.</xsd:documentation>
               </xsd:annotation>
               <xsd:selector xpath="mal:capabilitySet/*"/>
               <xsd:field    xpath="@number"/>
@@ -105,7 +105,7 @@
               <xsd:annotation>
                 <xsd:documentation xml:lang="en">Ensures that type short forms are unique.</xsd:documentation>
               </xsd:annotation>
-              <xsd:selector xpath=".//mal:composite|.//mal:attribute|.//mal:enumeration|.//mal:object"/>
+              <xsd:selector xpath=".//mal:composite|.//mal:attribute|.//mal:enumeration"/>
               <xsd:field    xpath="@shortFormPart"/>
             </xsd:unique>
           </xsd:element>
@@ -137,7 +137,7 @@
 
   <xsd:complexType name="CapabilitySetType">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Element that represents a Capability set, contains one or more operation specifications.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Element that represents a Capability set, contains one or more operation specification.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:choice minOccurs="0" maxOccurs="unbounded">
@@ -283,9 +283,13 @@
     <xsd:annotation>
       <xsd:documentation xml:lang="en">Base type that the operations extend, defines the common aspects of all operations.</xsd:documentation>
     </xsd:annotation>
-    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
-    <xsd:attribute name="number" type="xsd:unsignedShort" use="required"/>
-    <xsd:attribute name="comment" type="xsd:string" use="optional"/>
+    <xsd:complexContent>
+      <xsd:extension base="mal:DocumentationBaseType">
+        <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+        <xsd:attribute name="number" type="xsd:unsignedShort" use="required"/>
+        <xsd:attribute name="comment" type="xsd:string" use="optional"/>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="AreaDataTypeList">
@@ -297,7 +301,7 @@
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
           <xsd:element name="fundamental" type="mal:FundamentalType">
             <xsd:annotation>
-              <xsd:documentation xml:lang="en">Only to be used for Element, Attribute, Composite, and Object. Shall only be present in the MAL Area type definitions.</xsd:documentation>
+              <xsd:documentation xml:lang="en">Only to be used for Element, Attribute, and Composite. Shall only be present in the MAL Area type definitions.</xsd:documentation>
             </xsd:annotation>
           </xsd:element>
           <xsd:element name="attribute" type="mal:AttributeType">
@@ -321,15 +325,6 @@
               </xsd:annotation>
               <xsd:selector xpath="mal:item"/>
               <xsd:field    xpath="@nvalue"/>
-            </xsd:unique>
-          </xsd:element>
-          <xsd:element name="object" type="mal:ObjectType">
-            <xsd:unique name="areaObjectFieldName">
-              <xsd:annotation>
-                <xsd:documentation xml:lang="en">Field names inside an Object must be unique.</xsd:documentation>
-              </xsd:annotation>
-              <xsd:selector xpath="mal:field"/>
-              <xsd:field    xpath="@name"/>
             </xsd:unique>
           </xsd:element>
         </xsd:choice>
@@ -366,7 +361,7 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+    <xsd:attribute name="name" type="xsd:token" use="required"/>
     <xsd:attribute name="number" type="xsd:unsignedInt" use="required"/>
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
@@ -390,7 +385,7 @@
 
   <xsd:complexType name="FundamentalType">
     <xsd:annotation>
-      <xsd:documentation xml:lang="en">Represents one of the four fundamental types, element, attribute, composite, or object.</xsd:documentation>
+      <xsd:documentation xml:lang="en">Represents one of the three fundamental types, element, attribute, or composite.</xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="extends" type="mal:ElementReferenceType" minOccurs="0" maxOccurs="1">
@@ -451,28 +446,9 @@
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
 
-  <xsd:complexType name="ObjectType">
-    <xsd:annotation>
-      <xsd:documentation xml:lang="en">Represents an object type.</xsd:documentation>
-    </xsd:annotation>
-    <xsd:complexContent>
-      <xsd:extension base="mal:CompositeType">
-        <xsd:attribute name="identityFieldName" type="xsd:NCName" use="optional"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
   <xsd:complexType name="MessageBodyType">
     <xsd:sequence>
-      <xsd:element name="field" type="mal:NamedElementReferenceWithCommentType" minOccurs="0" maxOccurs="unbounded">
-		<xsd:unique name="bodyFieldName">
-		  <xsd:annotation>
-			<xsd:documentation xml:lang="en">Field names inside a Composite must be unique.</xsd:documentation>
-		  </xsd:annotation>
-		  <xsd:selector xpath="mal:field"/>
-		  <xsd:field    xpath="@name"/>
-		</xsd:unique>
-      </xsd:element>
+      <xsd:element name="field" type="mal:NamedElementReferenceWithCommentType" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:attribute name="comment" type="xsd:string" use="optional"/>
   </xsd:complexType>
@@ -507,7 +483,7 @@
     <xsd:attribute name="list" type="xsd:boolean" use="optional" default="false"/>
     <xsd:attribute name="objectRef" type="xsd:boolean" use="optional" default="false"/>
     <xsd:attribute name="area" type="xsd:NCName" use="required"/>
-    <xsd:attribute name="name" type="xsd:NCName" use="required"/>
+    <xsd:attribute name="name" type="xsd:token" use="required"/>
   </xsd:complexType>
 
   <xsd:complexType name="DocumentationBaseType">
@@ -550,9 +526,9 @@
   </xsd:simpleType>
 
   <xsd:simpleType name="ShortFormPart">
-    <xsd:restriction base="xsd:unsignedInt">
+    <xsd:restriction base="xsd:unsignedShort">
       <xsd:minInclusive value="1"/>
-      <xsd:maxInclusive value="8388607"/>
+      <xsd:maxInclusive value="32767"/>
     </xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>

@@ -46,7 +46,6 @@ import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.MessageBodyType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
-import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
@@ -267,14 +266,14 @@ public class MosdlSpecLoader implements SpecLoader {
 					for (Object dataType : area.getDataTypes().getFundamentalOrAttributeOrComposite()) {
 						int typeNumber = 0;
 						if (dataType instanceof EnumerationType) {
-							typeNumber = (int) ((EnumerationType) dataType).getShortFormPart();
+							typeNumber = ((EnumerationType) dataType).getShortFormPart();
 						} else if (dataType instanceof CompositeType) {
-							Long tempTypeNumber = ((CompositeType) dataType).getShortFormPart();
+							Integer tempTypeNumber = ((CompositeType) dataType).getShortFormPart();
 							if (null != tempTypeNumber) {
-								typeNumber = tempTypeNumber.intValue();
+								typeNumber = tempTypeNumber;
 							}
 						} else if (dataType instanceof AttributeType) {
-							typeNumber = (int) ((AttributeType) dataType).getShortFormPart();
+							typeNumber = ((AttributeType) dataType).getShortFormPart();
 						}
 						maxAreaType = Math.max(maxAreaType, typeNumber);
 					}
@@ -401,54 +400,13 @@ public class MosdlSpecLoader implements SpecLoader {
 				currentArea.setDataTypes(dataTypeList);
 			}
 			if (!isAbstract) {
-				compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+				compType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter));
 			}
 			dataTypeList.getFundamentalOrAttributeOrComposite().add(compType);
 		}
 
 		@Override
 		public void exitComposite(MOSDLParser.CompositeContext ctx) {
-			currentComposite = null;
-		}
-
-		@Override
-		public void enterObject(MOSDLParser.ObjectContext ctx) {
-			boolean isAbstract = null != ctx.ABSTRACT();
-			ObjectType objType = new ObjectType();
-			if (isAbstract) {
-				objType.setName(getId(ctx.ID(0)));
-			} else {
-				objType.setName(getName(ctx.nidentifier()));
-			}
-			if (null != ctx.IDENTITY()) {
-				if (isAbstract) {
-					objType.setIdentityFieldName(getId(ctx.ID(1)));
-				} else {
-					objType.setIdentityFieldName(getId(ctx.ID(0)));
-				}
-			}
-			objType.setComment(getDoc(ctx.doc()));
-			if (null != ctx.EXTENDS()) {
-				ElementReferenceType refType = new ElementReferenceType();
-				refType.setType(getType(ctx.type()));
-				objType.setExtends(refType);
-			}
-			currentComposite = objType;
-
-			// add object to area
-			AreaDataTypeList dataTypeList = currentArea.getDataTypes();
-			if (null == dataTypeList) {
-				dataTypeList = new AreaDataTypeList();
-				currentArea.setDataTypes(dataTypeList);
-			}
-			if (!isAbstract) {
-				objType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
-			}
-			dataTypeList.getFundamentalOrAttributeOrComposite().add(objType);
-		}
-
-		@Override
-		public void exitObject(MOSDLParser.ObjectContext ctx) {
 			currentComposite = null;
 		}
 
@@ -538,7 +496,7 @@ public class MosdlSpecLoader implements SpecLoader {
 			AttributeType attrType = new AttributeType();
 			attrType.setName(getName(ctx.nidentifier()));
 			attrType.setComment(getDoc(ctx.doc()));
-			attrType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter).longValue());
+			attrType.setShortFormPart(claimNumber(ctx.nidentifier(), areaTypeCounter));
 			AreaDataTypeList dataTypeList = currentArea.getDataTypes();
 			if (null == dataTypeList) {
 				dataTypeList = new AreaDataTypeList();

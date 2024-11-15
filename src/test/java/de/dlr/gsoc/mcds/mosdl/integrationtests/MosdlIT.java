@@ -27,13 +27,12 @@ public class MosdlIT {
 		"OpSendTest", "OpSubmitTest", "OpRequestTest", "OpInvokeTest", "OpProgressTest", "OpPubsubTest",
 		"CompositeTest", "CompositeAbstractTest", "EnumTest", "ErrorTest",
 		"CommentTest", "ImportTest", "ImportComplexTest",
-		"FundamentalTest", "AttributeTest"};
+		"FundamentalTest", "AttributeTest", "ObjectTest"};
 	private static final String[] COMPLEX_TEST_CASES = {"VerySimpleService", "ComplexService"};
-	private static final String[] SKIP_VALIDATION_TEST_CASES = {"ObjectTest"}; // need to skip XML validation because per standard the generated XML will be invalid
 
 	// do not change method signature without changing MethodSource annotations on test methods
 	static Stream<String> simpleTestCaseProvider() {
-		return Stream.concat(Stream.of(SIMPLE_TEST_CASES), Stream.of(SKIP_VALIDATION_TEST_CASES));
+		return Stream.of(SIMPLE_TEST_CASES);
 	}
 
 	// do not change method signature without changing MethodSource annotations on test methods
@@ -53,8 +52,7 @@ public class MosdlIT {
 		File outputFile = new File(targetDirectory, outputFileName);
 		File expectedFile = TestUtils.getResource(expectedFilePath);
 
-		boolean isSkipValidation = Arrays.stream(SKIP_VALIDATION_TEST_CASES).anyMatch(input::equals);
-		Runner runner = new MosdlRunner(isSkipValidation, true, false, false, false, null);
+		Runner runner = new MosdlRunner(false, true, false, false, false, null);
 		runner.execute(outputFile, inputFile);
 
 		assertXmlEquals(expectedFile, outputFile);
@@ -100,11 +98,10 @@ public class MosdlIT {
 		File inputFile = TestUtils.getResource(inputFilePath);
 		File outputFile = new File(xmlTargetDirectory, xmlFileName);
 
-		boolean isSkipValidation = Arrays.stream(SKIP_VALIDATION_TEST_CASES).anyMatch(input::equals);
-		Runner xmlToMosdlRunner = new MosdlRunner(isSkipValidation, false, true, false, false, docType);
+		Runner xmlToMosdlRunner = new MosdlRunner(false, false, true, false, false, docType);
 		xmlToMosdlRunner.execute(mosdlTargetDirectory, inputFile);
 
-		Runner mosdlToXmlRunner = new MosdlRunner(isSkipValidation, true, false, false, false, null);
+		Runner mosdlToXmlRunner = new MosdlRunner(false, true, false, false, false, null);
 		mosdlToXmlRunner.execute(outputFile, mosdlTargetDirectory);
 
 		assertXmlEquals(inputFile, outputFile);
@@ -140,8 +137,7 @@ public class MosdlIT {
 		outputDirectory.mkdirs();
 		File expectedDirectory = TestUtils.getResource(expectedDirectoryPath);
 
-		boolean isSkipValidation = Arrays.stream(SKIP_VALIDATION_TEST_CASES).anyMatch(input::equals);
-		Runner runner = new MosdlRunner(isSkipValidation, false, false, true, isCreateXsdBodyTypes, docType);
+		Runner runner = new MosdlRunner(false, false, false, true, isCreateXsdBodyTypes, docType);
 		runner.execute(outputDirectory, inputFile);
 
 		File[] expectedFiles = null == expectedDirectory ? new File[]{} : expectedDirectory.listFiles();

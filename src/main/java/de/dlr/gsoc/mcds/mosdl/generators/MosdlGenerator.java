@@ -32,7 +32,6 @@ import org.ccsds.schema.serviceschema.ErrorReferenceType;
 import org.ccsds.schema.serviceschema.FundamentalType;
 import org.ccsds.schema.serviceschema.InvokeOperationType;
 import org.ccsds.schema.serviceschema.NamedElementReferenceWithCommentType;
-import org.ccsds.schema.serviceschema.ObjectType;
 import org.ccsds.schema.serviceschema.OperationType;
 import org.ccsds.schema.serviceschema.ProgressOperationType;
 import org.ccsds.schema.serviceschema.PubSubOperationType;
@@ -104,9 +103,9 @@ public class MosdlGenerator extends Generator {
 		this.docType = docType;
 	}
 
-	private boolean isDefaultSequence(List<Long> numberList) {
-		long prevNumber = 0;
-		for (long n : numberList) {
+	private boolean isDefaultSequence(List<Integer> numberList) {
+		int prevNumber = 0;
+		for (int n : numberList) {
 			if (n == 0) {
 				continue;
 			}
@@ -130,7 +129,7 @@ public class MosdlGenerator extends Generator {
 				writeDoc(area.getComment());
 				writeLine("area ", getId(area.getName()), " [", area.getNumber(), area.getVersion() == 1 ? "" : "." + area.getVersion(), "]");
 				writeLine();
-				List<Long> svcNumberSequence = area.getService().stream().map(svc -> (long) svc.getNumber()).collect(Collectors.toList());
+				List<Integer> svcNumberSequence = area.getService().stream().map(svc -> svc.getNumber()).collect(Collectors.toList());
 				boolean isDefaultSvcNumbers = isDefaultSequence(svcNumberSequence);
 				// TODO: imports
 				for (ServiceType service : area.getService()) {
@@ -141,9 +140,9 @@ public class MosdlGenerator extends Generator {
 						writeLine("service ", getId(service.getName()), " [", service.getNumber(), "] {");
 					}
 					indent();
-					List<Long> opNumberSequence = service.getCapabilitySet().stream()
+					List<Integer> opNumberSequence = service.getCapabilitySet().stream()
 							.flatMap(cs -> cs.getSendIPOrSubmitIPOrRequestIP().stream())
-							.map(op -> (long) op.getNumber())
+							.map(op -> op.getNumber())
 							.collect(Collectors.toList());
 					boolean isDefaultOpNumbers = isDefaultSequence(opNumberSequence);
 					boolean isDefaultCapSet = service.getCapabilitySet().size() == 1 && service.getCapabilitySet().get(0).getNumber() == 1;
@@ -248,18 +247,18 @@ public class MosdlGenerator extends Generator {
 				}
 
 				if (null != area.getDataTypes()) {
-					List<Long> typeNumberSequence = area.getDataTypes().getFundamentalOrAttributeOrComposite().stream()
+					List<Integer> typeNumberSequence = area.getDataTypes().getFundamentalOrAttributeOrComposite().stream()
 							.map(dt -> {
 								if (dt instanceof CompositeType) {
-									Long sfp = ((CompositeType) dt).getShortFormPart();
+									Integer sfp = ((CompositeType) dt).getShortFormPart();
 									if (null == sfp || sfp == 0) {
-										return 0L;
+										return 0;
 									}
 									return sfp;
 								} else if (dt instanceof EnumerationType) {
 									return ((EnumerationType) dt).getShortFormPart();
 								}
-								return -1L;
+								return -1;
 							})
 							.collect(Collectors.toList());
 					boolean isDefaultTypeNumbers = isDefaultSequence(typeNumberSequence);
@@ -329,16 +328,9 @@ public class MosdlGenerator extends Generator {
 			if (isAbstract) {
 				write("abstract ");
 			}
-			if (composite instanceof ObjectType) {
-				write("object ", getId(composite.getName()));
-			} else {
-				write("composite ", getId(composite.getName()));
-			}
+			write("composite ", getId(composite.getName()));
 			if (!isAbstract && !isDefaultTypeNumbers) {
 				write(" [", composite.getShortFormPart(), "]");
-			}
-			if (composite instanceof ObjectType && null != ((ObjectType) composite).getIdentityFieldName()) {
-				write(" identity ", ((ObjectType) composite).getIdentityFieldName());
 			}
 			if (null != composite.getExtends()) {
 				write(" extends ", resolveType(composite.getExtends().getType()));

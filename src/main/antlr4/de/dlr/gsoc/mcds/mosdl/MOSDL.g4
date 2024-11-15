@@ -50,13 +50,10 @@ attribute         : doc? ATTRIBUTE nidentifier ;
 fundamental       : doc? FUNDAMENTAL ID (EXTENDS type)? ;
 
 dataType    : composite
-            | object
             | enumeration ;
 
 composite   : doc? (ABSTRACT COMPOSITE ID | COMPOSITE nidentifier) (EXTENDS type)? LBRACE field* RBRACE ;
 field       : doc? ID COLON genericType;
-
-object      : doc? (ABSTRACT OBJECT ID | OBJECT nidentifier) ((EXTENDS type)? (IDENTITY ID)? | (IDENTITY ID)? (EXTENDS type)?) LBRACE field* RBRACE ;
 
 enumeration : doc? ENUM nidentifier LBRACE enumItem (COMMA? enumItem)* RBRACE ;
 enumItem    : doc? nidentifier ;
@@ -77,7 +74,6 @@ doc                : DOC
 AREA        : 'area' ;
 SERVICE     : 'service' ;
 COMPOSITE   : 'composite' ;
-OBJECT      : 'object' ;
 ENUM        : 'enum' ;
 ATTRIBUTE   : 'attribute' ;
 FUNDAMENTAL : 'fundamental' ;

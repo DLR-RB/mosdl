@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema">
+<mal:specification xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mal="http://www.ccsds.org/schema/ServiceSchema-v003">
     <mal:area number="4711" name="full" version="2"/>
 </mal:specification>

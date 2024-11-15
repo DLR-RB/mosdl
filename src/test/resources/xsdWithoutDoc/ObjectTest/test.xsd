@@ -3,10 +3,10 @@
     <xs:import namespace="http://www.ccsds.org/schema/malxml/MAL"/>
     <xs:complexType name="Person">
         <xs:complexContent>
-            <xs:extension base="malxml:Composite">
+            <xs:extension base="malxml:Object">
                 <xs:sequence>
                     <xs:element name="address" type="malxml:String"/>
-                    <xs:element name="birthdate" type="Timestamp"/>
+                    <xs:element name="birthdate" type="malxml:Time"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

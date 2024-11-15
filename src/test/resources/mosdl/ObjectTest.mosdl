@@ -1,8 +1,8 @@
 area test [4711]
 
-object Person identity name {
+composite Person extends Object {
 	address: String
-	birthdate: Timestamp
+	birthdate: Time
 }
 
 composite Invoice {

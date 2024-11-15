@@ -429,14 +429,14 @@ composite Airplane [42] extends Vehicle {
 }
 ```
 
-### Objects
+### MO Objects
 
-Objects are similar to composites but in addition have a unique identity and can be referenced unambiguously. They are defined exactly like composites but with the `object` keyword. The same rules as for composites apply. All objects implicitly inherit from `MAL::Object` (but still may extend another abstract composite) and include an identity field of type `MAL::ObjectIdentity` as first field. By default the field name is `identity`, but it can be renamed if another name is more appropriate for the service model. Use the `identity` keyword followed by the new identity field name for that. Example:
+MO Objects are composites that inherit from `MAL::Object` (either directly or indirectly). They include a field `identity` of type `MAL::ObjectIdentity` as first field which makes them uniquely identifiable. Example:
 
 ```
-object Person identity name {
+composite Person extends Object {
 	address: String
-	birthdate: Timestamp
+	birthdate: Time
 }
 ```
 
