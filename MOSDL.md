@@ -106,7 +106,7 @@ send thirdOperation()            // auto-assigned operation number: 43
 
 As you have seen numbers are specified by putting them in square brackets right after the name. You can specify numbers either in decimal or (case-insensitive) hexadecimal format: `error MY_DEC_ERROR [123]` or `error MY_HEX_ERROR [0xAFFE]`.
 
-Names can be put directly in the specification or they can be put between quotation marks. Quotation marks are mandatory if you use a keyword as name in order to distinguish the two. For example:
+Names can be put directly in the specification or they can be put between quotation marks. Quotation marks are mandatory if you use a keyword as name in order to distinguish the two or if you use spaces (only applicable for errors). For example:
 
 ```
 send fourthOperation("request": String)
@@ -476,6 +476,7 @@ Documentation comes before the `error` keyword for the error and before the extr
 /// Simple error that does not contain extra information.
 error SOME_ERROR
 error DESCRIPTIVE_ERROR [0xD00F] : """Human readable error cause.""" String
+error "Error with spaces"
 ```
 
 

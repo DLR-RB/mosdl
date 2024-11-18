@@ -24,7 +24,7 @@
             <Keywords name="Folders in comment, open"></Keywords>
             <Keywords name="Folders in comment, middle"></Keywords>
             <Keywords name="Folders in comment, close"></Keywords>
-            <Keywords name="Keywords1">area service composite enum object identity attribute fundamental error capability send submit invoke request progress pubsub</Keywords>
+            <Keywords name="Keywords1">area service composite enum attribute fundamental error capability send submit invoke request progress pubsub</Keywords>
             <Keywords name="Keywords2">-&gt; &lt;-</Keywords>
             <Keywords name="Keywords3">extends abstract import throws</Keywords>
             <Keywords name="Keywords4"></Keywords>
