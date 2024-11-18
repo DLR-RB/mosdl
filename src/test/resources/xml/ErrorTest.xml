@@ -8,6 +8,7 @@
                     <mal:type area="MAL" name="String"/>
                 </mal:extraInformation>
             </mal:error>
+            <mal:error name="Error with spaces" number="53264"/>
         </mal:errors>
     </mal:area>
 </mal:specification>

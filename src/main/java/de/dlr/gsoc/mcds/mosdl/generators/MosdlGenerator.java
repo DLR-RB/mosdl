@@ -614,7 +614,7 @@ public class MosdlGenerator extends Generator {
 	}
 
 	private String getId(String id) {
-		if (KEYWORDS.contains(id)) {
+		if (KEYWORDS.contains(id) || id.contains(" ")) {
 			return "\"" + id + "\"";
 		}
 		return id;

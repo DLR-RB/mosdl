@@ -94,7 +94,7 @@ PUBSUB      : 'pubsub' ;
 DOC      : TRPLQUOT .*? TRPLQUOT ;
 LINE_DOC : TRPLSLASH .*? '\r'?'\n';
 ID       : LETTER (LETTER | '0'..'9')*
-         | '"' LETTER (LETTER | '0'..'9')* '"' ;
+         | '"' LETTER (LETTER | '0'..'9' | ' ')* '"' ;
 NUMBER   : '0' [xX] [0-9a-fA-F]+
          | [0-9]+ ;
 LPAREN   : '(' ;
